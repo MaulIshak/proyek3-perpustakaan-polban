@@ -124,6 +124,13 @@
     --sidebar-border: hsl(0 0% 91%);
     --sidebar-ring: hsl(217.2 91.2% 59.8%);
     --sidebar: hsl(0 0% 98%);
+
+    /* Warna utama */
+    --dark-green: rgb(6, 84, 63);
+    --font-green: rgb(4, 120, 87);
+    --primary-green: rgb(17, 186, 130);
+    --background-green: rgb(245, 255, 250);
+    --font-light-green: rgb(210, 250, 229);
 }
 
 /* .dark {
