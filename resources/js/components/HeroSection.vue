@@ -12,24 +12,24 @@ import { SwatchBook } from 'lucide-vue-next';
 
         <!-- Konten utama hero -->
         <div
-            class="relative z-10 container mx-auto px-6 py-32 text-center md:py-44 lg:px-16"
+            class="relative z-10 container mx-auto px-6 py-24 text-center md:py-36 lg:px-16"
         >
-            <h2 class="mb-4 text-4xl font-extrabold md:text-6xl">
+            <h2 class="mb-4 text-3xl font-extrabold md:text-5xl">
                 Selamat Datang di
             </h2>
             <h1
-                class="mb-6 text-5xl font-extrabold text-[var(--primary-green)] md:text-7xl"
+                class="mb-6 text-4xl font-extrabold text-[var(--primary-green)] md:text-6xl"
             >
                 UPT Perpustakaan POLBAN
             </h1>
-            <p class="mb-10 text-lg text-gray-100 md:text-xl">
+            <p class="mb-10 text-base text-gray-100 md:text-lg">
                 Pusat Informasi dan Pengetahuan untuk Kemajuan Akademik Anda
             </p>
 
             <div class="flex justify-center gap-4">
                 <a
                     href="/collections"
-                    class="flex items-center gap-2 rounded-lg bg-[var(--primary-green)] px-6 py-3 font-semibold text-white transition-colors hover:bg-emerald-700"
+                    class="flex items-center gap-2 rounded-lg bg-[var(--primary-green)] px-4 py-2.5 font-semibold text-white transition-colors hover:bg-emerald-700"
                 >
                     <SwatchBook />
                     Jelajahi Koleksi
@@ -37,7 +37,7 @@ import { SwatchBook } from 'lucide-vue-next';
 
                 <a
                     href="/about"
-                    class="rounded-lg border border-white px-6 py-3 font-semibold transition-colors hover:bg-white hover:text-[var(--font-green)]"
+                    class="rounded-lg border border-white px-4 py-2.5 font-semibold transition-colors hover:bg-white hover:text-[var(--font-green)]"
                 >
                     Tentang Kami
                 </a>

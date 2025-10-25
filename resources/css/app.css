@@ -90,6 +90,9 @@
 }
 
 :root {
+    /* skala global -> 80% dari default browser */
+    font-size: 90%;
+
     --background: hsl(0 0% 100%);
     --foreground: hsl(0 0% 3.9%);
     --card: hsl(0 0% 100%);
