@@ -8,7 +8,7 @@ import { SwatchBook } from 'lucide-vue-next';
         :style="{ backgroundImage: `url('/hero-bg.jpg')` }"
     >
         <!-- Overlay gelap agar teks terbaca -->
-        <div class="absolute inset-0 bg-black/70"></div>
+        <div class="absolute inset-0 bg-black/60"></div>
 
         <!-- Konten utama hero -->
         <div
