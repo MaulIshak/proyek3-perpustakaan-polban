@@ -54,7 +54,7 @@ console.log(currentUrl);
 </script>
 
 <template>
-    <nav class="bg-white py-4 text-[var(--font-green)] backdrop-blur-3xl">
+    <nav class="bg-white/80 py-3 text-[var(--font-green)] backdrop-blur-md">
         <div class="container mx-auto px-4">
             <div class="flex h-16 items-center justify-between">
                 <div class="flex items-center gap-3">
@@ -79,10 +79,10 @@ console.log(currentUrl);
                         <Link
                             v-if="!item.items"
                             :href="item.href"
-                            class="font-medium hover:text-[var(--font-green)]"
+                            class="text-md rounded-full p-2 font-medium hover:text-[var(--font-green)]"
                             :class="[
                                 item.href === currentUrl
-                                    ? 'text-[var(--font-green)]'
+                                    ? 'bg-[var(--background-green)] text-[var(--font-green)]'
                                     : 'text-gray-700',
                             ]"
                         >
@@ -91,7 +91,7 @@ console.log(currentUrl);
 
                         <DropdownMenu v-else>
                             <DropdownMenuTrigger
-                                class="flex items-center gap-1 font-medium text-gray-700 transition-colors hover:text-[var(--font-green)]"
+                                class="text-md flex items-center gap-1 font-medium text-gray-700 transition-colors hover:text-[var(--font-green)]"
                             >
                                 <span>{{ item.name }}</span>
                                 <ChevronDown class="h-4 w-4" />

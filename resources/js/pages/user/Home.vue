@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import HeroSection from '@/components/HeroSection.vue';
 import Layout from '@/layouts/UserAppLayout.vue';
 
 defineProps({
@@ -9,11 +10,6 @@ defineProps({
 
 <template>
     <Layout>
-        <div class="container mx-auto px-4 py-8">
-            <h1 class="mb-4 text-3xl font-bold">
-                {{ title }}
-            </h1>
-            <p class="text-sm text-gray-900">{{ description }}</p>
-        </div>
+        <HeroSection />
     </Layout>
 </template>

@@ -5,8 +5,8 @@ import Navbar from '../components/Navbar.vue';
 
 <template>
     <div class="flex min-h-screen flex-col">
-        <Navbar />
-        <main class="flex-grow">
+        <Navbar class="fixed top-0 left-0 z-50 w-full bg-white shadow" />
+        <main class="flex-grow pt-22">
             <slot />
         </main>
         <Footer />
