@@ -17,8 +17,7 @@ return new class extends Migration
             $table->string('username', 100)->unique();
             $table->string('email', 150)->unique();
             $table->string('password', 255);
-            $table->string('role', 50)->default('admin');
-            $table->timestamp('last_login')->nullable();
+            $table->rememberToken();
             $table->timestamp('created_date')->useCurrent();
             $table->timestamp('updated_date')->nullable();
             $table->softDeletes('deleted_date', precision: 0);
