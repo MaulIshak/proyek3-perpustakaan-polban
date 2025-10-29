@@ -35,26 +35,51 @@ const toggleProfileMenu = () => {
         >
             <!-- Logo -->
             <div class="flex items-center gap-3 border-b p-4">
-                <img src="/logo-polban-hijau.webp" alt="Logo" class="h-8 w-8" />
-                <h1
-                    v-if="sidebarOpen"
-                    class="text-lg font-semibold whitespace-nowrap text-emerald-700"
-                >
-                    Admin Perpustakaan
-                </h1>
+                <img
+                    src="/logo-polban.webp"
+                    alt="Logo"
+                    class="h-10 w-10 rounded-lg bg-emerald-500 p-1"
+                />
+                <div v-if="sidebarOpen">
+                    <h1
+                        class="text-md font-bold whitespace-nowrap text-emerald-500"
+                    >
+                        UPT Perpustakaan
+                    </h1>
+                    <h3 class="text-sm text-gray-500">Admin Panel</h3>
+                </div>
             </div>
 
             <!-- Menu -->
             <nav class="flex-1 space-y-1 p-3 text-sm font-medium">
                 <Link
+                    :class="{
+                        'bg-emerald-500 text-gray-100 hover:bg-emerald-600':
+                            $page.url === '/admin/dashboard',
+                    }"
                     href="/admin/dashboard"
-                    class="flex items-center gap-3 rounded-lg p-2 text-emerald-700 hover:bg-emerald-50"
+                    class="flex items-center gap-3 rounded-lg p-2 text-gray-700 hover:bg-emerald-50"
                 >
-                    <LayoutDashboard class="text-xl" />
-                    <span v-if="sidebarOpen">Dashboard</span>
+                    <LayoutDashboard
+                        :class="{
+                            'text-gray-100': $page.url === '/admin/dashboard',
+                        }"
+                        class="text-xl"
+                    />
+                    <span
+                        v-if="sidebarOpen"
+                        :class="{
+                            'text-gray-100': $page.url === '/admin/dashboard',
+                        }"
+                        >Dashboard</span
+                    >
                 </Link>
 
                 <Link
+                    :class="{
+                        'bg-emerald-500 text-gray-100 hover:bg-emerald-600':
+                            $page.url === '/admin/page-builder',
+                    }"
                     href="/admin/page-builder"
                     class="flex items-center gap-3 rounded-lg p-2 text-gray-700 hover:bg-emerald-50"
                 >
@@ -63,6 +88,10 @@ const toggleProfileMenu = () => {
                 </Link>
 
                 <Link
+                    :class="{
+                        'bg-emerald-500 text-gray-100 hover:bg-emerald-600':
+                            $page.url === '/admin/berita',
+                    }"
                     href="/admin/berita"
                     class="flex items-center gap-3 rounded-lg p-2 text-gray-700 hover:bg-emerald-50"
                 >
@@ -71,6 +100,10 @@ const toggleProfileMenu = () => {
                 </Link>
 
                 <Link
+                    :class="{
+                        'bg-emerald-500 text-gray-100 hover:bg-emerald-600':
+                            $page.url === '/admin/pengumuman',
+                    }"
                     href="/admin/pengumuman"
                     class="flex items-center gap-3 rounded-lg p-2 text-gray-700 hover:bg-emerald-50"
                 >
@@ -79,6 +112,10 @@ const toggleProfileMenu = () => {
                 </Link>
 
                 <Link
+                    :class="{
+                        'bg-emerald-500 text-gray-100 hover:bg-emerald-600':
+                            $page.url === '/admin/galeri',
+                    }"
                     href="/admin/galeri"
                     class="flex items-center gap-3 rounded-lg p-2 text-gray-700 hover:bg-emerald-50"
                 >
@@ -87,7 +124,11 @@ const toggleProfileMenu = () => {
                 </Link>
 
                 <Link
-                    href="/admin/booking-buku"
+                    :class="{
+                        'bg-emerald-500 text-gray-100 hover:bg-emerald-600':
+                            $page.url === '/admin/usulan-buku',
+                    }"
+                    href="/admin/usulan-buku"
                     class="flex items-center gap-3 rounded-lg p-2 text-gray-700 hover:bg-emerald-50"
                 >
                     <Book class="text-xl" />
