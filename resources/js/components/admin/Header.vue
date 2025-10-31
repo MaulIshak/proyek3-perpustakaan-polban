@@ -1,6 +1,6 @@
-<script setup>
+<script setup lang="ts">
+import ProfileMenu from '@/components/admin/ProfileMenu.vue';
 import { Menu } from 'lucide-vue-next';
-import ProfileMenu from './ProfileMenu.vue';
 
 defineProps({
     sidebarOpen: Boolean,

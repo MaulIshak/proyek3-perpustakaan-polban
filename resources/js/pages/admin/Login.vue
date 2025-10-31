@@ -152,7 +152,7 @@ const generalError = computed(() => {
 function submit() {
     // send POST to admin login endpoint
     form.post('/admin/login', {
-        onError(errors) {
+        onError() {
             // leave field errors to form.errors; non-field errors may be in flash which we read from page.props
         },
         onFinish() {
