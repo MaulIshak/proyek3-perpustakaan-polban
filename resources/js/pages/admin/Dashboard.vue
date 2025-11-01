@@ -1,13 +1,9 @@
 <template>
-    <AdminLayout>
+    <AdminLayout
+        title="Dashboard Admin"
+        subTitle="Ringkasan aktivitas dan statistik terbaru"
+    >
         <div class="space-y-6">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-800">Dashboard</h1>
-                <p class="text-gray-500">
-                    Selamat datang di Admin Panel UPT Perpustakaan Polban
-                </p>
-            </div>
-
             <!-- Stats Cards -->
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <div
