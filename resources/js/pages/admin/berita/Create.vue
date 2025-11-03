@@ -12,6 +12,18 @@ const article = ref({
     attachment: null,
 });
 
+defineOptions({
+    layout: (h, page) =>
+        h(
+            AdminLayout,
+            {
+                title: 'Buat Berita Baru',
+                subTitle: 'Kelola konten berita perpustakaan baru',
+            },
+            { default: () => page },
+        ),
+});
+
 const handleSubmit = (data) => {
     console.log('Data form:', data);
     // Kirim ke server via Inertia atau Axios
@@ -19,16 +31,11 @@ const handleSubmit = (data) => {
 </script>
 
 <template>
-    <AdminLayout
-        title="Buat Berita Baru"
-        subTitle="Kelola konten berita perpustakaan baru"
-    >
-        <div class="rounded-xl bg-white p-6 shadow">
-            <ArticleForm
-                v-model="article"
-                :show-attachment="false"
-                @submit="handleSubmit"
-            />
-        </div>
-    </AdminLayout>
+    <div class="rounded-xl bg-white p-6 shadow">
+        <ArticleForm
+            v-model="article"
+            :show-attachment="false"
+            @submit="handleSubmit"
+        />
+    </div>
 </template>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import DOMPurify from 'dompurify';
-import { Eye, Pencil, Trash } from 'lucide-vue-next';
+import { Calendar, Eye, Pencil, Trash } from 'lucide-vue-next';
 
 defineProps<{
     title: string;
@@ -39,8 +39,8 @@ function truncateText(text: string, maxLength: number = 120): string {
                 >
             </div>
 
-            <p class="text-xs text-gray-500">
-                {{ time }}
+            <p class="flex items-center gap-1 text-xs text-gray-500">
+                <Calendar class="h-3.5 w-3.5" />{{ time }}
             </p>
             <div class="mt-3 text-sm text-gray-700">
                 {{ truncateText(sanitizeContent(content), 110) }}

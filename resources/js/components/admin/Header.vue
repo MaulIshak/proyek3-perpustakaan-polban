@@ -5,6 +5,7 @@ import { Menu } from 'lucide-vue-next';
 defineProps({
     sidebarOpen: Boolean,
     profileMenuOpen: Boolean,
+    title: String,
 });
 
 const emit = defineEmits(['toggle-sidebar', 'toggle-profile-menu']);
@@ -24,7 +25,7 @@ const emit = defineEmits(['toggle-sidebar', 'toggle-profile-menu']);
                     :class="{ 'rotate-180': !sidebarOpen }"
                 />
             </button>
-            <h2 class="text-lg font-semibold">Dashboard</h2>
+            <h2 class="text-lg font-semibold">{{ title }}</h2>
         </div>
 
         <ProfileMenu

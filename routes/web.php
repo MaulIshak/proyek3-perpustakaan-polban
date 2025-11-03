@@ -36,10 +36,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         return Inertia::render('admin/Dashboard');
     })->middleware('auth:admin')->name('dashboard');
 
+    // Berita
     Route::get('berita', [ArticleController::class, 'index'])->middleware('auth:admin')->name('beritaIndex');
     Route::get('berita/create', function(){
         return Inertia::render('admin/berita/Create');
     })->middleware('auth:admin')->name('beritaCreate');
+
 });
 
 require __DIR__.'/settings.php';

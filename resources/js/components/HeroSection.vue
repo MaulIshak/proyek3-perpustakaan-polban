@@ -1,6 +1,4 @@
-<script setup lang="ts">
-import { SwatchBook } from 'lucide-vue-next';
-</script>
+<script setup lang="ts"></script>
 
 <template>
     <section
@@ -20,28 +18,11 @@ import { SwatchBook } from 'lucide-vue-next';
             <h1
                 class="mb-6 text-4xl font-extrabold text-[var(--primary-green)] md:text-6xl"
             >
-                UPT Perpustakaan POLBAN
+                PERPUSTAKAAN POLBAN
             </h1>
             <p class="mb-10 text-base text-gray-100 md:text-lg">
                 Pusat Informasi dan Pengetahuan untuk Kemajuan Akademik Anda
             </p>
-
-            <div class="flex justify-center gap-4">
-                <a
-                    href="/collections"
-                    class="flex items-center gap-2 rounded-lg bg-[var(--primary-green)] px-4 py-2.5 font-semibold text-white transition-colors hover:bg-emerald-700"
-                >
-                    <SwatchBook />
-                    Jelajahi Koleksi
-                </a>
-
-                <a
-                    href="/about"
-                    class="rounded-lg border border-white px-4 py-2.5 font-semibold transition-colors hover:bg-white hover:text-[var(--font-green)]"
-                >
-                    Tentang Kami
-                </a>
-            </div>
         </div>
     </section>
 </template>

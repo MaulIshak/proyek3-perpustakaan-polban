@@ -24,6 +24,7 @@ defineProps<{
             <Header
                 :sidebar-open="sidebarOpen"
                 :profile-menu-open="profileMenuOpen"
+                :title="title"
                 @toggle-sidebar="toggleSidebar"
                 @toggle-profile-menu="toggleProfileMenu"
             />

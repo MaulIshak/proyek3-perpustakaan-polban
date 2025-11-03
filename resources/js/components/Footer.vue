@@ -17,7 +17,7 @@ const quickLinks = [
                 <!-- About -->
                 <div>
                     <h2 class="mb-4 text-xl font-semibold">
-                        UPT Perpustakaan POLBAN
+                        PERPUSTAKAAN POLBAN
                     </h2>
                     <p class="mb-4 text-sm">NPP: 3270130B1000002</p>
                     <p class="mb-2 text-sm">
@@ -28,7 +28,7 @@ const quickLinks = [
 
                 <!-- Quick Links -->
                 <div>
-                    <h2 class="mb-4 text-xl font-semibold">Link Cepat</h2>
+                    <h2 class="mb-4 text-xl font-semibold">Link</h2>
                     <ul class="space-y-2">
                         <li v-for="link in quickLinks" :key="link.name">
                             <Link
