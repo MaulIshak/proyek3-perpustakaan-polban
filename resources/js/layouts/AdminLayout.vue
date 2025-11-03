@@ -9,6 +9,11 @@ const profileMenuOpen = ref(false);
 const toggleSidebar = () => (sidebarOpen.value = !sidebarOpen.value);
 const toggleProfileMenu = () =>
     (profileMenuOpen.value = !profileMenuOpen.value);
+
+defineProps<{
+    title?: string;
+    subTitle?: string;
+}>();
 </script>
 
 <template>
@@ -19,11 +24,20 @@ const toggleProfileMenu = () =>
             <Header
                 :sidebar-open="sidebarOpen"
                 :profile-menu-open="profileMenuOpen"
+                :title="title"
                 @toggle-sidebar="toggleSidebar"
                 @toggle-profile-menu="toggleProfileMenu"
             />
 
             <main class="flex-1 overflow-y-auto p-6">
+                <div class="mb-6">
+                    <h1 class="text-3xl font-bold text-gray-800">
+                        {{ title }}
+                    </h1>
+                    <p class="text-gray-500">
+                        {{ subTitle }}
+                    </p>
+                </div>
                 <slot />
             </main>
         </div>

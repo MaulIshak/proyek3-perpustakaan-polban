@@ -14,11 +14,12 @@ use Inertia\Inertia;
 //     return Inertia::render('Dashboard');
 // })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/', [HomeController::class, 'index'])->name('home');
-
-require __DIR__.'/settings.php';
 
 use App\Http\Controllers\Admin\Auth\LoginController;
+use App\Http\Controllers\ArticleController;
+
+
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::prefix('admin')->name('admin.')->group(function () {
     // show login form (only for guests of admin guard)
@@ -30,8 +31,17 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // logout
     Route::post('logout', [LoginController::class, 'logout'])->middleware('auth:admin')->name('logout');
 
-    // admin dashboard example (protected)
+    // admin dashboard (protected)
     Route::get('dashboard', function () {
         return Inertia::render('admin/Dashboard');
     })->middleware('auth:admin')->name('dashboard');
+
+    // Berita
+    Route::get('berita', [ArticleController::class, 'index'])->middleware('auth:admin')->name('beritaIndex');
+    Route::get('berita/create', function(){
+        return Inertia::render('admin/berita/Create');
+    })->middleware('auth:admin')->name('beritaCreate');
+
 });
+
+require __DIR__.'/settings.php';
