@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import HeroSection from '@/components/HeroSection.vue';
-import Layout from '@/layouts/UserAppLayout.vue';
+import UserAppLayout from '@/layouts/UserAppLayout.vue';
 
 defineProps({
     title: String,
@@ -9,7 +9,7 @@ defineProps({
 </script>
 
 <template>
-    <Layout>
+    <UserAppLayout>
         <HeroSection />
-    </Layout>
+    </UserAppLayout>
 </template>
