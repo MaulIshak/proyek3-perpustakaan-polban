@@ -97,7 +97,7 @@ onUnmounted(() => {
 
                     <div>
                         <h1 class="text-lg font-extrabold">
-                            UPT Perpustakaan POLBAN
+                            PERPUSTAKAAN POLBAN
                         </h1>
                         <p class="text-sm text-gray-600">
                             NPP: 3270130B1000002
