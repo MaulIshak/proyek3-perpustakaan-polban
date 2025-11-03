@@ -14,6 +14,9 @@ const navItems = [
         items: [
             { name: 'Tentang Perpustakaan', href: '/about' },
             { name: 'Fasilitas', href: '/facilities' },
+            { name: 'Tim Manajemen', href: '/tim-manajemen'},
+            { name: 'Peraturan Perpustakaan', href: '/peraturan'},
+            { name: 'Jam Layanan', href: '/jam-layanan'}
         ],
     },
     {
@@ -31,7 +34,7 @@ const navItems = [
         ],
     },
     {
-        name: 'Berita & Pengumuman',
+        name: 'Informasi',
         items: [
             { name: 'Berita', href: '/news' },
             { name: 'Pengumuman', href: '/announcements' },
@@ -83,7 +86,7 @@ onUnmounted(() => {
 
 <template>
     <nav class="bg-white/95 py-3 text-[var(--font-green)] backdrop-blur-md">
-        <div class="container mx-auto px-4">
+        <div class="container mx-auto px-7">
             <div class="flex h-16 items-center justify-between">
                 <div class="flex items-center gap-3">
                     <img
