@@ -179,8 +179,6 @@ Route::get('/pelayanan/{slug}', function (string $slug) {
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-<<<<<<< HEAD
-=======
 Route::prefix('admin')->name('admin.')->group(function () {
     // show login form (only for guests of admin guard)
     Route::get('login', [LoginController::class, 'showLogin'])->middleware('guest:admin')->name('login');
@@ -203,6 +201,5 @@ Route::prefix('admin')->name('admin.')->group(function () {
     })->middleware('auth:admin')->name('beritaCreate');
 
 });
->>>>>>> e83dcc4bbc774e973af9fb0be991c4cad4d053e6
 
 require __DIR__.'/settings.php';
