@@ -42,6 +42,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         return Inertia::render('admin/berita/Create');
     })->middleware('auth:admin')->name('beritaCreate');
 
+    Route::post('berita/store', [ArticleController::class, 'storeBerita'])
+    ->middleware('auth:admin')
+    ->name('beritaStore');
+
 });
 
 require __DIR__.'/settings.php';

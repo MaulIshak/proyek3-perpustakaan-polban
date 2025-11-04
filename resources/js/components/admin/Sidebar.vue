@@ -52,7 +52,7 @@ defineProps({
             <div>
                 <h2
                     v-if="sidebarOpen"
-                    class="mb-2 px-2 text-xs font-semibold text-gray-400 uppercase"
+                    class="mb-2 px-2 text-xs font-semibold text-wrap whitespace-nowrap text-gray-400 uppercase"
                 >
                     Konten & Informasi Publik
                 </h2>

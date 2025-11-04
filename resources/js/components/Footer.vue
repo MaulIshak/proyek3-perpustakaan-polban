@@ -11,7 +11,7 @@ const quickLinks = [
 </script>
 
 <template>
-    <footer class="bg-[var(--dark-green)] text-[var(--font-light-green)]">
+    <footer class="bg-gray-800 text-white">
         <div class="container mx-auto px-4 py-8">
             <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
                 <!-- About -->

@@ -76,7 +76,7 @@ onUnmounted(() => {
 
 <template>
     <nav
-        class="border-b border-gray-200 bg-white/95 py-3 text-[var(--font-green)] backdrop-blur-md"
+        class="bg-grey border-b border-gray-200 bg-white/90 py-3 text-[var(--dark-green)] backdrop-blur-md"
     >
         <div class="container mx-auto px-4">
             <div class="flex h-16 items-center justify-between">

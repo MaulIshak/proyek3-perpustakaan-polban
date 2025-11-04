@@ -15,6 +15,15 @@ defineOptions({
         ),
 });
 
+const { articles } = defineProps({
+    articles: {
+        type: Array,
+        default: () => [],
+    },
+});
+
+console.log(articles);
+
 const berita = [
     {
         id: 1,
@@ -102,14 +111,14 @@ const handleCreate = () => {};
         class="grid gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4"
     >
         <ArticleCard
-            v-for="item in berita"
-            :key="item.id"
-            :title="item.title"
-            :content="item.content"
-            :status="item.status"
-            :time="item.time"
-            :delete-action="`/admin/berita/${item.id}/delete`"
-            :thumbnail-url="item.thumbnailUrl"
+            v-for="berita in articles"
+            :key="berita.article_id"
+            :title="berita.judul"
+            :content="berita.content"
+            :status="berita.status"
+            :time="berita.created_date"
+            :delete-action="`/admin/berita/${berita.article_id}/delete`"
+            :thumbnail-url="berita.url_thumbnail"
             class="flex-1"
         />
     </div>
