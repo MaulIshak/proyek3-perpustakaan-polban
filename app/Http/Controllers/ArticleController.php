@@ -66,4 +66,13 @@ class ArticleController extends Controller
             ->with('success', 'Artikel berhasil dibuat.');
     }
 
+    public function showBerita($id)
+    {
+        $article = Article::where('article_id', $id)->firstOrFail();
+
+        return inertia('admin/berita/Detail', [
+            'article' => $article,
+        ]);
+    }
+
 }

@@ -129,10 +129,10 @@
     --sidebar: hsl(0 0% 98%);
 
     /* Warna utama */
-    --dark-green: #669933;
-    --very-dark-green: #254b00;
+    --secondary-green: #00637b;
+    --dark-green: #0f3800;
     --primary-green: #99cc33;
-    --background-green: #eeffee;
+    --background-green: #f3fff3;
     --footer-green: #1b2800;
 }
 

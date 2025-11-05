@@ -8,7 +8,8 @@ defineProps<{
     status: string;
     time: string;
     deleteAction: string;
-    thumbnailUrl: string;
+    thumbnailUrl: string
+    viewHref: string;
 }>();
 
 const sanitizeContent = (html: string) => DOMPurify.sanitize(html);
@@ -64,6 +65,7 @@ function stripHtml(html: string) {
             </div>
             <div class="mt-4 flex justify-end gap-2 text-sm">
                 <a
+                :href="viewHref"
                     class="rounded-lg border border-blue-600 px-2 py-2 text-center font-medium text-blue-600 transition hover:bg-blue-600 hover:text-white"
                 >
                     <Eye class="mr-1 inline-block h-4 w-4" />

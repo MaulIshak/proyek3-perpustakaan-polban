@@ -119,6 +119,7 @@ const handleCreate = () => {};
             :time="berita.created_date"
             :delete-action="`/admin/berita/${berita.article_id}/delete`"
             :thumbnail-url="berita.url_thumbnail"
+            :view-href="`/admin/berita/detail/${berita.article_id}/`"
             class="flex-1"
         />
     </div>

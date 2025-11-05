@@ -82,11 +82,6 @@ onUnmounted(() => {
             <div class="flex h-16 items-center justify-between">
                 <!-- Logo -->
                 <div class="flex items-center gap-3">
-                    <img
-                        src="/logo-polban-hijau.webp"
-                        alt="Logo"
-                        class="h-12 w-12"
-                    />
                     <div>
                         <h1 class="text-lg font-extrabold">
                             PERPUSTAKAAN POLBAN
