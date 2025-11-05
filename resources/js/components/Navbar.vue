@@ -83,8 +83,8 @@ onUnmounted(() => {
                 <!-- Logo -->
                 <div class="flex items-center gap-3">
                     <div>
-                        <h1 class="text-lg font-extrabold">
-                            PERPUSTAKAAN POLBAN
+                        <h1 class="text-lg font-bold">
+                            PERPUSTAKAAN POLITEKNIK NEGERI BANDUNG
                         </h1>
                         <p class="text-sm text-gray-600">
                             NPP: 3270130B1000002
@@ -103,16 +103,16 @@ onUnmounted(() => {
                 </button>
 
                 <!-- Desktop Nav -->
-                <div class="hidden items-center gap-7 xl:flex">
+                <div class="hidden items-center gap-5 xl:flex">
                     <template v-for="(item, i) in navItems" :key="item.name">
                         <!-- plain link -->
                         <Link
                             v-if="!item.items"
                             :href="item.href"
-                            class="text-md rounded-full p-2 font-medium hover:text-[var(--font-green)]"
+                            class="text-md rounded-full p-2 font-medium hover:text-[var(--dark-green)]"
                             :class="[
                                 item.href === currentUrl
-                                    ? 'bg-[var(--background-green)] text-[var(--font-green)]'
+                                    ? 'bg-[var(--background-green)] text-[var(--dark-green)]'
                                     : 'text-gray-700',
                             ]"
                         >
