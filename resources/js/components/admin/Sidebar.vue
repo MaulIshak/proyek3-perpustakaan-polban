@@ -17,7 +17,7 @@ const emit = defineEmits(['toggle-sidebar']);
             sidebarOpen ? 'w-64' : 'w-20',
         ]"
     >
-        <!-- Logo -->
+        <!-- Header Logo -->
         <div
             class="flex min-h-20 items-center justify-between gap-3 border-b p-4"
         >
@@ -42,16 +42,20 @@ const emit = defineEmits(['toggle-sidebar']);
             </button>
         </div>
 
-        <!-- Menu -->
-        <nav class="flex-1 space-y-4 overflow-y-auto p-3 text-sm font-medium">
-            <!-- Group 1: Umum -->
+        <!-- Navigation -->
+        <nav
+            class="flex-1 space-y-4 overflow-hidden overflow-y-auto p-3 text-sm font-medium"
+        >
+            <!-- Group 1 -->
             <div>
-                <h2
-                    v-if="sidebarOpen"
-                    class="mb-2 px-2 text-xs font-semibold text-[var(--secondary-green)] uppercase"
-                >
-                    Umum
-                </h2>
+                <template v-if="sidebarOpen">
+                    <h2
+                        class="mb-2 px-2 text-xs font-semibold text-[var(--secondary-green)] uppercase"
+                    >
+                        Umum
+                    </h2>
+                </template>
+
                 <SidebarLink
                     icon="LayoutDashboard"
                     label="Dashboard"
@@ -60,14 +64,21 @@ const emit = defineEmits(['toggle-sidebar']);
                 />
             </div>
 
-            <!-- Group 2: Konten & Informasi Publik -->
+            <!-- Group 2 -->
             <div>
-                <h2
-                    v-if="sidebarOpen"
-                    class="mb-2 px-2 text-xs font-semibold text-wrap whitespace-nowrap text-[var(--secondary-green)] uppercase"
-                >
-                    Konten & Informasi Publik
-                </h2>
+                <template v-if="sidebarOpen">
+                    <h2
+                        class="mb-2 px-2 text-xs font-semibold text-wrap whitespace-nowrap text-[var(--secondary-green)] uppercase"
+                    >
+                        Konten & Informasi Publik
+                    </h2>
+                </template>
+                <template v-else>
+                    <hr
+                        class="my-2 border-[var(--secondary-green)] opacity-40"
+                    />
+                </template>
+
                 <SidebarLink
                     icon="Newspaper"
                     label="Berita"
@@ -106,14 +117,21 @@ const emit = defineEmits(['toggle-sidebar']);
                 />
             </div>
 
-            <!-- Group 3: Layanan Perpustakaan -->
+            <!-- Group 3 -->
             <div>
-                <h2
-                    v-if="sidebarOpen"
-                    class="mb-2 px-2 text-xs font-semibold text-[var(--secondary-green)] uppercase"
-                >
-                    Layanan Perpustakaan
-                </h2>
+                <template v-if="sidebarOpen">
+                    <h2
+                        class="mb-2 px-2 text-xs font-semibold text-wrap whitespace-nowrap text-[var(--secondary-green)] uppercase"
+                    >
+                        Layanan Perpustakaan
+                    </h2>
+                </template>
+                <template v-else>
+                    <hr
+                        class="my-2 border-[var(--secondary-green)] opacity-40"
+                    />
+                </template>
+
                 <SidebarLink
                     icon="Book"
                     label="Usulan Buku"
@@ -128,14 +146,21 @@ const emit = defineEmits(['toggle-sidebar']);
                 />
             </div>
 
-            <!-- Group 4: Sumber Daya Digital -->
+            <!-- Group 4 -->
             <div>
-                <h2
-                    v-if="sidebarOpen"
-                    class="mb-2 px-2 text-xs font-semibold text-[var(--secondary-green)] uppercase"
-                >
-                    Sumber Daya Digital
-                </h2>
+                <template v-if="sidebarOpen">
+                    <h2
+                        class="mb-2 px-2 text-xs font-semibold text-wrap whitespace-nowrap text-[var(--secondary-green)] uppercase"
+                    >
+                        Sumber Daya Digital
+                    </h2>
+                </template>
+                <template v-else>
+                    <hr
+                        class="my-2 border-[var(--secondary-green)] opacity-40"
+                    />
+                </template>
+
                 <SidebarLink
                     icon="BookImage"
                     label="Cover Buku"
@@ -149,14 +174,19 @@ const emit = defineEmits(['toggle-sidebar']);
                     :sidebar-open="sidebarOpen"
                 />
             </div>
-            <hr />
+
+            <!-- Divider sebelum logout -->
+            <hr class="my-2 border-[var(--secondary-green)] opacity-40" />
+
+            <!-- Logout -->
             <Link
                 href="/admin/logout"
                 method="post"
                 as="button"
-                class="text-md flex items-center gap-3 rounded-xl px-3 py-2 text-red-500 transition hover:bg-red-500 hover:text-black"
+                class="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-red-500 transition hover:bg-red-500 hover:text-black"
             >
-                <LogOut class="w-5" /> Keluar
+                <LogOut class="w-5" />
+                <span v-if="sidebarOpen">Keluar</span>
             </Link>
         </nav>
     </aside>

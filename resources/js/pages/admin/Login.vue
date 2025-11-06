@@ -1,37 +1,37 @@
 <template>
     <div
-        class="flex min-h-screen items-center justify-center"
-        :style="{ background: 'var(--background-green)' }"
+        class="flex min-h-screen items-center justify-center bg-[url('/bg-login.jpeg')] bg-cover bg-center px-6"
     >
-        <div class="w-full max-w-md px-6 py-8">
+        <div
+            class="flex max-h-[600px] w-full max-w-5xl overflow-hidden rounded-2xl bg-white shadow-lg"
+        >
+            <!-- KIRI: Form Login -->
             <div
-                class="overflow-hidden rounded-xl bg-white p-6 shadow-md"
-                style="border-radius: 12px"
+                class="flex w-full flex-col justify-center p-8 lg:w-1/2 lg:p-12"
             >
-                <h1
-                    class="mb-1 text-2xl font-semibold"
-                    style="color: var(--dark-green)"
-                >
-                    Admin Login
-                </h1>
-                <p class="mb-6 text-sm" style="color: var(--font-green)">
-                    Please sign in with your administrator account.
-                </p>
+                <div class="mb-6 text-center lg:text-left">
+                    <h2 class="text-2xl font-bold text-[var(--dark-green)]">
+                        Selamat Datang, Pustakawan
+                    </h2>
+                    <p class="mt-1 text-sm text-[var(--font-green)]">
+                        Silakan masuk untuk mengelola sistem informasi
+                        perpustakaan.
+                    </p>
+                </div>
 
                 <form @submit.prevent="submit" class="space-y-4">
                     <div>
                         <label
-                            class="mb-1 block text-sm font-medium"
-                            style="color: var(--font-green)"
+                            class="mb-1 block text-sm font-medium text-[var(--font-green)]"
                             >Email</label
                         >
                         <input
                             v-model="form.email"
                             type="email"
                             autocomplete="username"
+                            placeholder="contoh@polban.ac.id"
                             class="focus:ring-opacity-50 w-full rounded-md border px-4 py-2 focus:ring-2 focus:outline-none"
                             :class="{ 'border-red-300': form.errors.email }"
-                            placeholder="you@example.com"
                         />
                         <p
                             v-if="form.errors.email"
@@ -43,27 +43,26 @@
 
                     <div>
                         <label
-                            class="mb-1 block text-sm font-medium"
-                            style="color: var(--font-green)"
-                            >Password</label
+                            class="mb-1 block text-sm font-medium text-[var(--font-green)]"
+                            >Kata Sandi</label
                         >
                         <div class="relative">
                             <input
                                 v-model="form.password"
                                 :type="showPassword ? 'text' : 'password'"
                                 autocomplete="current-password"
+                                placeholder="Masukkan kata sandi"
                                 class="focus:ring-opacity-50 w-full rounded-md border px-4 py-2 focus:ring-2 focus:outline-none"
                                 :class="{
                                     'border-red-300': form.errors.password,
                                 }"
-                                placeholder="Your password"
                             />
                             <button
                                 type="button"
                                 @click="showPassword = !showPassword"
                                 class="absolute top-1/2 right-2 -translate-y-1/2 text-sm text-gray-600"
                             >
-                                {{ showPassword ? 'Hide' : 'Show' }}
+                                {{ showPassword ? 'Sembunyikan' : 'Tampilkan' }}
                             </button>
                         </div>
                         <p
@@ -81,15 +80,14 @@
                                 v-model="form.remember"
                                 class="rounded text-white/90"
                             />
-                            <span class="ml-2" style="color: var(--font-green)"
-                                >Remember me</span
+                            <span class="ml-2 text-[var(--font-green)]"
+                                >Ingat saya</span
                             >
                         </label>
                         <a
                             href="#"
-                            class="text-sm underline"
-                            style="color: var(--font-green)"
-                            >Forgot password?</a
+                            class="text-sm text-[var(--font-green)] underline hover:text-[var(--dark-green)]"
+                            >Lupa kata sandi?</a
                         >
                     </div>
 
@@ -97,15 +95,15 @@
                         <button
                             :disabled="form.processing"
                             type="submit"
-                            class="w-full rounded-md py-2 font-medium text-white"
+                            class="w-full rounded-md py-2 font-medium text-white transition-colors"
                             :style="{
                                 background: form.processing
                                     ? 'rgba(17,186,130,0.7)'
                                     : 'var(--primary-green)',
                             }"
                         >
-                            <span v-if="form.processing">Signing in...</span>
-                            <span v-else>Sign in</span>
+                            <span v-if="form.processing">Memproses...</span>
+                            <span v-else>Masuk</span>
                         </button>
                         <p
                             v-if="generalError"
@@ -116,25 +114,28 @@
                     </div>
                 </form>
 
-                <p
-                    class="mt-6 text-center text-xs"
-                    style="color: var(--font-green)"
-                >
-                    Only administrators can login here
+                <p class="mt-6 text-center text-xs text-[var(--font-green)]">
+                    Hanya akun admin yang dapat masuk ke sistem ini.
                 </p>
+            </div>
+
+            <!-- KANAN: Ilustrasi -->
+            <div
+                class="bg-opacity-10 hidden w-1/2 items-center justify-center bg-[var(--background-green)] lg:flex"
+            >
+                <LoginPerson class="w-4/5 max-w-md" />
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
+import LoginPerson from '@/components/admin/ilust/LoginPerson.vue';
 import { useForm, usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 
-// toggle for password visibility
 const showPassword = ref(false);
 
-// Inertia form state
 const form = useForm({
     email: '',
     password: '',
@@ -143,21 +144,14 @@ const form = useForm({
 
 const page = usePage();
 
-// general error from flash (e.g., invalid credentials) or set via onError
 const generalError = computed(() => {
-    // flash messages from backend (Laravel) are available at page.props.value.flash
     return page.props.value?.flash?.error || '';
 });
 
 function submit() {
-    // send POST to admin login endpoint
     form.post('/admin/login', {
-        onError() {
-            // leave field errors to form.errors; non-field errors may be in flash which we read from page.props
-        },
-        onFinish() {
-            // you can add tracking or cleanup here
-        },
+        onError() {},
+        onFinish() {},
     });
 }
 </script>
@@ -168,10 +162,8 @@ function submit() {
     --font-green: rgb(4, 120, 87);
     --primary-green: rgb(17, 186, 130);
     --background-green: rgb(245, 255, 250);
-    --font-light-green: rgb(210, 250, 229);
 }
 
-/* minimal style adjustments to match design intent; Tailwind handles responsive layout */
 input:focus {
     box-shadow: 0 0 0 4px rgba(4, 120, 87, 0.06);
     border-color: var(--font-green);
