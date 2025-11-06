@@ -23,7 +23,7 @@ const navItems = [
             { name: 'Pengembalian Buku', href: '/pelayanan/pengembalian' },
             { name: 'Keanggotaan', href: '/pelayanan/keanggotaan' },
             { name: 'Pelayanan Referensi', href: '/pelayanan/referensi' },
-            { name: 'Ruang Komputer', href: '/pelayanan/ruang-komputer' },
+            { name: 'Ruang Komputer', href: '/pelayanan/ruang_komputer' },
         ],
     },
     {
@@ -40,7 +40,7 @@ const navItems = [
             { name: 'Pengumuman', href: '/announcements' },
         ],
     },
-    { name: 'Bebas Masalah', href: '/no-problem' },
+    { name: 'Bebas Masalah', href: '/bebas_masalah' },
     { name: 'Galeri', href: '/gallery' },
     { name: 'Booking Buku', href: '/book-reservation' },
     { name: 'Kontak', href: '/contact' },
