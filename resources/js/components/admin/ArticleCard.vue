@@ -12,7 +12,6 @@ defineProps<{
     viewHref: string;
 }>();
 
-const sanitizeContent = (html: string) => DOMPurify.sanitize(html);
 
 function formatDate(dateString: string) {
     if (!dateString) return '-'; // fallback kalau null

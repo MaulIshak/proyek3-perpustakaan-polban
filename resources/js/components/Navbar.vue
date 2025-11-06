@@ -87,7 +87,7 @@ onUnmounted(() => {
                             PERPUSTAKAAN POLITEKNIK NEGERI BANDUNG
                         </h1>
                         <p class="text-sm text-gray-600">
-                            NPP: 3270130B1000002
+                            NPP: 321702200000001
                         </p>
                     </div>
                 </div>
