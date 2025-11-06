@@ -1,10 +1,9 @@
 <script setup>
 import { computed } from 'vue';
-import Layout from '@/layouts/UserAppLayout.vue'; // <-- Impor layout kita
+import Layout from '@/layouts/UserAppLayout.vue';
 import { Link } from '@inertiajs/vue3';
 import { BookOpen, Clock, Users, FileText, Laptop } from 'lucide-vue-next';
 
-// 1. Terima 'props' yang dikirim oleh PelayananController.php
 const props = defineProps({
   pelayanan: String
 });
@@ -148,7 +147,6 @@ const PelayananData = {
         }
     };
 
-// 2. Petakan string 'icon' dari props ke komponen icon Vue
 const icons = {
   BookOpen,
   Clock,
