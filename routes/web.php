@@ -19,7 +19,6 @@ use Inertia\Inertia;
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\ArticleController;
 
-
 Route::get('/pelayanan/{slug}', function (string $slug) {
     $pelayananContent = [
         'peminjaman' => [
