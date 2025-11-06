@@ -15,11 +15,6 @@ defineProps({
     >
         <!-- Logo -->
         <div class="flex min-h-20 items-center gap-3 border-b p-4">
-            <img
-                src="/logo-polban.webp"
-                alt="Logo"
-                class="h-10 w-10 rounded-lg bg-emerald-500 p-1"
-            />
             <div v-if="sidebarOpen">
                 <h1
                     class="text-md font-bold whitespace-nowrap text-emerald-500"
@@ -52,7 +47,7 @@ defineProps({
             <div>
                 <h2
                     v-if="sidebarOpen"
-                    class="mb-2 px-2 text-xs font-semibold text-gray-400 uppercase"
+                    class="mb-2 px-2 text-xs font-semibold text-wrap whitespace-nowrap text-gray-400 uppercase"
                 >
                     Konten & Informasi Publik
                 </h2>

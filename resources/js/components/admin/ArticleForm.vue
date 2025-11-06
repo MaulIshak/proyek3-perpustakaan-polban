@@ -7,6 +7,7 @@
             class="hidden"
             accept="image/*"
             @change="handleThumbnailChange"
+            name="thumbnail"
         />
 
         <!-- Bagian Thumbnail -->
@@ -97,6 +98,7 @@
                     required
                     class="block w-full rounded-md border-gray-300 p-3 shadow-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500 sm:text-sm"
                     placeholder="Masukkan judul..."
+                    name="judul"
                 />
             </div>
         </div>
@@ -117,6 +119,7 @@
                     toolbar="essential"
                     contentType="html"
                     placeholder="Tulis isi di sini..."
+                    name="content"
                 />
             </div>
         </div>
@@ -133,6 +136,7 @@
                 </label>
                 <div class="mt-1">
                     <input
+                        name="date"
                         id="date"
                         v-model="articleData.date"
                         type="date"
@@ -152,6 +156,7 @@
                 </label>
                 <div class="mt-1">
                     <select
+                        name="status"
                         id="status"
                         v-model="articleData.status"
                         required
@@ -174,6 +179,7 @@
             </label>
             <div class="mt-1">
                 <input
+                    name="attachment"
                     id="attachment"
                     type="file"
                     @change="handleAttachmentChange"
