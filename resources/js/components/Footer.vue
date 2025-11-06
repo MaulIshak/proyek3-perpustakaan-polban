@@ -11,7 +11,7 @@ const quickLinks = [
 </script>
 
 <template>
-    <footer class="bg-[var(--dark-green)] text-[var(--font-light-green)]">
+    <footer class="bg-[var(--dark-green)] text-[var(--background-green)]">
         <div class="container mx-auto px-4 py-8">
             <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
                 <!-- About -->
@@ -47,16 +47,13 @@ const quickLinks = [
                     <div class="space-y-2 text-sm">
                         <p>Jl. Gegerkalong Hilir, Ciwaruga</p>
                         <p>Bandung Barat, Jawa Barat 40559</p>
-                        <p>(022) 2013789</p>
                         <p>perpustakaan@polban.ac.id</p>
-                        <p class="mt-4">Senin - Jumat: 08.00 - 16.00 WIB</p>
-                        <p>Sabtu: 08.00 - 12.00 WIB</p>
                     </div>
                 </div>
             </div>
 
             <div
-                class="mt-8 border-t border-green-700 pt-8 text-center text-sm"
+                class="mt-8 border-t border-[var(--primary-green)] pt-8 text-center text-sm"
             >
                 <p>
                     © 2025 UPT Perpustakaan Politeknik Negeri Bandung. All

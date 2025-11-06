@@ -9,7 +9,7 @@
 
 @theme inline {
     --font-sans:
-        Instrument Sans, ui-sans-serif, system-ui, sans-serif,
+        'Segoe UI', ui-sans-serif, system-ui, sans-serif,
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
         'Noto Color Emoji';
 
@@ -83,7 +83,7 @@
     body,
     html {
         --font-sans:
-            'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
+            'Segoe UI', ui-sans-serif, system-ui, sans-serif,
             'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
             'Noto Color Emoji';
     }
@@ -129,13 +129,11 @@
     --sidebar: hsl(0 0% 98%);
 
     /* Warna utama */
-    --dark-green: rgb(6, 84, 63);
-    --font-green: rgb(4, 120, 87);
-    --primary-green: rgb(17, 186, 130);
-    --background-green: rgb(245, 255, 250);
-    --font-light-green: rgb(210, 250, 229);
-
-
+    --secondary-green: #00637b;
+    --dark-green: #0f3800;
+    --primary-green: #99cc33;
+    --background-green: #f3fff3;
+    --footer-green: #1b2800;
 }
 
 /* .dark {

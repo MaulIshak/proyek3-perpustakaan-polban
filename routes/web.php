@@ -24,7 +24,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::prefix('admin')->name('admin.')->group(function () {
     // show login form (only for guests of admin guard)
-    Route::get('login', [LoginController::class, 'showLogin'])->middleware('guest:admin')->name('login');
+    Route::get('login', [LoginController::class, 'showLogin'])->middleware('guest.admin')->name('login');
 
     // perform login
     Route::post('login', [LoginController::class, 'login'])->name('login.post');
@@ -42,6 +42,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('berita/create', function(){
         return Inertia::render('admin/berita/Create');
     })->middleware('auth:admin')->name('beritaCreate');
+
+    Route::post('berita/store', [ArticleController::class, 'storeBerita'])
+    ->middleware('auth:admin')
+    ->name('beritaStore');
+
+    Route::get('berita/detail/{id}', [ArticleController::class, 'showBerita'])->middleware('auth:admin')->name('beritaShow');
 
 });
 
