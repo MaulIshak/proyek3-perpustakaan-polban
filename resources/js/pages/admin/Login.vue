@@ -10,7 +10,9 @@
                 class="flex w-full flex-col justify-center p-8 lg:w-1/2 lg:p-12"
             >
                 <div class="mb-6 text-center lg:text-left">
-                    <h2 class="text-2xl font-bold text-[var(--dark-green)]">
+                    <h2
+                        class="text-3xl font-extrabold text-[var(--dark-green)]"
+                    >
                         Selamat Datang, Pustakawan
                     </h2>
                     <p class="mt-1 text-sm text-[var(--font-green)]">
