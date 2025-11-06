@@ -13,7 +13,7 @@ const emit = defineEmits(['toggle-profile-menu']);
     <div class="relative">
         <button
             @click="emit('toggle-profile-menu')"
-            class="flex items-center gap-2 rounded-full bg-emerald-500 px-3 py-1.5 text-white transition hover:bg-emerald-600"
+            class="flex items-center gap-2 rounded-full bg-[var(--primary-green)] px-3 py-1.5 text-white transition hover:bg-emerald-600"
         >
             <span class="text-sm font-medium">Admin</span>
             <div

@@ -7,7 +7,9 @@
             >
                 <h2 class="text-sm text-gray-500">Total Berita</h2>
                 <div class="mt-1 text-3xl font-bold text-gray-800">24</div>
-                <p class="mt-1 text-xs text-emerald-600">+3 bulan ini</p>
+                <p class="mt-1 text-xs text-[var(--primary-green)]">
+                    +3 bulan ini
+                </p>
             </div>
 
             <div
@@ -15,7 +17,9 @@
             >
                 <h2 class="text-sm text-gray-500">Pengumuman</h2>
                 <div class="mt-1 text-3xl font-bold text-gray-800">12</div>
-                <p class="mt-1 text-xs text-emerald-600">+2 minggu ini</p>
+                <p class="mt-1 text-xs text-[var(--primary-green)]">
+                    +2 minggu ini
+                </p>
             </div>
 
             <div
@@ -23,7 +27,9 @@
             >
                 <h2 class="text-sm text-gray-500">Foto Galeri</h2>
                 <div class="mt-1 text-3xl font-bold text-gray-800">156</div>
-                <p class="mt-1 text-xs text-emerald-600">+15 foto baru</p>
+                <p class="mt-1 text-xs text-[var(--primary-green)]">
+                    +15 foto baru
+                </p>
             </div>
 
             <div
@@ -53,7 +59,7 @@
                                 >Berita</span
                             >
                             <span
-                                class="rounded-full bg-emerald-50 px-2 py-0.5 text-xs text-emerald-600"
+                                class="rounded-full bg-emerald-50 px-2 py-0.5 text-xs text-[var(--primary-green)]"
                                 >Published</span
                             >
                         </div>
@@ -70,7 +76,7 @@
                                 >Pengumuman</span
                             >
                             <span
-                                class="rounded-full bg-emerald-50 px-2 py-0.5 text-xs text-emerald-600"
+                                class="rounded-full bg-emerald-50 px-2 py-0.5 text-xs text-[var(--primary-green)]"
                                 >Published</span
                             >
                         </div>
@@ -94,7 +100,7 @@
                 </p>
 
                 <button
-                    class="mb-2 w-full rounded-lg bg-emerald-500 px-4 py-2 font-medium text-white transition hover:bg-emerald-600"
+                    class="mb-2 w-full rounded-lg bg-[var(--primary-green)] px-4 py-2 font-medium text-[var(--dark-green)] transition hover:bg-emerald-600"
                 >
                     Buat Berita Baru
                 </button>

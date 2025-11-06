@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import { Link } from '@inertiajs/vue3';
+import { LogOut, PanelLeft, X } from 'lucide-vue-next';
 import SidebarLink from './SidebarLink.vue';
 
 defineProps({
     sidebarOpen: Boolean,
 });
+
+const emit = defineEmits(['toggle-sidebar']);
 </script>
 
 <template>
@@ -14,17 +18,28 @@ defineProps({
         ]"
     >
         <!-- Logo -->
-        <div class="flex min-h-20 items-center gap-3 border-b p-4">
-            <div v-if="sidebarOpen">
-                <h1
-                    class="text-md font-bold whitespace-nowrap text-[var(--dark-green)]"
-                >
-                    Perpustakaan POLBAN
-                </h1>
-                <h3 class="text-sm text-[var(--secondary-green)]">
-                    Admin Panel
-                </h3>
+        <div
+            class="flex min-h-20 items-center justify-between gap-3 border-b p-4"
+        >
+            <div v-if="sidebarOpen" class="flex items-center gap-3">
+                <div>
+                    <h1
+                        class="text-md font-bold whitespace-nowrap text-[var(--dark-green)]"
+                    >
+                        Perpustakaan POLBAN
+                    </h1>
+                    <h3 class="text-sm text-[var(--secondary-green)]">
+                        Admin Panel
+                    </h3>
+                </div>
             </div>
+            <button
+                @click="emit('toggle-sidebar')"
+                class="rounded-lg p-2 transition hover:bg-gray-100"
+            >
+                <X v-if="sidebarOpen" class="text-2xl text-gray-700" />
+                <PanelLeft v-else class="text-2xl text-gray-700" />
+            </button>
         </div>
 
         <!-- Menu -->
@@ -134,6 +149,15 @@ defineProps({
                     :sidebar-open="sidebarOpen"
                 />
             </div>
+            <hr />
+            <Link
+                href="/admin/logout"
+                method="post"
+                as="button"
+                class="text-md flex items-center gap-3 rounded-xl px-3 py-2 text-red-500 transition hover:bg-red-500 hover:text-black"
+            >
+                <LogOut class="w-5" /> Keluar
+            </Link>
         </nav>
     </aside>
 </template>

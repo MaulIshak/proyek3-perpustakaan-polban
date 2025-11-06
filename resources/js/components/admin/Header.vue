@@ -1,36 +1,30 @@
 <script setup lang="ts">
-import ProfileMenu from '@/components/admin/ProfileMenu.vue';
-import { Menu } from 'lucide-vue-next';
-
 defineProps({
     sidebarOpen: Boolean,
     profileMenuOpen: Boolean,
     title: String,
+    subTitle: String,
 });
 
-const emit = defineEmits(['toggle-sidebar', 'toggle-profile-menu']);
+const emit = defineEmits(['toggle-profile-menu']);
 </script>
 
 <template>
     <header
-        class="flex min-h-40 items-center justify-between rounded-b-3xl border-b bg-white bg-[url('/hero-bg.jpg')] bg-cover bg-center px-6 py-3 shadow-sm brightness-40"
+        class="relative flex min-h-40 items-center justify-between rounded-b-3xl border-b bg-white bg-[url('/hero-bg.jpg')] bg-cover bg-center px-6 py-3 shadow-sm"
     >
-        <div class="flex items-center gap-3">
-            <button
-                @click="emit('toggle-sidebar')"
-                class="rounded-lg p-2 transition hover:bg-gray-100"
-            >
-                <Menu
-                    class="text-2xl text-gray-700 transition-transform"
-                    :class="{ 'rotate-180': !sidebarOpen }"
-                />
-            </button>
-            <h2 class="text-lg font-semibold">{{ title }}</h2>
+        <div
+            class="absolute inset-0 rounded-b-3xl bg-[var(--dark-green)]/55"
+        ></div>
+        <div class="relative flex w-full items-end justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-white">
+                    {{ title }}
+                </h1>
+                <p class="text-gray-200">
+                    {{ subTitle }}
+                </p>
+            </div>
         </div>
-
-        <ProfileMenu
-            :profile-menu-open="profileMenuOpen"
-            @toggle-profile-menu="emit('toggle-profile-menu')"
-        />
     </header>
 </template>
