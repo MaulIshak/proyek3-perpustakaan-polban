@@ -3,21 +3,22 @@
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-
-// Route::get('/', function () {
-//     return Inertia::render('Welcome', [
-//         'canRegister' => Features::enabled(Features::registration()),
-//     ]);
-// })->name('home');
-
-// Route::get('dashboard', function () {
-//     return Inertia::render('Dashboard');
-// })->middleware(['auth', 'verified'])->name('dashboard');
-
-
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\ArticleController;
 
+Route::get('/pelayanan/{slug}', function (string $slug) {
+    return Inertia::render('Pelayanan/Show', [
+        'pelayanan' => $slug
+    ]);
+});
+
+Route::get('/bebas_masalah', function () {
+    return Inertia::render('BebasMasalah/Bebas_Masalah');
+});
+
+Route::get('/gallery', function() {
+    return Inertia::render('Galeri/Galeri');
+});
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
