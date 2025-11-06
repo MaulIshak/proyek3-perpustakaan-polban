@@ -86,6 +86,12 @@ defineProps({
                     to="/admin/tim-manajemen"
                     :sidebar-open="sidebarOpen"
                 />
+                <SidebarLink
+                    icon="Map"
+                    label="Map"
+                    to="/admin/map"
+                    :sidebar-open="sidebarOpen"
+                />
             </div>
 
             <!-- Group 3: Layanan Perpustakaan -->

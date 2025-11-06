@@ -25,9 +25,11 @@ const breadcrumb = [
             <RemahanRoti :itemRoti="breadcrumb" />
 
             <!-- Judul Halaman -->
-            <h1 class="text-4xl font-extrabold text-gray-900 mb-8 border-b pb-3">
+            <h1 class="text-4xl font-extrabold text-gray-900 pb-2">
                 {{ title }}
             </h1>
+            <p class="mb-8">Lorem ipsum dolor sit amet consectetur adipisicing.</p>
+            
 
             <div class="bg-white rounded-2xl shadow-lg p-8 space-y-10">
                 <!-- Sejarah -->
@@ -41,6 +43,7 @@ const breadcrumb = [
                         </svg>
                         {{ subjudul_1 }}
                     </h2>
+
                     <div class="text-gray-700 text-justify space-y-4 pl-9">
                         <p>
                             Perpustakaan Polban hadir bersamaan dengan berdirinya Politeknik ITB pada tahun 1982. 
@@ -78,9 +81,7 @@ const breadcrumb = [
                         {{ subjudul_2 }}
                     </h2>
                     <p class="text-gray-700 text-justify pl-9">
-                        Menjadi pusat sumber belajar dan informasi yang unggul serta modern 
-                        untuk mendukung visi Politeknik Negeri Bandung — menjadi politeknik 
-                        unggul di tingkat nasional dan diakui di tingkat internasional.
+                        Menjadi Pusat Sumber Belajar (Learning Resource Centre) yang mampu memenuhi beragam informasi mutakhir melalui beragam media dalam upaya membantu meningkatkan kualitas dan kemampuan kerja para lulusan Politeknik Negeri Bandung.
                     </p>
                 </section>
 

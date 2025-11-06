@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Layout from '@/layouts/UserAppLayout.vue';
+import RemahanRoti from '@/layouts/RemahanRoti.vue';
 
 // Definisikan tipe Props yang baru sesuai struktur Controller
 defineProps<{
@@ -11,12 +12,19 @@ defineProps<{
         image: string;
     }[];
 }>();
+
+const breadcrumb = [
+    { label: 'Profile' },
+    { label: 'Fasilitas' }
+];
+
 </script>
 
 <template>
     <Layout>
         <div class="container mx-auto py-12 px-4 sm:px-6 lg:px-8 max-w-6xl">
-            <header class="text-center mb-10">
+            <RemahanRoti :itemRoti="breadcrumb" />
+            <header class="mb-10">
                 <h1 class="text-3xl font-bold text-gray-900 mb-1">
                     {{ title }}
                 </h1>
@@ -25,32 +33,16 @@ defineProps<{
                 </p>
             </header>
 
-            <div class="space-y-12">
-                
-                <div 
-                    v-for="(facility, index) in facilities" 
-                    :key="index" 
-                    class="bg-white rounded-xl shadow-lg overflow-hidden"
-                >
-                    <div 
-                        class="md:grid md:grid-cols-2 md:gap-0"
-                        :class="{ 'md:grid-flow-col-dense': index % 2 !== 0 }"
-                    >
-                        <div 
-                            class="md:order-1" 
-                            :class="{ 'md:order-2': index % 2 !== 0 }"
-                        >
-                            <img 
-                                :src="facility.image" 
-                                :alt="'Gambar ' + facility.subjudul" 
-                                class="w-full h-full object-cover max-h-96 md:max-h-full" 
-                            />
+            <div class="space-y-16">
+
+                <div v-for="(facility, index) in facilities" :key="index" class="group">
+                    <div class="flex flex-col md:flex-row items-center bg-white rounded-xl shadow-lg overflow-hidden">
+                        
+                        <div :class="['w-full md:w-1/2', { 'md:order-last': index % 2 !== 0 }]">
+                            <img :src="facility.image" :alt="'Gambar ' + facility.subjudul" class="w-full h-96 object-cover"/>
                         </div>
 
-                        <div 
-                            class="p-6 sm:p-8 flex flex-col justify-center md:order-2"
-                            :class="{ 'md:order-1': index % 2 !== 0 }"
-                        >
+                        <div :class="['w-full md:w-1/2 p-8', { 'md:order-first': index % 2 !== 0 }]">
                             <h3 class="text-2xl font-semibold text-gray-900 mb-3">
                                 {{ facility.subjudul }}
                             </h3>
