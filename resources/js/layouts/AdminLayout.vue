@@ -18,26 +18,18 @@ defineProps<{
 
 <template>
     <div class="flex h-screen bg-gray-50 text-gray-800">
-        <Sidebar :sidebar-open="sidebarOpen" />
+        <Sidebar :sidebar-open="sidebarOpen" @toggle-sidebar="toggleSidebar" />
 
         <div class="flex flex-1 flex-col">
             <Header
                 :sidebar-open="sidebarOpen"
                 :profile-menu-open="profileMenuOpen"
                 :title="title"
-                @toggle-sidebar="toggleSidebar"
+                :sub-title="subTitle"
                 @toggle-profile-menu="toggleProfileMenu"
             />
 
             <main class="flex-1 overflow-y-auto p-6">
-                <div class="mb-6">
-                    <h1 class="text-3xl font-bold text-gray-800">
-                        {{ title }}
-                    </h1>
-                    <p class="text-gray-500">
-                        {{ subTitle }}
-                    </p>
-                </div>
                 <slot />
             </main>
         </div>
