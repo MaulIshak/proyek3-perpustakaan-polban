@@ -1,6 +1,23 @@
-<script setup lang="ts">
+<script setup>
+import { ArrowLeft, ArrowRight } from 'lucide-vue-next';
+import { ref } from 'vue';
 import BookCoverLink from './BookCoverLink.vue';
 
+const scrollContainer = ref(null);
+
+const scrollLeft = () => {
+    scrollContainer.value.scrollBy({
+        left: -300,
+        behavior: 'smooth',
+    });
+};
+
+const scrollRight = () => {
+    scrollContainer.value.scrollBy({
+        left: 300,
+        behavior: 'smooth',
+    });
+};
 const books = [
     {
         href: '#',
@@ -73,17 +90,39 @@ const books = [
             </div>
 
             <!-- Scroll Container -->
-            <div class="scroll-container relative overflow-x-auto">
-                <div class="animate-scroll flex gap-4 pb-4">
-                    <BookCoverLink
-                        v-for="(book, index) in books
-                            .concat(books)
-                            .concat(books)"
-                        :key="index"
-                        :href="book.href"
-                        :src="book.src"
-                    />
+            <div class="group relative">
+                <!-- Tombol panah kiri -->
+                <button
+                    @click="scrollLeft"
+                    class="absolute top-1/2 left-0 z-10 -translate-y-1/2 rounded-full bg-white p-2 opacity-0 shadow-md transition-opacity duration-300 group-hover:opacity-100 hover:bg-[var(--primary-green)] hover:text-white"
+                >
+                    <ArrowLeft class="h-5 w-5" />
+                </button>
+
+                <!-- Scroll Container -->
+                <div
+                    ref="scrollContainer"
+                    class="scroll-container relative overflow-x-hidden scroll-smooth px-8"
+                >
+                    <div class="flex gap-4 pb-4">
+                        <BookCoverLink
+                            v-for="(book, index) in books
+                                .concat(books)
+                                .concat(books)"
+                            :key="index"
+                            :href="book.href"
+                            :src="book.src"
+                        />
+                    </div>
                 </div>
+
+                <!-- Tombol panah kanan -->
+                <button
+                    @click="scrollRight"
+                    class="absolute top-1/2 right-0 z-10 -translate-y-1/2 rounded-full bg-white p-2 opacity-0 shadow-md transition-opacity duration-300 group-hover:opacity-100 hover:bg-[var(--primary-green)] hover:text-white"
+                >
+                    <ArrowRight class="h-5 w-5" />
+                </button>
             </div>
         </div>
     </section>
@@ -130,6 +169,4 @@ const books = [
     scrollbar-color: var(--primary-green) var(--background-green);
     scrollbar-width: thin;
 }
-
-
 </style>
