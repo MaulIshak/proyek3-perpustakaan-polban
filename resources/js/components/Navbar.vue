@@ -14,6 +14,9 @@ const navItems = [
         items: [
             { name: 'Tentang Perpustakaan', href: '/about' },
             { name: 'Fasilitas', href: '/facilities' },
+            { name: 'Tim Manajemen', href: '/tim-manajemen'},
+            { name: 'Peraturan Perpustakaan', href: '/peraturan'},
+            { name: 'Jam Layanan', href: '/jam-layanan'}
         ],
     },
     {
