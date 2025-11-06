@@ -47,10 +47,7 @@ const quickLinks = [
                     <div class="space-y-2 text-sm">
                         <p>Jl. Gegerkalong Hilir, Ciwaruga</p>
                         <p>Bandung Barat, Jawa Barat 40559</p>
-                        <p>(022) 2013789</p>
                         <p>perpustakaan@polban.ac.id</p>
-                        <p class="mt-4">Senin - Jumat: 08.00 - 16.00 WIB</p>
-                        <p>Sabtu: 08.00 - 12.00 WIB</p>
                     </div>
                 </div>
             </div>
