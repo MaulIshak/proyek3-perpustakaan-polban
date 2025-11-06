@@ -9,7 +9,7 @@ defineProps({
 <template>
     <aside
         :class="[
-            'flex flex-col bg-white shadow-sm transition-all duration-300',
+            'flex flex-col rounded-br-2xl bg-[var(--background-green)] shadow-sm transition-all duration-300',
             sidebarOpen ? 'w-64' : 'w-20',
         ]"
     >
@@ -17,11 +17,13 @@ defineProps({
         <div class="flex min-h-20 items-center gap-3 border-b p-4">
             <div v-if="sidebarOpen">
                 <h1
-                    class="text-md font-bold whitespace-nowrap text-emerald-500"
+                    class="text-md font-bold whitespace-nowrap text-[var(--dark-green)]"
                 >
                     Perpustakaan POLBAN
                 </h1>
-                <h3 class="text-sm text-gray-500">Admin Panel</h3>
+                <h3 class="text-sm text-[var(--secondary-green)]">
+                    Admin Panel
+                </h3>
             </div>
         </div>
 
@@ -31,7 +33,7 @@ defineProps({
             <div>
                 <h2
                     v-if="sidebarOpen"
-                    class="mb-2 px-2 text-xs font-semibold text-gray-400 uppercase"
+                    class="mb-2 px-2 text-xs font-semibold text-[var(--secondary-green)] uppercase"
                 >
                     Umum
                 </h2>
@@ -47,7 +49,7 @@ defineProps({
             <div>
                 <h2
                     v-if="sidebarOpen"
-                    class="mb-2 px-2 text-xs font-semibold text-wrap whitespace-nowrap text-gray-400 uppercase"
+                    class="mb-2 px-2 text-xs font-semibold text-wrap whitespace-nowrap text-[var(--secondary-green)] uppercase"
                 >
                     Konten & Informasi Publik
                 </h2>
@@ -93,7 +95,7 @@ defineProps({
             <div>
                 <h2
                     v-if="sidebarOpen"
-                    class="mb-2 px-2 text-xs font-semibold text-gray-400 uppercase"
+                    class="mb-2 px-2 text-xs font-semibold text-[var(--secondary-green)] uppercase"
                 >
                     Layanan Perpustakaan
                 </h2>
@@ -115,7 +117,7 @@ defineProps({
             <div>
                 <h2
                     v-if="sidebarOpen"
-                    class="mb-2 px-2 text-xs font-semibold text-gray-400 uppercase"
+                    class="mb-2 px-2 text-xs font-semibold text-[var(--secondary-green)] uppercase"
                 >
                     Sumber Daya Digital
                 </h2>

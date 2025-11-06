@@ -13,7 +13,7 @@ const emit = defineEmits(['toggle-sidebar', 'toggle-profile-menu']);
 
 <template>
     <header
-        class="flex min-h-20 items-center justify-between border-b bg-white px-6 py-3"
+        class="flex min-h-40 items-center justify-between rounded-b-3xl border-b bg-white bg-[url('/hero-bg.jpg')] bg-cover bg-center px-6 py-3 shadow-sm brightness-40"
     >
         <div class="flex items-center gap-3">
             <button
