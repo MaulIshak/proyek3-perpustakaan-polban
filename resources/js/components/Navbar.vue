@@ -76,20 +76,15 @@ onUnmounted(() => {
 
 <template>
     <nav
-        class="border-b border-gray-200 bg-white/95 py-3 text-[var(--font-green)] backdrop-blur-md"
+        class="bg-grey border-b border-gray-200 bg-white/90 py-3 text-[var(--dark-green)] backdrop-blur-md"
     >
         <div class="container mx-auto px-4">
             <div class="flex h-16 items-center justify-between">
                 <!-- Logo -->
                 <div class="flex items-center gap-3">
-                    <img
-                        src="/logo-polban-hijau.webp"
-                        alt="Logo"
-                        class="h-12 w-12"
-                    />
                     <div>
-                        <h1 class="text-lg font-extrabold">
-                            PERPUSTAKAAN POLBAN
+                        <h1 class="text-lg font-bold">
+                            PERPUSTAKAAN POLITEKNIK NEGERI BANDUNG
                         </h1>
                         <p class="text-sm text-gray-600">
                             NPP: 3270130B1000002
@@ -108,16 +103,16 @@ onUnmounted(() => {
                 </button>
 
                 <!-- Desktop Nav -->
-                <div class="hidden items-center gap-7 xl:flex">
+                <div class="hidden items-center gap-5 xl:flex">
                     <template v-for="(item, i) in navItems" :key="item.name">
                         <!-- plain link -->
                         <Link
                             v-if="!item.items"
                             :href="item.href"
-                            class="text-md rounded-full p-2 font-medium hover:text-[var(--font-green)]"
+                            class="text-md rounded-full p-2 font-medium hover:text-[var(--dark-green)]"
                             :class="[
                                 item.href === currentUrl
-                                    ? 'bg-[var(--background-green)] text-[var(--font-green)]'
+                                    ? 'bg-[var(--background-green)] text-[var(--dark-green)]'
                                     : 'text-gray-700',
                             ]"
                         >

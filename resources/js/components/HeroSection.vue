@@ -6,7 +6,7 @@
         :style="{ backgroundImage: `url('/hero-bg.jpg')` }"
     >
         <!-- Overlay gelap agar teks terbaca -->
-        <div class="absolute inset-0 bg-black/60"></div>
+        <div class="absolute inset-0 bg-black/50"></div>
 
         <!-- Konten utama hero -->
         <div
@@ -16,7 +16,7 @@
                 Selamat Datang di
             </h2>
             <h1
-                class="mb-6 text-4xl font-extrabold text-[var(--primary-green)] md:text-6xl"
+                class="mb-6 text-4xl font-bold text-[var(--primary-green)] md:text-6xl"
             >
                 PERPUSTAKAAN POLBAN
             </h1>
