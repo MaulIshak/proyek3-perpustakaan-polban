@@ -166,7 +166,7 @@ const IconComponent = computed(() => icons[Pelayanan_Data.value.icon]);
         
         <div class="mb-8">
           <nav class="text-sm text-gray-500 mb-4">
-            <Link href="/" class="hover:text-emerald-600">Home</Link>
+            <Link href="/" class="hover:text-[var(--primary-green)]">Home</Link>
             <span class="mx-2">/</span>
             <span>Pelayanan</span>
             <span class="mx-2">/</span>
@@ -174,7 +174,7 @@ const IconComponent = computed(() => icons[Pelayanan_Data.value.icon]);
           </nav>
           
           <div class="flex items-center gap-4 mb-4">
-            <div class="w-16 h-16 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center">
+            <div class="w-16 h-16 bg-gradient-to-br from-emerald-500 to-[var(--primary-green)] rounded-xl flex items-center justify-center">
               <component :is="IconComponent" class="w-8 h-8 text-white" />
             </div>
             <div>
@@ -188,17 +188,17 @@ const IconComponent = computed(() => icons[Pelayanan_Data.value.icon]);
           <div
             v-for="(section, index) in Pelayanan_Data.content"
             :key="index"
-            class="p-6 bg-white shadow rounded-lg"
+            class="p-6 bg-white rounded-lg shadow-md border border-transparent duration-300 hover:border-[var(--primary-green)] hover:shadow-xl hover:scale-102"
           >
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ section.subtitle }}</h2>
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">{{ section.subtitle }}</h2>
             <ul class="space-y-3">
               <li
                 v-for="(item, itemIndex) in section.items"
                 :key="itemIndex"
-                class="flex items-start gap-3 text-gray-700"
+                class="flex items-start gap-3 text-gray-800"
               >
-                <span class="w-2 h-2 bg-emerald-600 rounded-full mt-2 flex-shrink-0"></span>
-                <span>{{ item }}</span>
+                <span class="w-2 h-2 bg-[var(--primary-green)] rounded-full mt-2 flex-shrink-0"></span>
+                <span class="text-lg">{{ item }}</span>
               </li>
             </ul>
           </div>

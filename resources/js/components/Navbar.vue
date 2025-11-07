@@ -55,18 +55,30 @@ const mobileOpen = ref(false);
 function toggleMenu(i: number) {
     openIndex.value = openIndex.value === i ? null : i;
 }
+
+function showDropdown(i: number) {
+    if (window.innerWidth >= 1280) openIndex.value = i;
+}
+
+function hideDropdown(i: number) {
+    if (window.innerWidth >= 1280) openIndex.value = null;
+}
+
 function closeAll() {
     openIndex.value = null;
 }
+
 function onDocumentClick(e: MouseEvent) {
     const target = e.target as HTMLElement | null;
     if (!target) return;
     if (target.closest('.navbar-dropdown')) return;
     closeAll();
 }
+
 function onEsc(e: KeyboardEvent) {
     if (e.key === 'Escape') closeAll();
 }
+
 onMounted(() => {
     document.addEventListener('click', onDocumentClick, true);
     document.addEventListener('keydown', onEsc);
@@ -78,20 +90,14 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <nav
-        class="bg-grey border-b border-gray-200 bg-white/90 py-3 text-[var(--dark-green)] backdrop-blur-md"
-    >
+    <nav class="bg-white/90 border-b border-gray-200 py-3 text-[var(--dark-green)] backdrop-blur-md">
         <div class="container mx-auto px-4">
             <div class="flex h-16 items-center justify-between">
                 <!-- Logo -->
                 <div class="flex items-center gap-3">
                     <div>
-                        <h1 class="text-lg font-bold">
-                            PERPUSTAKAAN POLITEKNIK NEGERI BANDUNG
-                        </h1>
-                        <p class="text-sm text-gray-600">
-                            NPP: 321702200000001
-                        </p>
+                        <h1 class="text-lg font-bold">PERPUSTAKAAN POLITEKNIK NEGERI BANDUNG</h1>
+                        <p class="text-sm text-gray-600">NPP: 321702200000001</p>
                     </div>
                 </div>
 
@@ -126,7 +132,8 @@ onUnmounted(() => {
                         <div
                             v-else
                             class="navbar-dropdown relative"
-                            @click.stop
+                            @mouseenter="showDropdown(i)"
+                            @mouseleave="hideDropdown(i)"
                         >
                             <button
                                 @click="toggleMenu(i)"
@@ -136,24 +143,34 @@ onUnmounted(() => {
                                 <ChevronDown class="h-4 w-4" />
                             </button>
 
-                            <ul
-                                v-show="openIndex === i"
-                                class="absolute z-50 mt-2 w-48 rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 focus:outline-none"
+                            <!-- animasi transisi -->
+                            <Transition
+                                enter-active-class="transition ease-out duration-300"
+                                enter-from-class="opacity-0 -translate-y-2"
+                                enter-to-class="opacity-100 translate-y-0"
+                                leave-active-class="transition ease-in duration-200"
+                                leave-from-class="opacity-100 translate-y-0"
+                                leave-to-class="opacity-0 -translate-y-2"
                             >
-                                <li
-                                    v-for="subItem in item.items"
-                                    :key="subItem.name"
-                                    class="p-3 hover:bg-[var(--background-green)]"
+                                <ul
+                                    v-show="openIndex === i"
+                                    class="absolute z-50 mt-2 w-48 rounded-md bg-white py-2 shadow-lg ring-1 ring-black/5 focus:outline-none"
                                 >
-                                    <Link
-                                        :href="subItem.href"
-                                        class="block text-sm text-gray-700"
-                                        @click="closeAll"
+                                    <li
+                                        v-for="subItem in item.items"
+                                        :key="subItem.name"
+                                        class="p-3 hover:bg-[var(--background-green)]"
                                     >
-                                        {{ subItem.name }}
-                                    </Link>
-                                </li>
-                            </ul>
+                                        <Link
+                                            :href="subItem.href"
+                                            class="block text-md text-gray-700"
+                                            @click="closeAll"
+                                        >
+                                            {{ subItem.name }}
+                                        </Link>
+                                    </li>
+                                </ul>
+                            </Transition>
                         </div>
                     </template>
                 </div>
@@ -166,7 +183,6 @@ onUnmounted(() => {
                     class="mt-3 flex flex-col gap-2 border-t border-gray-200 pt-3 xl:hidden"
                 >
                     <template v-for="(item, i) in navItems" :key="item.name">
-                        <!-- single link -->
                         <Link
                             v-if="!item.items"
                             :href="item.href"
@@ -176,7 +192,6 @@ onUnmounted(() => {
                             {{ item.name }}
                         </Link>
 
-                        <!-- dropdown in mobile -->
                         <div v-else class="navbar-dropdown">
                             <button
                                 @click="toggleMenu(i)"
@@ -191,20 +206,30 @@ onUnmounted(() => {
                                 />
                             </button>
 
-                            <div
-                                v-show="openIndex === i"
-                                class="flex flex-col gap-1 py-1 pl-5"
-                            >
-                                <Link
-                                    v-for="subItem in item.items"
-                                    :key="subItem.name"
-                                    :href="subItem.href"
-                                    class="block rounded-md px-3 py-1 text-sm text-gray-600 hover:bg-gray-100"
-                                    @click="mobileOpen = false"
+                            <Transition
+                                enter-active-class="transition ease-out duration-300"
+                                enter-from-class="opacity-0 -translate-y-2"
+                                enter-to-class="opacity-100 translate-y-0"
+                                leave-active-class="transition ease-in duration-200"
+                                leave-from-class="opacity-100 translate-y-0"
+                                leave-to-class="opacity-0 -translate-y-2"
                                 >
-                                    {{ subItem.name }}
-                                </Link>
-                            </div>
+
+                                <div
+                                    v-show="openIndex === i"
+                                    class="flex flex-col gap-1 py-1 pl-5"
+                                >
+                                    <Link
+                                        v-for="subItem in item.items"
+                                        :key="subItem.name"
+                                        :href="subItem.href"
+                                        class="block rounded-md px-3 py-1 text-sm text-gray-600 hover:bg-gray-100"
+                                        @click="mobileOpen = false"
+                                    >
+                                        {{ subItem.name }}
+                                    </Link>
+                                </div>
+                            </Transition>
                         </div>
                     </template>
                 </div>

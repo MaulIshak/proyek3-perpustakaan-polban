@@ -15,7 +15,7 @@ const activeTab = ref('alur')
         <!-- Breadcrumb -->
         <div class="mb-8">
           <nav class="text-sm text-gray-500 mb-4">
-            <Link href="/" class="hover:text-emerald-600">Home</Link>
+            <Link href="/" class="hover:text-[var(--primary-green)]">Home</Link>
             <span class="mx-2">/</span>
             <span class="text-gray-800">Bebas Masalah</span>
           </nav>
@@ -28,10 +28,10 @@ const activeTab = ref('alur')
           <!-- Tab Header -->
           <div class="grid grid-cols-5 mb-6 border-b border-gray-200">
             <button
-              v-for="tab in ['alur', 'persyaratan', 'panduan', 'template', 'watermark']"
+              v-for="tab in ['alur', 'persyaratan', 'panduan', 'SP3KTI', 'watermark']"
               :key="tab"
-              class="py-2 text-center text-gray-600 font-medium hover:text-emerald-600"
-              :class="{ 'border-b-2 border-emerald-600 text-emerald-600': activeTab === tab }"
+              class="py-2 text-center text-gray-600 font-medium hover:text-[var(--primary-green)]"
+              :class="{ 'border-b-2 border-[var(--primary-green)] text-[var(--primary-green)]': activeTab === tab }"
               @click="activeTab = tab"
             >
               {{ tab.charAt(0).toUpperCase() + tab.slice(1) }}
@@ -41,7 +41,7 @@ const activeTab = ref('alur')
           <!-- Tab Content -->
           <div v-if="activeTab === 'alur'" class="space-y-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Diagram Alur Bebas Masalah</h2>
-            <div class="bg-gradient-to-br from-emerald-50 to-white p-8 rounded-lg border border-emerald-200">
+            <div class="bg-gradient-to-br from-emerald-50 to-white p-8 rounded-lg border border-emerald-200 transition duration-300 hover:shadow-2xl hover:bg-gradient-to-br hover:from-green-100 hover:to-green-200 hover:scale-101">
               <img
                 src="/Images/Diagram_Alur.png"
                 alt="Diagram Alur"
@@ -63,9 +63,9 @@ const activeTab = ref('alur')
                   { title: '5. Watermark Logo POLBAN', desc: 'Menempelkan watermark logo POLBAN pada halaman judul tugas akhir.' }
                 ]"
                 :key="index"
-                class="p-5 border border-emerald-200 rounded-lg flex items-start gap-3 bg-white"
+                class="p-5 border border-emerald-200 rounded-lg flex items-start gap-3 bg-white transition hover:scale-102 duration-300 hover:-translate-y-1 hover:bg-gradient-to-br hover:from-green-100 hover:to-green-300"
               >
-                <CheckCircle class="w-6 h-6 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle class="w-6 h-6 text-[var(--primary-green)] flex-shrink-0 mt-0.5" />
                 <div>
                   <h3 class="font-semibold text-gray-800 mb-1">{{ item.title }}</h3>
                   <p class="text-gray-600 text-sm">{{ item.desc }}</p>
@@ -89,7 +89,7 @@ const activeTab = ref('alur')
                   :key="index"
                   class="flex items-start gap-3"
                 >
-                  <span class="font-bold text-emerald-600 text-lg">{{ item.step }}</span>
+                  <span class="font-bold text-[var(--primary-green)] text-lg">{{ item.step }}</span>
                   <div>
                     <p class="font-medium">{{ item.title }}</p>
                     <p class="text-sm text-gray-600 mt-1">{{ item.desc }}</p>
@@ -99,19 +99,19 @@ const activeTab = ref('alur')
             </div>
           </div>
 
-          <div v-if="activeTab === 'template'" class="space-y-4">
+          <div v-if="activeTab === 'SP3KTI'" class="space-y-4">
             <h2 class="text-2xl font-bold text-gray-800 mb-4">Template Surat Pernyataan</h2>
             <div class="p-6 bg-white rounded-lg shadow">
               <div class="flex items-center gap-4 mb-4">
                 <div class="w-16 h-16 bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-lg flex items-center justify-center">
-                  <FileText class="w-8 h-8 text-emerald-600" />
+                  <FileText class="w-8 h-8 text-[var(--primary-green)]" />
                 </div>
                 <div>
                   <h3 class="font-bold text-lg text-gray-800">Surat Pernyataan Publikasi</h3>
                   <p class="text-sm text-gray-600">Format PDF - Ukuran: 150 KB</p>
                 </div>
               </div>
-              <button class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md flex items-center">
+              <button class="bg-[var(--primary-green)] hover:bg-emerald-700 text-white px-4 py-2 rounded-md flex items-center">
                 <Download class="w-4 h-4 mr-2" />
                 Download Template
               </button>
@@ -126,14 +126,14 @@ const activeTab = ref('alur')
             <div class="p-6 bg-white rounded-lg shadow">
               <div class="flex items-center gap-4 mb-4">
                 <div class="w-16 h-16 bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-lg flex items-center justify-center">
-                  <Image class="w-8 h-8 text-emerald-600" />
+                  <Image class="w-8 h-8 text-[var(--primary-green)]" />
                 </div>
                 <div>
                   <h3 class="font-bold text-lg text-gray-800">Logo POLBAN Watermark</h3>
                   <p class="text-sm text-gray-600">Format PNG Transparan - Ukuran: 2 MB</p>
                 </div>
               </div>
-              <button class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md flex items-center">
+              <button class="bg-[var(--primary-green)] hover:bg-emerald-700 text-white px-4 py-2 rounded-md flex items-center">
                 <Download class="w-4 h-4 mr-2" />
                 Download Watermark
               </button>

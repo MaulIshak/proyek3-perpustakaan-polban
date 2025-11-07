@@ -25,7 +25,7 @@ const selectedImage = ref(null)
         <!-- Breadcrumb -->
         <div class="mb-8">
           <nav class="text-sm text-gray-500 mb-4">
-            <Link href="/" class="hover:text-emerald-600">Home</Link>
+            <Link href="/" class="hover:text-[var(--primary-green)]">Home</Link>
             <span class="mx-2">/</span>
             <span class="text-gray-800">Galeri</span>
           </nav>
