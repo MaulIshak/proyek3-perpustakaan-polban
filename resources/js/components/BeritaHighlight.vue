@@ -32,7 +32,7 @@ const beritaList = [
     <section
         class="bg-gradient-to-br from-white to-[var(--background-green)] py-16"
     >
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-7xl">
             <div class="mb-8 flex items-center justify-between">
                 <div class="inline-block">
                     <h2
@@ -45,7 +45,7 @@ const beritaList = [
                     ></span>
                 </div>
                 <a
-                    class="flex w-35 items-center justify-evenly gap-1 rounded-3xl border border-transparent bg-[var(--primary-green)] p-2 text-center text-sm font-medium text-[var(--dark-green)] transition-all duration-300 hover:border-[var(--primary-green)] hover:bg-white hover:text-[var(--primary-green)]"
+                    class="flex w-35 items-center justify-evenly gap-1 rounded-3xl border border-transparent bg-[var(--primary-green)] p-2 text-center text-sm font-medium text-white transition-all duration-300 hover:border-[var(--primary-green)] hover:bg-white hover:text-[var(--primary-green)]"
                     href="/berita"
                     data-discover="true"
                     >Lihat Semua<svg
