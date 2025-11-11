@@ -11,20 +11,14 @@ const emit = defineEmits(['toggle-profile-menu']);
 
 <template>
     <header
-        class="relative flex min-h-40 items-center justify-between rounded-b-3xl border-b bg-white bg-[url('/hero-bg.jpg')] bg-cover bg-center px-6 py-3 shadow-sm"
+        class="relative flex h-40 items-center justify-between rounded-b-4xl bg-[url('/hero-bg.jpg')] bg-cover bg-center shadow-sm"
     >
         <div
-            class="absolute inset-0 rounded-b-3xl bg-[var(--dark-green)]/55"
+            class="absolute inset-0 bg-[var(--dark-green)]/85 bg-gradient-to-r to-[var(--primary-green)]/50"
         ></div>
-        <div class="relative flex w-full items-end justify-between">
-            <div>
-                <h1 class="text-3xl font-bold text-white">
-                    {{ title }}
-                </h1>
-                <p class="text-gray-200">
-                    {{ subTitle }}
-                </p>
-            </div>
-        </div>
+
+        <div
+            class="relative z-10 flex w-full items-end justify-between px-8 pb-4"
+        ></div>
     </header>
 </template>
