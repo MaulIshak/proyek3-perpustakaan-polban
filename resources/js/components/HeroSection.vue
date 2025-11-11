@@ -20,9 +20,6 @@
             >
                 PERPUSTAKAAN POLBAN
             </h1>
-            <p class="mb-10 text-base text-gray-100 md:text-lg">
-                Pusat Informasi dan Pengetahuan untuk Kemajuan Akademik Anda
-            </p>
         </div>
     </section>
 </template>
