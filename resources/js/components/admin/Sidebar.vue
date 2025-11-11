@@ -29,7 +29,7 @@ const emit = defineEmits(['toggle-sidebar']);
                         Perpustakaan POLBAN
                     </h1>
                     <h3 class="text-sm text-[var(--secondary-green)]">
-                        Admin Panel
+                        Pustakawan
                     </h3>
                 </div>
             </div>
@@ -107,12 +107,6 @@ const emit = defineEmits(['toggle-sidebar']);
                     icon="Users"
                     label="Tim Manajemen"
                     to="/admin/tim-manajemen"
-                    :sidebar-open="sidebarOpen"
-                />
-                <SidebarLink
-                    icon="Map"
-                    label="Map"
-                    to="/admin/map"
                     :sidebar-open="sidebarOpen"
                 />
             </div>
