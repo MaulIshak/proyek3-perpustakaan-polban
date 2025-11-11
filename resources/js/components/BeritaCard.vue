@@ -54,7 +54,7 @@ function stripHtml(html: string) {
                 {{ truncateText(stripHtml(content)) }}
             </p>
             <a
-                class="flex w-45 items-center justify-evenly gap-1 rounded-3xl border border-transparent bg-[var(--primary-green)] p-2 text-center text-sm font-medium text-[var(--dark-green)] transition-all duration-300 hover:border-[var(--primary-green)] hover:bg-white hover:text-[var(--primary-green)]"
+                class="flex w-45 items-center justify-evenly gap-1 rounded-3xl border border-transparent bg-[var(--primary-green)] p-2 text-center text-sm font-medium text-white transition-all duration-300 hover:border-[var(--primary-green)] hover:bg-white hover:text-[var(--primary-green)]"
                 :href="`/berita/${id}`"
                 data-discover="true"
                 >Baca Selengkapnya <ArrowRight class="w-5" />

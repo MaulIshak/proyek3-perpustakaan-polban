@@ -12,13 +12,20 @@ const books = [
     },
     {
         href: '#',
+        src: 'https://images.unsplash.com/photo-1589998059171-988d887df646?w=300',
+    },
+    {
+        href: '#',
         src: 'https://images.unsplash.com/photo-1592496431122-2349e0fbc666?w=300',
     },
     {
         href: '#',
         src: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300',
     },
-
+    {
+        href: '#',
+        src: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300',
+    },
 ];
 </script>
 
@@ -26,7 +33,7 @@ const books = [
     <section
         class="bg-gradient-to-b from-white to-[var(--background-green)] py-16"
     >
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-7xl">
             <!-- Title -->
             <div class="mb-8 flex items-center justify-between">
                 <div class="inline-block">
@@ -41,7 +48,7 @@ const books = [
                 </div>
 
                 <a
-                    class="flex w-35 items-center justify-evenly gap-1 rounded-3xl border border-transparent bg-[var(--primary-green)] p-2 text-center text-sm font-medium text-[var(--dark-green)] transition-all duration-300 hover:border-[var(--primary-green)] hover:bg-white hover:text-[var(--primary-green)]"
+                    class="flex w-35 items-center justify-evenly gap-1 rounded-3xl border border-transparent bg-[var(--primary-green)] p-2 text-center text-sm font-medium text-white transition-all duration-300 hover:border-[var(--primary-green)] hover:bg-white hover:text-[var(--primary-green)]"
                     href="/koleksi/elib"
                     data-discover="true"
                 >
@@ -69,9 +76,7 @@ const books = [
             <div class="scroll-container relative overflow-x-auto">
                 <div class="animate-scroll flex gap-4 pb-4">
                     <BookCoverLink
-                        v-for="(book, index) in books
-                            .concat(books)
-                            .concat(books)"
+                        v-for="(book, index) in books"
                         :key="index"
                         :href="book.href"
                         :src="book.src"
