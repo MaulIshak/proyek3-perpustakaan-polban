@@ -37,7 +37,7 @@ const breadcrumb = [
 
 <template>
     <UserAppLayout :title="title">
-        <div class="container mx-auto py-10 px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <div class="container mx-auto py-10 px-4 sm:px-6 lg:px-8 max-w-9xl">
             <RemahanRoti :itemRoti="breadcrumb" />
             <h1 class="text-4xl font-extrabold text-gray-900 pb-2">
                 {{ title }}
@@ -93,10 +93,9 @@ const breadcrumb = [
 
                 <!-- Lokasi Kami Card -->
                 <div class="border bg-white rounded-lg shadow-sm w-full lg:w-1/2">
+                    <h3 class="text-xl font-bold p-6">Lokasi Kami</h3>
                     <div class="p-6">
-                        <h3 class="text-xl font-bold">Lokasi Kami</h3>
-                    </div>
-                    <div class="p-6 pt-0">
+                        <div class="p-6 pt-0">
                         <div class="h-[260px] w-full border rounded-md flex items-center justify-center bg-gray-50">
                             <div class="embed-map-responsive">
                                 <div class="embed-map-container">
@@ -126,6 +125,8 @@ const breadcrumb = [
                             </div>
                         </div>
                     </div>
+                    </div>
+                    
                 </div>
             </div>
         </div>

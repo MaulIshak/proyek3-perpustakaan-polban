@@ -80,9 +80,13 @@ Route::get('/contact', function () {
 // Peraturan Perpustakaan
 Route::get('/peraturan', function (){
     $data = [
-        'title' => 'peraturan'
+        'title' => 'Peraturan Perpustakaan'
     ];
+
+    return Inertia::render('user/Profile/Peraturan', $data);
 });
+
+// Jam Layanan 
 
 Route::prefix('admin')->name('admin.')->group(function () {
     // show login form (only for guests of admin guard)
