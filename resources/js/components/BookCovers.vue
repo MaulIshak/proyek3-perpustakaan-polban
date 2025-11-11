@@ -18,14 +18,7 @@ const books = [
         href: '#',
         src: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300',
     },
-    {
-        href: '#',
-        src: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=300',
-    },
-    {
-        href: '#',
-        src: 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=300',
-    },
+
 ];
 </script>
 
@@ -91,14 +84,6 @@ const books = [
 
 <style scoped>
 /* ===== Auto Scroll Animation ===== */
-@keyframes scroll-horizontal {
-    0% {
-        transform: translateX(0);
-    }
-    100% {
-        transform: translateX(-50%);
-    }
-}
 
 .animate-scroll {
     display: flex;
@@ -130,6 +115,4 @@ const books = [
     scrollbar-color: var(--primary-green) var(--background-green);
     scrollbar-width: thin;
 }
-
-
 </style>

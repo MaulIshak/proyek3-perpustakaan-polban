@@ -55,7 +55,7 @@ Route::get('/facilities', function () {
             [
                 'subjudul' => 'Ruang Referensi',
                 'description' => 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit excepturi quia a maxime quisquam impedit qui velit optio iusto. Voluptas beatae similique corporis ex ipsam eveniet assumenda, possimus nobis distinctio.',
-                'image' => 'https://library.polban.ac.id/wp-content/uploads/2024/09/Screenshot-2024-09-12-124117-10-1024x511.png' 
+                'image' => 'https://library.polban.ac.id/wp-content/uploads/2024/09/Screenshot-2024-09-12-124117-10-1024x511.png'
             ]
         ],
     ];
@@ -75,6 +75,9 @@ Route::get('/contact', function () {
 
     return Inertia::render('user/Kontak/Kontak', $data);
 });
+
+Route::get('/berita', [ArticleController::class, 'beritaUser'])->name('beritaUser');
+Route::get('/pengumuman', [ArticleController::class, 'pengumumanUser'])->name('pengumumanUser');
 
 
 // Peraturan Perpustakaan
@@ -113,6 +116,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // Tim manajemen
     Route::get('tim-manajemen', [TimManajemen::class, 'TmAdminPage']);
+
+
 });
 
 require __DIR__.'/settings.php';

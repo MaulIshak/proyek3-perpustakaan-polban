@@ -8,14 +8,16 @@ defineProps({
     title: String,
     description: String,
 });
+
+const breadcrumbs = [
+    { label: 'Home', link: '/' },
+];
 </script>
 
 <template>
-    <UserAppLayout>
+    <UserAppLayout :page="false" title="HOME" subtitle="" :breadcrumb="breadcrumbs">
         <HeroSection />
         <BeritaHighlight />
         <BookCovers />
     </UserAppLayout>
 </template>
-
-<style></style>

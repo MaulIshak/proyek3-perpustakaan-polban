@@ -75,4 +75,30 @@ class ArticleController extends Controller
         ]);
     }
 
+    public function beritaUser()
+    {
+        // $articles = Article::where('type', 'berita')
+        //     ->where('status', 'published')
+        //     ->orderBy('created_date', 'desc')
+        //     ->get();
+
+        // return inertia('user/Berita/BeritaList', [
+        //     'articles' => $articles,
+        // ]);
+        return inertia('user/Berita');
+    }
+
+    public function pengumumanUser()
+    {
+        // $articles = Article::where('type', 'pengumuman')
+        //     ->where('status', 'published')
+        //     ->orderBy('created_date', 'desc')
+        //     ->get();
+
+        // return inertia('user/Pengumuman/PengumumanList', [
+        //     'articles' => $articles,
+        // ]);
+        return inertia('user/Pengumuman');
+    }
+
 }
