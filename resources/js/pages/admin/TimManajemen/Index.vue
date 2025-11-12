@@ -41,7 +41,7 @@ defineProps({
             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jabatan</th>
             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gelar</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider col-span-2  ">Aksi</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
@@ -49,21 +49,22 @@ defineProps({
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ item.nama }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.jabatan }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ item.gelar }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex gap-2">
+            <td class="flex justify-center py-4 whitespace-nowrap text-sm text-gray-500 bg-blue-700">
                 <button
                     class="rounded-lg border border-yellow-500 px-2 py-2 text-center font-medium text-yellow-500 transition hover:bg-yellow-500 hover:text-white"
                 >
                     <Pencil class="mr-1 inline-block h-4 w-4" />
                     Edit
                 </button>
-                <button
+            </td>
+            <td class="whitespace-nowrap text-sm text-grey-500">
+              <button
                         type="submit"
                         class="rounded-lg border border-red-600 px-2 py-2 text-center font-medium text-red-600 transition hover:bg-red-600 hover:text-white"
                     >
                         <Trash class="mr-1 inline-block h-4 w-4" />
                         Hapus
                 </button> 
-                
             </td>
           </tr>
           <tr v-else>

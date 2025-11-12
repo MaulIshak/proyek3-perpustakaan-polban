@@ -43,17 +43,32 @@ Route::get('/facilities', function () {
         'subtitle' => 'Berbagai fasilitas modern untuk mendukung kegiatan belajar Anda',
         'facilities' => [
             [
-                'subjudul' => 'Ruang Baca',
-                'description' => 'Ruang baca dengan kapasitas 150 orang, dilengkapi dengan AC, pencahayaan yang baik, dan suasana tenang untuk mendukung aktivitas belajar mandiri.',
+                'subjudul' => 'Ruang Sirkulasi',
+                'description' => 'Fasilitas 40 unit komputer dengan akses internet cepat, tersedia untuk browsing, mengakses e-journal, dan mengerjakan tugas.',
                 'image' => 'https://library.polban.ac.id/wp-content/uploads/2024/09/Screenshot-2024-09-12-124117-10-1024x511.png',
             ],
             [
-                'subjudul' => 'Ruang Komputer',
-                'description' => 'Fasilitas 40 unit komputer dengan akses internet cepat, tersedia untuk browsing, mengakses e-journal, dan mengerjakan tugas.',
+                'subjudul' => 'Ruang Baca',
+                'description' => 'Ruang baca dengan kapasitas 150 orang, dilengkapi dengan AC, pencahayaan yang baik, dan suasana tenang untuk mendukung aktivitas belajar mandiri.',
                 'image' => 'https://library.polban.ac.id/wp-content/uploads/2024/09/Ruang-Baca-7-1024x682.jpg',
             ],
             [
                 'subjudul' => 'Ruang Referensi',
+                'description' => 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit excepturi quia a maxime quisquam impedit qui velit optio iusto. Voluptas beatae similique corporis ex ipsam eveniet assumenda, possimus nobis distinctio.',
+                'image' => 'https://library.polban.ac.id/wp-content/uploads/2024/09/Screenshot-2024-09-12-124117-10-1024x511.png'
+            ],
+            [
+                'subjudul' => 'Ruang Komputer',
+                'description' => 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit excepturi quia a maxime quisquam impedit qui velit optio iusto. Voluptas beatae similique corporis ex ipsam eveniet assumenda, possimus nobis distinctio.',
+                'image' => 'https://library.polban.ac.id/wp-content/uploads/2024/09/Screenshot-2024-09-12-124117-10-1024x511.png'
+            ],
+            [
+                'subjudul' => 'Ruang Belajar Mandiri',
+                'description' => 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit excepturi quia a maxime quisquam impedit qui velit optio iusto. Voluptas beatae similique corporis ex ipsam eveniet assumenda, possimus nobis distinctio.',
+                'image' => 'https://library.polban.ac.id/wp-content/uploads/2024/09/Screenshot-2024-09-12-124117-10-1024x511.png'
+            ],
+            [
+                'subjudul' => 'Ruang Loker',
                 'description' => 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit excepturi quia a maxime quisquam impedit qui velit optio iusto. Voluptas beatae similique corporis ex ipsam eveniet assumenda, possimus nobis distinctio.',
                 'image' => 'https://library.polban.ac.id/wp-content/uploads/2024/09/Screenshot-2024-09-12-124117-10-1024x511.png'
             ]
@@ -89,7 +104,15 @@ Route::get('/peraturan', function (){
     return Inertia::render('user/Profile/Peraturan', $data);
 });
 
-// Jam Layanan 
+// Jam Layanan
+Route::get('/jam-layanan', function (){
+    $data = [
+        'title' => 'Jam Layanan',
+        
+    ];
+
+    return Inertia::render('user/Profile/JamLayanan', $data);
+});
 
 Route::prefix('admin')->name('admin.')->group(function () {
     // show login form (only for guests of admin guard)
@@ -120,7 +143,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // Tim manajemen
     Route::get('tim-manajemen', [TimManajemen::class, 'TmAdminPage']);
-
 
 });
 

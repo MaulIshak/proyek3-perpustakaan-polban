@@ -17,6 +17,7 @@ const navItems = [
             { name: 'Tim Manajemen', href: '/tim-manajemen' },
             { name: 'Peraturan Perpustakaan', href: '/peraturan' },
             { name: 'Jam Layanan', href: '/jam-layanan' },
+            { name: 'Rencana Strategi', href: 'renstra'}
         ],
     },
     {

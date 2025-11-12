@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { defineProps, ref } from 'vue';
 import UserAppLayout from '@/layouts/UserAppLayout.vue';
-import RemahanRoti from '@/layouts/RemahanRoti.vue';
 import { Icon } from '@iconify/vue'; 
 
 // --- Data Halaman dari Controller ---
@@ -35,43 +34,59 @@ function toggleAccordion(value: string) {
 const peraturanItems = [
     {
         value: "item-1",
-        trigger: "Peraturan Pengunjung", 
+        trigger: "PERATURAN PENGUNJUNG", 
         rules: [
-            "Pengunjung yang memakai sandal dan jaket akan dikeluarkan dari ruangan perpustakaan.",
-            "Pengunjung yang membawa tas, tas laptop, makanan, minuman, rokok ke dalam ruangan akan dikeluarkan dari ruangan perpustakaan.",
-            "Pengunjung yang mengganggu ketertiban dan ketenangan akan dikeluarkan dari ruangan perpustakaan.",
-            "Pengunjung yang merusak koleksi dan fasilitas perpustakaan wajib mengganti dengan koleksi dan fasilitas yang sama dan dikenakan sanksi tidak diperbolehkan melakukan peminjaman buku selama 1 semester.",
-            "Pengunjung yang menghilangkan, merusak, dan/atau mematahkan kunci loker akan dikenakan sanksi.",
+            "Perpustakaan hanya melayani civitas akademika Polban.",
+            "Wajib berpakaian sopan dan tidak menggunakan sandal.",
+            "Pengunjung perpustakaan wajib mengisi komputer data pengunjung.",
+            "Menyimpan tas, jaket, jas di dalam loker yang tersedia.",
+            "Tidak menyimpan barang berharga di dalam loker (dompet, hp, laptop).",
+            "Tidak diperbolehkan membawa makanan dan minuman, merokok kedalam ruang perpustakaan.",
+            "Pengunjung perpustakaan harus menjaga ketenangan, tidak membuat kegaduhan dan tidak mengganggu pengunjung yang lain.",
+            "Wajib menjaga dan memelihara seluruh koleksi dan fasilitas yang ada di Perpustakaan. Pengunjung yang merusak koleksi dan fasilitas perpustakaan wajib mengganti dengan koleksi dan fasilitas yang sama dan dikenakan sanksi tidak diperbolehkan melakukan peminjaman buku selama 1 semester.",
+            "Buku yang telah selesai dibaca harap tidak dikembalikan ke rak buku tapi disimpan di atas meja, disimpan di troli, atau diserahkan kepada petugas.",
+            "Petugas tidak bertanggung jawab atas kehilangan barang pengunjung."
         ]
     },
     {
         value: "item-2",
-        trigger: "Pengembalian Buku & Ketentuan Ganti Rugi", 
+        trigger: "PERATURAN PENGGUNAAN LOKER", 
         rules: [
-            "Keterlambatan pengembalian buku dikenakan denda Rp500,-/buku/hari.",
-            "Kerusakan dan kehilangan buku yang dipinjam menjadi tanggung jawab peminjam. Kerusakan buku yang terjadi pada saat pengembalian (sobek, basah, coretan, kotor, terbakar) akan dikenakan sanksi berupa tidak diperbolehkan melakukan peminjaman buku selama 1 semester dan penggantian buku.",
-            // Sub-aturan: Ketentuan penggantian buku rusak
-            "Ketentuan penggantian buku rusak sebagai berikut:",
-            "Buku diganti sesuai aslinya.",
-            "Apabila tidak ada sesuai buku aslinya, maka diganti dengan judul buku yang sama edisi terbaru.",
-            "Diganti dengan subyek buku yang sama dengan buku yang dihilangkan.",
-            "Jumlah halamannya sama atau lebih banyak dengan buku yang dihilangkan.",
-            "Tahun terbit buku sama atau terbaru dengan buku yang dihilangkan.",
+            "Barang-barang milik pengunjung (tas, tas laptop, jaket, jaket himpunan, jas, jas lab, jas almameter, baju hangat/sweater, serta makanan dan minuman) diwajibkan untuk disimpan di dalam loker.",
+            "Pemakaian loker hanya berlaku ketika jam pelayanan perpustakaan.",
+            "Loker hanya boleh diperkenankan bagi yang akan memasuki perpustakaan dan selama ada di perpustakaan.",
+            "Tidak diperkenankan meninggalkan barang-barang dalam loker apabila telah meninggalkan perpustakaan.",
+            "Pengunjung wajib menjaga kebersihan loker.",
+            "Pengunjung dilarang membuat coretan, merusak, dan atau membawa kunci loker.",
+            "Pengunjung yang menghilangkan, merusak, dan atau mematahkan kunci loker akan dikenakan sanksi."
         ]
     },
     {
         value: "item-3",
-        trigger: "Buku Hilang", 
+        trigger: "PERATURAN PEMINJAMAN BUKU", 
         rules: [
-            "Kehilangan buku yang dipinjam menjadi tanggung jawab peminjam. Ketentuan penggantian buku hilang sebagai berikut:**",
-            // Aturan Penggantian Buku Hilang (Sama seperti yang rusak)
-            "Buku diganti sesuai aslinya.",
-            "Apabila tidak ada sesuai buku aslinya, maka diganti dengan judul buku yang sama edisi terbaru.",
-            "Diganti dengan subyek buku yang sama dengan buku yang dihilangkan.",
-            "Jumlah halamannya sama atau lebih banyak dengan buku yang dihilangkan.",
-            "Tahun terbit buku sama atau terbaru dengan buku yang dihilangkan.",
+            "Peminjam adalah Pemustaka yaitu mahasiswa, dosen atau karyawan Polban yang status keanggotaan perpustakaannya aktif.",
+            "Anggota yang status keanggotaannya tidak aktif dapat memperpanjang keanggotaannya terlebih dahulu.",
+            "Tidak diperkenankan meminjam buku dengan menggunakan kartu anggota mahasiswa lain.",
+            "Jumlah buku yang dapat dipinjam maksimal 2 (dua) buku untuk mahasiswa dan 3 (tiga) buku untuk dosen, dengan periode peminjaman selama satu (satu) minggu.",
+            "Perpanjangan periode peminjaman buku hanya dapat dilakukan 1 (satu) kali.",
+            "Keterlambatan pengembalian buku dikenakan denda.",
+            "Kerusakan dan kehilangan buku yang dipinjam menjadi tanggung jawab peminjam. Kerusakan buku yang terjadi pada saat pengembalian (sobek, basah, coretan, kotor, terbakar) akan dikenakan sanksi berupa tidak diperbolehkan melakukan peminjaman buku selama 1 semester dan penggantian buku.",
+            "Penggantian buku yang hilang atau rusak diganti dengan buku yang sama. Apabila tidak ada sesuai buku aslinya maka diganti dengan judul buku yang sama edisi terbaru, diganti dengan subyek buku yang sama, diganti dengan jumlah halamannya sama atau lebih banyak, atau diganti dengan tahun terbit buku sama atau terbaru dengan buku yang dihilangkan.",
         ]
     },
+    {
+        value: "item-4",
+        trigger: "PERATURAN KEANGGOTAAN PERPUSTAKAAN",
+        rules: [
+            "Anggota adalah pemustaka yaitu mahasiswa, dosen atau karyawan Polban yang terdaftar dalam basis data keanggotaan perpustakaan.",
+            "Mahasiswa Baru sudah otomatis menjadi anggota perpustakaan.",
+            "Mahasiswa yang status keanggotaannya tidak aktif, dapat memperpanjang keanggotaannya dengan memperlihatkan bukti pembayaran UKT semester berjalan.",
+            "Keanggotaan perpustakaan bagi mahasiswa berlaku per semester. Maka di setiap awal semester baru setelah melakukan pembayaran UKT harus memperpanjang keanggotaan perpustakaan.",
+            "Keanggotaan perpustakaan bagi dosen dan karyawan Polban berlaku per semester. Maka di setiap awal semester baru harus melakukan daftar ulang keanggotaan perpustakaan."
+        ]
+
+    }
 ];
 
 const breadcrumb = [
@@ -81,16 +96,9 @@ const breadcrumb = [
 </script>
 
 <template>
-    <UserAppLayout :title="title">
+    <UserAppLayout :title="title" :breadcrumb="breadcrumb" :page="true">
         <div class="py-12 bg-gray-50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                
-                <div class="mb-8">
-                    <RemahanRoti :itemRoti="breadcrumb" />
-                    <h1 class="text-4xl font-bold text-gray-900">{{ title }}</h1>
-                    <p class="text-gray-600 mt-2">Tata tertib dan ketentuan penggunaan perpustakaan</p>
-                </div>
-
                 <div class="p-6 mb-6 bg-emerald-50 border border-emerald-200 rounded-xl shadow">
                     <div class="flex items-start gap-3">
                         <Icon icon="lucide:alert-circle" class="w-6 h-6 text-emerald-600 shrink-0 mt-0.5" />
@@ -122,12 +130,7 @@ const breadcrumb = [
                             </button>
                             
                             <!-- Konten Accordion dengan Transisi Smooth -->
-                            <transition 
-                                name="accordion"
-                                @enter="onEnter"
-                                @after-enter="onAfterEnter"
-                                @leave="onLeave"
-                            >
+                            <transition name="accordion">
                                 <div
                                     v-show="activeAccordion.includes(item.value)"
                                     class="overflow-hidden"
