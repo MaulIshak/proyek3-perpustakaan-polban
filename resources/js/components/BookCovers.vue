@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import { Book, BookMarked } from 'lucide-vue-next';
 import BookCoverLink from './BookCoverLink.vue';
-
 const books = [
     {
         href: '#',
@@ -71,16 +71,33 @@ const books = [
                     </svg>
                 </a>
             </div>
-
             <!-- Scroll Container -->
-            <div class="scroll-container relative overflow-x-auto">
-                <div class="animate-scroll flex gap-4 pb-4">
+            <div class="relative overflow-x-auto">
+                <div class="flex gap-4 pb-4">
                     <BookCoverLink
                         v-for="(book, index) in books"
                         :key="index"
                         :href="book.href"
                         :src="book.src"
                     />
+                    <div class="flex flex-col justify-evenly">
+                        <a
+                            class="flex w-35 items-center justify-evenly gap-1 rounded-xl border border-transparent bg-[var(--dark-green)] p-2 py-10 text-center text-sm font-medium text-white transition-all duration-300 hover:border-[var(--dark-green)] hover:bg-white hover:text-[var(--dark-green)]"
+                            href="/usulan-buku"
+                            data-discover="true"
+                        >
+                            <BookMarked />
+                            Booking Buku
+                        </a>
+                        <a
+                            class="flex w-35 items-center justify-evenly gap-1 rounded-xl border border-transparent bg-[var(--dark-green)] p-2 py-10 text-center text-sm font-medium text-white transition-all duration-300 hover:border-[var(--dark-green)] hover:bg-white hover:text-[var(--dark-green)]"
+                            href="/booking-buku"
+                            data-discover="true"
+                        >
+                            <Book />
+                            Usulkan Buku
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

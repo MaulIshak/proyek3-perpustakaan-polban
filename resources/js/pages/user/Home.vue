@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="js">
 import BeritaHighlight from '@/components/BeritaHighlight.vue';
 import BookCovers from '@/components/BookCovers.vue';
 import HeroSection from '@/components/HeroSection.vue';
@@ -27,7 +27,7 @@ const activeTab = ref('berita');
         >
             <div class="w-full px-10">
                 <!-- TABS -->
-                <div class="tabs-container flex">
+                <div class="tabs-container flex gap-5">
                     <button
                         v-for="tab in [
                             {
@@ -40,13 +40,19 @@ const activeTab = ref('berita');
                                 label: 'Pengumuman Terbaru',
                                 icon: '',
                             },
-                            { key: 'buku', label: 'Koleksi Terbaru', icon: '' },
+                            {
+                                key: 'buku',
+                                label: 'Koleksi Terbaru',
+                                icon: 'Book',
+                            },
                         ]"
                         :key="tab.key"
                         @click="activeTab = tab.key"
                         :class="['tab', activeTab === tab.key ? 'active' : '']"
                     >
-                        <span class="mr-2">{{ tab.icon }}</span>
+                        <!-- <span class="mr-2">
+                            <component :is="Icons[tab.icon]" class="w-2" />
+                        </span> -->
                         {{ tab.label }}
                     </button>
                 </div>
@@ -75,7 +81,6 @@ const activeTab = ref('berita');
     color: #f3fff3;
     font-weight: 500;
     cursor: pointer;
-    clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
     transition: all 0.3s ease;
     margin-right: -10px;
     border-top-left-radius: 6px;
