@@ -28,7 +28,7 @@ const handleSubmit = (e) => {
             <svg viewBox="0 0 100 60"
                 class="absolute -top-6 left-1/2 -translate-x-1/2 w-50 pointer-events-none select-none">
                 <path id="curve" d="M10,50 A40,40 0 0,1 90,50" fill="transparent" />
-                <text font-size="8" fill="white" font-weight="bold" text-anchor="middle">
+                <text font-size="8" fill="var(--primary-green)" font-weight="bold" text-anchor="middle">
                     <textPath href="#curve" startOffset="50%">
                         Tanya Pustakawan
                     </textPath>
