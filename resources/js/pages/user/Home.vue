@@ -22,48 +22,36 @@ const activeTab = ref('berita');
         <HeroSection />
 
         <!-- SECTION TAB -->
-        <section
-            class="flex min-h-[60vh] flex-col items-center justify-center bg-gray-50 px-10 py-12"
-        >
-            <div class="w-full px-10">
-                <!-- TABS -->
-                <div class="tabs-container flex gap-5">
-                    <button
-                        v-for="tab in [
-                            {
-                                key: 'berita',
-                                label: 'Berita Terbaru',
-                                icon: '',
-                            },
-                            {
-                                key: 'pengumuman',
-                                label: 'Pengumuman Terbaru',
-                                icon: '',
-                            },
-                            {
-                                key: 'buku',
-                                label: 'Koleksi Terbaru',
-                                icon: 'Book',
-                            },
-                        ]"
-                        :key="tab.key"
-                        @click="activeTab = tab.key"
-                        :class="['tab', activeTab === tab.key ? 'active' : '']"
-                    >
-                        <!-- <span class="mr-2">
-                            <component :is="Icons[tab.icon]" class="w-2" />
-                        </span> -->
-                        {{ tab.label }}
-                    </button>
-                </div>
+   <section
+    class="flex min-h-[60vh] flex-col items-center justify-center bg-gray-50 px-4 sm:px-10 py-12"
+>
+    <div class="w-full">
+        <!-- TABS -->
+        <div class="tabs-container flex gap-3 sm:gap-5 overflow-x-auto pb-2">
+            <button
+                v-for="tab in [
+                    { key: 'berita', label: 'Berita Terbaru', icon: '' },
+                    { key: 'pengumuman', label: 'Pengumuman Terbaru', icon: '' },
+                    { key: 'buku', label: 'Koleksi Terbaru', icon: 'Book' },
+                ]"
+                :key="tab.key"
+                @click="activeTab = tab.key"
+                :class="[
+                    'tab flex-shrink-0 px-4 sm:px-6 py-2 text-sm sm:text-base',
+                    activeTab === tab.key ? 'active' : '',
+                ]"
+            >
+                {{ tab.label }}
+            </button>
+        </div>
 
-                <!-- TAB CONTENT -->
-                <div class="tab-content rounded-b-2xl">
-                    <BeritaHighlight v-if="activeTab === 'berita'" />
-                    <BookCovers v-else-if="activeTab === 'buku'" />
-                </div>
-            </div>
-        </section>
+        <!-- TAB CONTENT -->
+        <div class="tab-content rounded-b-2xl">
+            <BeritaHighlight v-if="activeTab === 'berita'" />
+            <BookCovers v-else-if="activeTab === 'buku'" />
+        </div>
+    </div>
+</section>
     </UserAppLayout>
 </template>
 
@@ -72,17 +60,19 @@ const activeTab = ref('berita');
     display: flex;
     position: relative;
     z-index: 10;
+    scrollbar-width: none;
+}
+.tabs-container::-webkit-scrollbar {
+    display: none;
 }
 
 .tab {
     position: relative;
-    padding: 1rem 2rem;
     background: #99cc33;
     color: #f3fff3;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin-right: -10px;
     border-top-left-radius: 6px;
     border-top-right-radius: 6px;
 }
