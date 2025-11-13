@@ -61,22 +61,25 @@ const handleSubmit = (e) => {
                 <!-- Form -->
                 <form @submit="handleSubmit" class="p-4 space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Nama Lengkap</label>
-                        <input type="text" v-model="formData.nama" placeholder="Masukkan nama Anda" required
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Nama Lengkap
+                            <input type="text" v-model="formData.nama" placeholder="Masukkan nama Anda" required
                             class="w-full rounded-md border border-gray-300 focus:border-[var(--primary-green)] focus:ring focus:ring-emerald-200 transition" />
+                        </label>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
-                        <input type="email" v-model="formData.email" placeholder="email@example.com" required
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Email
+                            <input type="email" v-model="formData.email" placeholder="email@example.com" required
                             class="w-full rounded-md border border-gray-300 focus:border-[var(--primary-green)] focus:ring focus:ring-emerald-200 transition" />
+                        </label>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Pertanyaan Anda</label>
-                        <textarea v-model="formData.pertanyaan" placeholder="Tuliskan pertanyaan Anda di sini..."
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Pertanyaan Anda
+                            <textarea v-model="formData.pertanyaan" placeholder="Tuliskan pertanyaan Anda di sini..."
                             required rows="4"
                             class="w-full rounded-md border border-gray-300 focus:border-[var(--primary--green)] focus:ring focus:ring-emerald-200 resize-none transition"></textarea>
+                        </label>
                     </div>
 
                     <button type="submit" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[var(--primary-green)] to-[var(--primary-green)] 

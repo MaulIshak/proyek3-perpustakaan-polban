@@ -14,9 +14,9 @@ const navItems = [
         items: [
             { name: 'Tentang Perpustakaan', href: '/about' },
             { name: 'Fasilitas', href: '/facilities' },
-            { name: 'Tim Manajemen', href: '/tim-manajemen'},
-            { name: 'Peraturan Perpustakaan', href: '/peraturan'},
-            { name: 'Jam Layanan', href: '/jam-layanan'}
+            { name: 'Tim Manajemen', href: '/tim-manajemen' },
+            { name: 'Peraturan Perpustakaan', href: '/peraturan' },
+            { name: 'Jam Layanan', href: '/jam-layanan' },
         ],
     },
     {
@@ -39,8 +39,8 @@ const navItems = [
     {
         name: 'Informasi',
         items: [
-            { name: 'Berita', href: '/news' },
-            { name: 'Pengumuman', href: '/announcements' },
+            { name: 'Berita', href: '/berita' },
+            { name: 'Pengumuman', href: '/pengumuman' },
         ],
     },
     { name: 'Bebas Masalah', href: '/bebas_masalah' },
@@ -99,8 +99,12 @@ onUnmounted(() => {
                 <!-- Logo -->
                 <div class="flex items-center gap-3">
                     <div>
-                        <h1 class="text-lg font-bold">PERPUSTAKAAN POLITEKNIK NEGERI BANDUNG</h1>
-                        <p class="text-sm text-gray-600">NPP: 321702200000001</p>
+                        <h1 class="text-lg font-bold">
+                            PERPUSTAKAAN POLITEKNIK NEGERI BANDUNG
+                        </h1>
+                        <p class="text-lg text-gray-600">
+                            NPP: 321702200000001
+                        </p>
                     </div>
                 </div>
 

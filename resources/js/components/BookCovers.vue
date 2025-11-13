@@ -1,10 +1,14 @@
 <script setup lang="ts">
+import { Book, BookMarked } from 'lucide-vue-next';
 import BookCoverLink from './BookCoverLink.vue';
-
 const books = [
     {
         href: '#',
         src: 'https://images.unsplash.com/photo-1532012197267-da84d127e765?w=300',
+    },
+    {
+        href: '#',
+        src: 'https://images.unsplash.com/photo-1589998059171-988d887df646?w=300',
     },
     {
         href: '#',
@@ -20,11 +24,7 @@ const books = [
     },
     {
         href: '#',
-        src: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=300',
-    },
-    {
-        href: '#',
-        src: 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=300',
+        src: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300',
     },
 ];
 </script>
@@ -33,7 +33,7 @@ const books = [
     <section
         class="bg-gradient-to-b from-white to-[var(--background-green)] py-16"
     >
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-7xl">
             <!-- Title -->
             <div class="mb-8 flex items-center justify-between">
                 <div class="inline-block">
@@ -48,7 +48,7 @@ const books = [
                 </div>
 
                 <a
-                    class="flex w-35 items-center justify-evenly gap-1 rounded-3xl border border-transparent bg-[var(--primary-green)] p-2 text-center text-sm font-medium text-[var(--dark-green)] transition-all duration-300 hover:border-[var(--primary-green)] hover:bg-white hover:text-[var(--primary-green)]"
+                    class="flex w-35 items-center justify-evenly gap-1 rounded-3xl border border-transparent bg-[var(--primary-green)] p-2 text-center text-sm font-medium text-white transition-all duration-300 hover:border-[var(--primary-green)] hover:bg-white hover:text-[var(--primary-green)]"
                     href="/koleksi/elib"
                     data-discover="true"
                 >
@@ -71,18 +71,33 @@ const books = [
                     </svg>
                 </a>
             </div>
-
             <!-- Scroll Container -->
-            <div class="scroll-container relative overflow-x-auto">
-                <div class="animate-scroll flex gap-4 pb-4">
+            <div class="relative overflow-x-auto">
+                <div class="flex gap-4 pb-4">
                     <BookCoverLink
-                        v-for="(book, index) in books
-                            .concat(books)
-                            .concat(books)"
+                        v-for="(book, index) in books"
                         :key="index"
                         :href="book.href"
                         :src="book.src"
                     />
+                    <div class="flex flex-col justify-evenly">
+                        <a
+                            class="flex w-35 items-center justify-evenly gap-1 rounded-xl border border-transparent bg-[var(--dark-green)] p-2 py-10 text-center text-sm font-medium text-white transition-all duration-300 hover:border-[var(--dark-green)] hover:bg-white hover:text-[var(--dark-green)]"
+                            href="/usulan-buku"
+                            data-discover="true"
+                        >
+                            <BookMarked />
+                            Booking Buku
+                        </a>
+                        <a
+                            class="flex w-35 items-center justify-evenly gap-1 rounded-xl border border-transparent bg-[var(--dark-green)] p-2 py-10 text-center text-sm font-medium text-white transition-all duration-300 hover:border-[var(--dark-green)] hover:bg-white hover:text-[var(--dark-green)]"
+                            href="/booking-buku"
+                            data-discover="true"
+                        >
+                            <Book />
+                            Usulkan Buku
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -91,14 +106,6 @@ const books = [
 
 <style scoped>
 /* ===== Auto Scroll Animation ===== */
-@keyframes scroll-horizontal {
-    0% {
-        transform: translateX(0);
-    }
-    100% {
-        transform: translateX(-50%);
-    }
-}
 
 .animate-scroll {
     display: flex;
@@ -130,6 +137,4 @@ const books = [
     scrollbar-color: var(--primary-green) var(--background-green);
     scrollbar-width: thin;
 }
-
-
 </style>

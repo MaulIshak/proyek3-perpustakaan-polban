@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { LogOut, PanelLeft, X } from 'lucide-vue-next';
+import { LogOut } from 'lucide-vue-next';
 import SidebarLink from './SidebarLink.vue';
 
 defineProps({
@@ -13,11 +13,11 @@ const emit = defineEmits(['toggle-sidebar']);
 <template>
     <aside
         :class="[
-            'flex flex-col rounded-br-2xl bg-[var(--background-green)] shadow-sm transition-all duration-300',
+            'flex flex-col rounded-r-2xl bg-[var(--background-green)]/80 shadow-sm backdrop-blur-xl transition-all duration-300',
             sidebarOpen ? 'w-64' : 'w-20',
         ]"
     >
-        <!-- Header Logo -->
+        <!-- Header Logo
         <div
             class="flex min-h-20 items-center justify-between gap-3 border-b p-4"
         >
@@ -29,7 +29,7 @@ const emit = defineEmits(['toggle-sidebar']);
                         Perpustakaan POLBAN
                     </h1>
                     <h3 class="text-sm text-[var(--secondary-green)]">
-                        Admin Panel
+                        Pustakawan
                     </h3>
                 </div>
             </div>
@@ -40,7 +40,7 @@ const emit = defineEmits(['toggle-sidebar']);
                 <X v-if="sidebarOpen" class="text-2xl text-gray-700" />
                 <PanelLeft v-else class="text-2xl text-gray-700" />
             </button>
-        </div>
+        </div> -->
 
         <!-- Navigation -->
         <nav
@@ -107,12 +107,6 @@ const emit = defineEmits(['toggle-sidebar']);
                     icon="Users"
                     label="Tim Manajemen"
                     to="/admin/tim-manajemen"
-                    :sidebar-open="sidebarOpen"
-                />
-                <SidebarLink
-                    icon="Map"
-                    label="Map"
-                    to="/admin/map"
                     :sidebar-open="sidebarOpen"
                 />
             </div>
