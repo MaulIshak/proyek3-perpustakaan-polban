@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
 import { ChevronDown, Menu, X } from 'lucide-vue-next';
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 
 defineProps({
     title: String,
@@ -59,6 +59,7 @@ function toggleMenu(i: number) {
     openIndex.value = openIndex.value === i ? null : i;
 }
 
+<<<<<<< HEAD
 function showDropdown(i: number) {
     if (window.innerWidth >= 1280) openIndex.value = i;
 }
@@ -67,10 +68,20 @@ function hideDropdown(i: number) {
     if (window.innerWidth >= 1280) openIndex.value = null;
 }
 
+=======
+>>>>>>> 1bc9b9c6f1da323f3e7ce0fdad287c8199107246
 function closeAll() {
     openIndex.value = null;
 }
 
+<<<<<<< HEAD
+=======
+function closeMobileMenu() {
+    mobileOpen.value = false;
+    openIndex.value = null;
+}
+
+>>>>>>> 1bc9b9c6f1da323f3e7ce0fdad287c8199107246
 function onDocumentClick(e: MouseEvent) {
     const target = e.target as HTMLElement | null;
     if (!target) return;
@@ -79,33 +90,66 @@ function onDocumentClick(e: MouseEvent) {
 }
 
 function onEsc(e: KeyboardEvent) {
-    if (e.key === 'Escape') closeAll();
+    if (e.key === 'Escape') {
+        closeAll();
+        if (mobileOpen.value) {
+            closeMobileMenu();
+        }
+    }
 }
 
+<<<<<<< HEAD
+=======
+// Mencegah scroll pada body ketika mobile menu terbuka
+watch(mobileOpen, (isOpen) => {
+    if (isOpen) {
+        document.body.style.overflow = 'hidden';
+    } else {
+        document.body.style.overflow = '';
+    }
+});
+
+>>>>>>> 1bc9b9c6f1da323f3e7ce0fdad287c8199107246
 onMounted(() => {
     document.addEventListener('click', onDocumentClick, true);
     document.addEventListener('keydown', onEsc);
 });
+
 onUnmounted(() => {
     document.removeEventListener('click', onDocumentClick, true);
     document.removeEventListener('keydown', onEsc);
+    // Reset body overflow saat component unmount
+    document.body.style.overflow = '';
 });
 </script>
 
 <template>
+<<<<<<< HEAD
     <nav class="bg-white/90 border-b border-gray-200 py-3 text-[var(--dark-green)] backdrop-blur-md">
+=======
+    <nav
+        class="bg-grey border-b border-gray-200 bg-white/90 py-3 text-black backdrop-blur-md"
+    >
+>>>>>>> 1bc9b9c6f1da323f3e7ce0fdad287c8199107246
         <div class="container mx-auto px-4">
             <div class="flex h-16 items-center justify-between">
                 <!-- Logo -->
                 <div class="flex items-center gap-3">
-                    <div>
-                        <h1 class="text-lg font-bold">
-                            PERPUSTAKAAN POLITEKNIK NEGERI BANDUNG
-                        </h1>
-                        <p class="text-lg text-gray-600">
-                            NPP: 321702200000001
-                        </p>
-                    </div>
+                    <Link href="/" class="flex items-center gap-6">
+                        <img
+                            src="/Images/logo-polban-ori.png"
+                            alt="Logo Politeknik Negeri Bandung"
+                            class="h-10 w-auto md:h-14 object-contain"
+                        />
+                        <div class=" sm:block leading-tight">
+                            <h1 class="text-sm font-bold md:text-lg">
+                                PERPUSTAKAAN POLBAN
+                            </h1>
+                            <p class="text-md text-gray-600 md:text-lg">
+                                NPP: 321702200000001
+                            </p>
+                        </div>
+                    </Link>
                 </div>
 
                 <!-- Tombol Mobile -->
@@ -187,8 +231,9 @@ onUnmounted(() => {
             <transition name="fade">
                 <div
                     v-show="mobileOpen"
-                    class="mt-3 flex flex-col gap-2 border-t border-gray-200 pt-3 xl:hidden"
+                    class="mt-3 flex max-h-[70vh] flex-col gap-2 overflow-y-auto border-t border-gray-200 pt-3 xl:hidden"
                 >
+<<<<<<< HEAD
                     <template v-for="(item, i) in navItems" :key="item.name">
                         <Link
                             v-if="!item.items"
@@ -203,16 +248,25 @@ onUnmounted(() => {
                             <button
                                 @click="toggleMenu(i)"
                                 class="flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100"
+=======
+                        <template v-for="(item, i) in navItems" :key="item.name">
+                            <!-- single link -->
+                            <Link
+                                v-if="!item.items"
+                                :href="item.href"
+                                class="block rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100"
+                                :class="[
+                                    item.href === currentUrl
+                                        ? 'bg-[var(--background-green)] text-[var(--dark-green)]'
+                                        : '',
+                                ]"
+                                @click="closeMobileMenu"
+>>>>>>> 1bc9b9c6f1da323f3e7ce0fdad287c8199107246
                             >
-                                <span>{{ item.name }}</span>
-                                <ChevronDown
-                                    :class="[
-                                        'h-4 w-4 transition-transform',
-                                        openIndex === i ? 'rotate-180' : '',
-                                    ]"
-                                />
-                            </button>
+                                {{ item.name }}
+                            </Link>
 
+<<<<<<< HEAD
                             <Transition
                                 enter-active-class="transition ease-out duration-300"
                                 enter-from-class="opacity-0 -translate-y-2"
@@ -221,6 +275,22 @@ onUnmounted(() => {
                                 leave-from-class="opacity-100 translate-y-0"
                                 leave-to-class="opacity-0 -translate-y-2"
                                 >
+=======
+                            <!-- dropdown in mobile -->
+                            <div v-else class="navbar-dropdown">
+                                <button
+                                    @click="toggleMenu(i)"
+                                    class="flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100"
+                                >
+                                    <span>{{ item.name }}</span>
+                                    <ChevronDown
+                                        :class="[
+                                            'h-4 w-4 transition-transform',
+                                            openIndex === i ? 'rotate-180' : '',
+                                        ]"
+                                    />
+                                </button>
+>>>>>>> 1bc9b9c6f1da323f3e7ce0fdad287c8199107246
 
                                 <div
                                     v-show="openIndex === i"
@@ -231,14 +301,28 @@ onUnmounted(() => {
                                         :key="subItem.name"
                                         :href="subItem.href"
                                         class="block rounded-md px-3 py-1 text-sm text-gray-600 hover:bg-gray-100"
+<<<<<<< HEAD
                                         @click="mobileOpen = false"
+=======
+                                        :class="[
+                                            subItem.href === currentUrl
+                                                ? 'bg-[var(--background-green)] text-[var(--dark-green)]'
+                                                : '',
+                                        ]"
+                                        @click="closeMobileMenu"
+>>>>>>> 1bc9b9c6f1da323f3e7ce0fdad287c8199107246
                                     >
                                         {{ subItem.name }}
                                     </Link>
                                 </div>
+<<<<<<< HEAD
                             </Transition>
                         </div>
                     </template>
+=======
+                            </div>
+                        </template>
+>>>>>>> 1bc9b9c6f1da323f3e7ce0fdad287c8199107246
                 </div>
             </transition>
         </div>
