@@ -65,6 +65,56 @@ class ArticleController extends Controller
             ->to('/admin/berita')
             ->with('success', 'Artikel berhasil dibuat.');
     }
+    public function editBerita($id)
+    {
+        $article = Article::where('article_id', $id)->firstOrFail();
+        // dd($article);
+        return inertia('admin/berita/Edit', [
+            'article' => $article,
+        ]);
+    }
+
+public function updateBerita(Request $request, $id)
+{
+    $article = Article::where('article_id', $id)->firstOrFail();
+
+    $validated = $request->validate([
+        'judul' => ['required', 'string', 'max:255'],
+        'content' => ['required', 'string'],
+        'status' => ['required', Rule::in(['published', 'draft'])],
+        'date' => ['required', 'date'],
+        'thumbnail' => ['nullable', 'image', 'max:2048'],
+        'attachment' => ['nullable', 'file', 'max:5120'],
+    ]);
+
+    if ($request->hasFile('thumbnail')) {
+        if ($article->url_thumbnail) {
+            Storage::disk('public')->delete(str_replace('/storage/', '', $article->url_thumbnail));
+        }
+        $thumbnailPath = $request->file('thumbnail')->store('articles/thumbnails', 'public');
+        $article->url_thumbnail = Storage::url($thumbnailPath);
+    }
+
+    if ($request->hasFile('attachment')) {
+        if ($article->url_attachment) {
+            Storage::disk('public')->delete(str_replace('/storage/', '', $article->url_attachment));
+        }
+        $attachmentPath = $request->file('attachment')->store('articles/attachments', 'public');
+        $article->url_attachment = Storage::url($attachmentPath);
+    }
+
+    $article->update([
+        'judul' => $validated['judul'],
+        'content' => $validated['content'],
+        'status' => $validated['status'],
+        'created_date' => $validated['date'],
+    ]);
+
+    return redirect()
+        ->to('/admin/berita')
+        ->with('success', 'Berita berhasil diperbarui.');
+}
+
 
     public function showBerita($id)
     {

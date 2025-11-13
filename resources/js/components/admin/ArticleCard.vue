@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import DOMPurify from 'dompurify';
 import { Calendar, Eye, Pencil, Trash } from 'lucide-vue-next';
 
 defineProps<{
@@ -8,10 +7,10 @@ defineProps<{
     status: string;
     time: string;
     deleteAction: string;
-    thumbnailUrl: string
+    thumbnailUrl: string;
     viewHref: string;
+    updateHref: string;
 }>();
-
 
 function formatDate(dateString: string) {
     if (!dateString) return '-'; // fallback kalau null
@@ -64,13 +63,14 @@ function stripHtml(html: string) {
             </div>
             <div class="mt-4 flex justify-end gap-2 text-sm">
                 <a
-                :href="viewHref"
+                    :href="viewHref"
                     class="rounded-lg border border-blue-600 px-2 py-2 text-center font-medium text-blue-600 transition hover:bg-blue-600 hover:text-white"
                 >
                     <Eye class="mr-1 inline-block h-4 w-4" />
                     Lihat
                 </a>
                 <a
+                    :href="updateHref"
                     class="rounded-lg border border-yellow-500 px-2 py-2 text-center font-medium text-yellow-500 transition hover:bg-yellow-500 hover:text-white"
                 >
                     <Pencil class="mr-1 inline-block h-4 w-4" />

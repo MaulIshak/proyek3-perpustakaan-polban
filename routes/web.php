@@ -113,7 +113,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     ->name('beritaStore');
 
     Route::get('berita/detail/{id}', [ArticleController::class, 'showBerita'])->middleware('auth:admin')->name('beritaShow');
-
+    Route::get('berita/edit/{id}', [ArticleController::class, 'editBerita'])->middleware('auth:admin');
+    Route::post('berita/update/{id}', [ArticleController::class, 'updateBerita'])->middleware('auth:admin');
     // Tim manajemen
     Route::get('tim-manajemen', [TimManajemen::class, 'TmAdminPage']);
 

@@ -3,26 +3,23 @@ import ArticleCard from '@/components/admin/ArticleCard.vue';
 import CreateWithSearch from '@/components/admin/CreateWithSearch.vue';
 import AdminLayout from '@/layouts/AdminLayout.vue';
 
-defineOptions({
-    layout: (h, page) =>
-        h(
-            AdminLayout,
-            {
-                title: 'Berita',
-                subTitle: 'Kelola konten berita perpustakaan',
-            },
-            { default: () => page },
-        ),
-});
-
 const { articles } = defineProps({
     articles: {
         type: Array,
         default: () => [],
     },
 });
-
-console.log(articles);
+defineOptions({
+    layout: (h, page) =>
+        h(
+            AdminLayout,
+            {
+                title: '',
+                subTitle: '',
+            },
+            { default: () => page },
+        ),
+});
 
 const berita = [
     {
@@ -120,6 +117,7 @@ const handleCreate = () => {};
             :delete-action="`/admin/berita/${berita.article_id}/delete`"
             :thumbnail-url="berita.url_thumbnail"
             :view-href="`/admin/berita/detail/${berita.article_id}/`"
+            :update-href="`/admin/berita/edit/${berita.article_id}/`"
             class="flex-1"
         />
     </div>

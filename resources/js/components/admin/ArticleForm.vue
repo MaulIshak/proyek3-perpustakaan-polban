@@ -215,10 +215,10 @@
     </form>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { QuillEditor } from '@vueup/vue-quill';
 import '@vueup/vue-quill/dist/vue-quill.snow.css';
-import { onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 
 // Props
 const props = defineProps({
@@ -232,7 +232,7 @@ const props = defineProps({
     },
 });
 
-// v-model artikel
+// v-model artikel (bisa dari create atau edit)
 const articleData = defineModel({
     type: Object,
     required: true,
@@ -241,13 +241,32 @@ const articleData = defineModel({
 // Emit submit
 const emit = defineEmits(['submit']);
 
-// State untuk thumbnail
-const thumbnailPreviewUrl = ref(null);
-const thumbnailInput = ref(null);
+// State thumbnail
+const thumbnailPreviewUrl = ref<string | null>(null);
+const thumbnailInput = ref<HTMLInputElement | null>(null);
 
-// Handle upload thumbnail
-function handleThumbnailChange(event) {
-    const file = event.target.files?.[0];
+// Saat komponen dimount (untuk halaman edit)
+onMounted(() => {
+    console.log(articleData.value);
+    // Jika ada thumbnail lama, tampilkan
+    if (articleData.value.url_thumbnail) {
+        thumbnailPreviewUrl.value = articleData.value.url_thumbnail;
+    }
+});
+
+// Jika artikel berubah (misalnya data async dari Inertia)
+watch(
+    () => articleData.value.thumbnail_url,
+    (newUrl) => {
+        if (newUrl && !thumbnailPreviewUrl.value) {
+            thumbnailPreviewUrl.value = newUrl;
+        }
+    },
+);
+
+// Handle upload thumbnail baru
+function handleThumbnailChange(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
     if (!file || !file.type.startsWith('image/')) {
         clearThumbnail();
         return;
@@ -255,19 +274,25 @@ function handleThumbnailChange(event) {
 
     articleData.value.thumbnail = file;
 
-    // Hapus preview lama jika ada
-    if (thumbnailPreviewUrl.value) {
+    // Hapus preview lama
+    if (
+        thumbnailPreviewUrl.value &&
+        thumbnailPreviewUrl.value.startsWith('blob:')
+    ) {
         URL.revokeObjectURL(thumbnailPreviewUrl.value);
     }
 
-    // Buat preview baru
+    // Buat preview baru dari file upload
     thumbnailPreviewUrl.value = URL.createObjectURL(file);
 }
 
-// Clear thumbnail
+// Hapus thumbnail
 function clearThumbnail() {
     articleData.value.thumbnail = null;
-    if (thumbnailPreviewUrl.value) {
+    if (
+        thumbnailPreviewUrl.value &&
+        thumbnailPreviewUrl.value.startsWith('blob:')
+    ) {
         URL.revokeObjectURL(thumbnailPreviewUrl.value);
     }
     thumbnailPreviewUrl.value = null;
@@ -277,17 +302,17 @@ function clearThumbnail() {
     }
 }
 
-// Trigger file dialog
+// Buka dialog file
 function triggerThumbnailClick() {
     if (thumbnailInput.value) {
-        thumbnailInput.value.value = null; // reset supaya event change tetap bisa dipanggil
+        thumbnailInput.value.value = '';
         thumbnailInput.value.click();
     }
 }
 
-// Handle lampiran opsional
-function handleAttachmentChange(event) {
-    const file = event.target.files?.[0];
+// Lampiran opsional
+function handleAttachmentChange(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
     articleData.value.attachment = file || null;
 }
 
@@ -298,7 +323,10 @@ function handleSubmit() {
 
 // Cleanup URL preview
 onUnmounted(() => {
-    if (thumbnailPreviewUrl.value) {
+    if (
+        thumbnailPreviewUrl.value &&
+        thumbnailPreviewUrl.value.startsWith('blob:')
+    ) {
         URL.revokeObjectURL(thumbnailPreviewUrl.value);
     }
 });

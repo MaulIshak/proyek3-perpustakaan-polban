@@ -1,18 +1,5 @@
 <script setup>
 import ArticlePage from '@/components/ArticlePage.vue';
-import AdminLayout from '@/layouts/AdminLayout.vue';
-
-defineOptions({
-    layout: (h, page) =>
-        h(
-            AdminLayout,
-            {
-                title: 'Judul Halaman',
-                subTitle: 'Subjudul Halaman',
-            },
-            { default: () => page },
-        ),
-});
 
 const article = defineProps({
     article: {
