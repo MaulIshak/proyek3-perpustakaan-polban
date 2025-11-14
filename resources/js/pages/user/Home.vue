@@ -43,7 +43,7 @@ const activeTab = ref('berita');
         :breadcrumb="breadcrumbs"
     >
         <!-- HERO -->
-        <HeroSection />
+  
 
         <!-- SECTION TAB -->
         <section

@@ -158,7 +158,10 @@ const icons = {
 
 const Pelayanan_Data = computed(() => PelayananData[props.pelayanan]);
 const IconComponent = computed(() => icons[Pelayanan_Data.value.icon]);
-const breadcrumb = [{ label: 'Pelayanan' }, { label: Pelayanan_Data.title }];
+const breadcrumb = computed(() => [
+    { label: 'Pelayanan', link: '/pelayanan' },
+    { label: Pelayanan_Data.value.title },
+]);
 </script>
 
 <template>

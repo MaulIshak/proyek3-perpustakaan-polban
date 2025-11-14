@@ -10,7 +10,7 @@
 
         <!-- Konten utama hero -->
         <div
-            class="relative z-10 container mx-auto px-6 py-36 text-center md:py-42 lg:px-24"
+            class="relative z-10 px-6 py-36 text-center md:py-42 lg:px-24"
         >
             <h2 class="mb-4 text-3xl font-extrabold md:text-5xl">
                 Selamat Datang di
