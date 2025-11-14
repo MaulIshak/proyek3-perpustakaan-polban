@@ -5,12 +5,12 @@ import { ref } from 'vue';
 
 // Data galeri (nanti bisa diganti import dari file JS atau dari backend)
 const galeriData = [
-    { id: 1, image: '/Images/galeri1.jpg', caption: 'Kegiatan Literasi 2024' },
-    { id: 2, image: '/Images/galeri2.jpg', caption: 'Ruang Baca Mahasiswa' },
-    { id: 3, image: '/Images/galeri3.jpg', caption: 'Workshop Referensi' },
-    { id: 4, image: '/Images/galeri4.jpg', caption: 'Pelatihan Mendeley' },
-    { id: 5, image: '/Images/galeri5.jpg', caption: 'Koleksi Buku Baru' },
-    { id: 6, image: '/Images/galeri6.jpg', caption: 'Layanan Pustakawan' },
+    { id: 1, image: '/hero-bg.jpg', caption: 'Kegiatan Literasi 2024' },
+    { id: 2, image: '/hero-bg.jpg', caption: 'Ruang Baca Mahasiswa' },
+    { id: 3, image: '/hero-bg.jpg', caption: 'Workshop Referensi' },
+    { id: 4, image: '/hero-bg.jpg', caption: 'Pelatihan Mendeley' },
+    { id: 5, image: '/hero-bg.jpg', caption: 'Koleksi Buku Baru' },
+    { id: 6, image: '/hero-bg.jpg', caption: 'Layanan Pustakawan' },
 ];
 
 // Gambar yang sedang dipilih

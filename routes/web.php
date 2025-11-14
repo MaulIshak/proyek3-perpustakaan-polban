@@ -76,6 +76,14 @@ Route::get('/contact', function () {
     return Inertia::render('user/Kontak/Kontak', $data);
 });
 
+Route::get('/usulan_buku', function () {
+    return Inertia::render('user/Koleksi/Usulan_Buku');
+});
+
+Route::get('/E_Journal', function () {
+    return Inertia::render('user/Koleksi/EJournal');
+});
+
 Route::get('/berita', [ArticleController::class, 'beritaUser'])->name('beritaUser');
 Route::get('/pengumuman', [ArticleController::class, 'pengumumanUser'])->name('pengumumanUser');
 
