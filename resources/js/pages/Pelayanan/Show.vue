@@ -157,19 +157,18 @@ const icons = {
 };
 
 const Pelayanan_Data = computed(() => PelayananData[props.pelayanan]);
-const IconComponent = computed(() => icons[Pelayanan_Data.value.icon]);
-const breadcrumb = [{ label: 'Pelayanan' }, { label: Pelayanan_Data.title }];
+const breadcrumb = [{ label: 'Pelayanan' }, { label: Pelayanan_Data.value.title }];
 </script>
 
 <template>
     <Layout :page="true" :breadcrumb="breadcrumb" :title="Pelayanan_Data.title">
         <div class="py-12" v-if="Pelayanan_Data">
             <div class="mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="space-y-6">
+                <div class="flex flex-col items-center gap-6">
                     <div
                         v-for="(section, index) in Pelayanan_Data.content"
                         :key="index"
-                        class="rounded-lg border border-transparent bg-white p-6 shadow-md duration-300 hover:scale-102 hover:border-[var(--primary-green)] hover:shadow-xl"
+                        class="rounded-lg border border-transparent bg-white p-6 shadow-md duration-300 hover:scale-102 hover:border-[var(--primary-green)] hover:shadow-xl w-full max-w-7xl"
                     >
                         <h2 class="mb-4 text-3xl font-bold text-gray-800">
                             {{ section.subtitle }}

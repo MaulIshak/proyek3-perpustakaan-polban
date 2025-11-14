@@ -1,7 +1,6 @@
 <script setup lang="js">
 import BeritaHighlight from '@/components/BeritaHighlight.vue';
 import BookCovers from '@/components/BookCovers.vue';
-import HeroSection from '@/components/HeroSection.vue';
 import PengumumanCard from '@/components/PengumumanCard.vue';
 import UserAppLayout from '@/layouts/UserAppLayout.vue';
 import { ref } from 'vue';
@@ -43,7 +42,7 @@ const activeTab = ref('berita');
         :breadcrumb="breadcrumbs"
     >
         <!-- HERO -->
-        <HeroSection />
+  
 
         <!-- SECTION TAB -->
         <section
@@ -117,8 +116,8 @@ const activeTab = ref('berita');
                                     aria-hidden="true"
                                 >
                                     <path d="M5 12h14"></path>
-                                    <path d="m12 5 7 7-7 7"></path></svg
-                            ></a>
+                                    <path d="m12 5 7 7-7 7"></path></svg>
+                            </a>
                         </div>
                         <PengumumanCard
                             v-for="pengumuman in pengumumanList"

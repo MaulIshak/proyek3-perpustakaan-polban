@@ -35,8 +35,8 @@ const navItems = [
         items: [
             { name: 'Katalog Digital', href: 'https://elib.polban.ac.id/' },
             { name: 'Digilib', href: 'https://digilib.polban.ac.id/' },
-            { name: 'E-Journal', href: '/' },
-            { name: 'Form Usulan Buku' },
+            { name: 'E-Journal', href: '/E_Journal' },
+            { name: 'Form Usulan Buku', href: '/usulan_buku' },
         ],
     },
     {
@@ -226,7 +226,11 @@ onUnmounted(() => {
                             v-if="!item.items"
                             :href="item.href"
                             class="block rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100"
-                            :class="[ item.href === currentUrl ? 'bg-[var(--background-green)] text-[var(--dark-green)]' : '' ]"
+                            :class="[
+                                item.href === currentUrl
+                                    ? 'bg-[var(--background-green)] text-[var(--dark-green)]'
+                                    : '',
+                            ]"
                             @click="closeMobileMenu"
                         >
                             {{ item.name }}
@@ -253,7 +257,11 @@ onUnmounted(() => {
                                     :key="subItem.name"
                                     :href="subItem.href"
                                     class="block rounded-md px-3 py-1 text-sm text-gray-600 hover:bg-gray-100"
-                                    :class="[ subItem.href === currentUrl ? 'bg-[var(--background-green)] text-[var(--dark-green)]' : '' ]"
+                                    :class="[
+                                        subItem.href === currentUrl
+                                            ? 'bg-[var(--background-green)] text-[var(--dark-green)]'
+                                            : '',
+                                    ]"
                                     @click="closeMobileMenu"
                                 >
                                     {{ subItem.name }}
