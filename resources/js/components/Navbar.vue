@@ -59,29 +59,15 @@ function toggleMenu(i: number) {
     openIndex.value = openIndex.value === i ? null : i;
 }
 
-<<<<<<< HEAD
-function showDropdown(i: number) {
-    if (window.innerWidth >= 1280) openIndex.value = i;
-}
-
-function hideDropdown(i: number) {
-    if (window.innerWidth >= 1280) openIndex.value = null;
-}
-
-=======
->>>>>>> 1bc9b9c6f1da323f3e7ce0fdad287c8199107246
 function closeAll() {
     openIndex.value = null;
 }
 
-<<<<<<< HEAD
-=======
 function closeMobileMenu() {
     mobileOpen.value = false;
     openIndex.value = null;
 }
 
->>>>>>> 1bc9b9c6f1da323f3e7ce0fdad287c8199107246
 function onDocumentClick(e: MouseEvent) {
     const target = e.target as HTMLElement | null;
     if (!target) return;
@@ -98,8 +84,6 @@ function onEsc(e: KeyboardEvent) {
     }
 }
 
-<<<<<<< HEAD
-=======
 // Mencegah scroll pada body ketika mobile menu terbuka
 watch(mobileOpen, (isOpen) => {
     if (isOpen) {
@@ -109,7 +93,6 @@ watch(mobileOpen, (isOpen) => {
     }
 });
 
->>>>>>> 1bc9b9c6f1da323f3e7ce0fdad287c8199107246
 onMounted(() => {
     document.addEventListener('click', onDocumentClick, true);
     document.addEventListener('keydown', onEsc);
@@ -124,13 +107,9 @@ onUnmounted(() => {
 </script>
 
 <template>
-<<<<<<< HEAD
-    <nav class="bg-white/90 border-b border-gray-200 py-3 text-[var(--dark-green)] backdrop-blur-md">
-=======
     <nav
         class="bg-grey border-b border-gray-200 bg-white/90 py-3 text-black backdrop-blur-md"
     >
->>>>>>> 1bc9b9c6f1da323f3e7ce0fdad287c8199107246
         <div class="container mx-auto px-4">
             <div class="flex h-16 items-center justify-between">
                 <!-- Logo -->
@@ -139,9 +118,9 @@ onUnmounted(() => {
                         <img
                             src="/Images/logo-polban-ori.png"
                             alt="Logo Politeknik Negeri Bandung"
-                            class="h-10 w-auto md:h-14 object-contain"
+                            class="h-10 w-auto object-contain md:h-14"
                         />
-                        <div class=" sm:block leading-tight">
+                        <div class="leading-tight sm:block">
                             <h1 class="text-sm font-bold md:text-lg">
                                 PERPUSTAKAAN POLBAN
                             </h1>
@@ -183,8 +162,7 @@ onUnmounted(() => {
                         <div
                             v-else
                             class="navbar-dropdown relative"
-                            @mouseenter="showDropdown(i)"
-                            @mouseleave="hideDropdown(i)"
+                            @click.stop
                         >
                             <button
                                 @click="toggleMenu(i)"
@@ -194,34 +172,24 @@ onUnmounted(() => {
                                 <ChevronDown class="h-4 w-4" />
                             </button>
 
-                            <!-- animasi transisi -->
-                            <Transition
-                                enter-active-class="transition ease-out duration-300"
-                                enter-from-class="opacity-0 -translate-y-2"
-                                enter-to-class="opacity-100 translate-y-0"
-                                leave-active-class="transition ease-in duration-200"
-                                leave-from-class="opacity-100 translate-y-0"
-                                leave-to-class="opacity-0 -translate-y-2"
+                            <ul
+                                v-show="openIndex === i"
+                                class="absolute z-50 mt-2 w-48 rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 focus:outline-none"
                             >
-                                <ul
-                                    v-show="openIndex === i"
-                                    class="absolute z-50 mt-2 w-48 rounded-md bg-white py-2 shadow-lg ring-1 ring-black/5 focus:outline-none"
+                                <li
+                                    v-for="subItem in item.items"
+                                    :key="subItem.name"
+                                    class="p-3 hover:bg-[var(--background-green)]"
                                 >
-                                    <li
-                                        v-for="subItem in item.items"
-                                        :key="subItem.name"
-                                        class="p-3 hover:bg-[var(--background-green)]"
+                                    <Link
+                                        :href="subItem.href"
+                                        class="block text-sm text-gray-700"
+                                        @click="closeAll"
                                     >
-                                        <Link
-                                            :href="subItem.href"
-                                            class="block text-md text-gray-700"
-                                            @click="closeAll"
-                                        >
-                                            {{ subItem.name }}
-                                        </Link>
-                                    </li>
-                                </ul>
-                            </Transition>
+                                        {{ subItem.name }}
+                                    </Link>
+                                </li>
+                            </ul>
                         </div>
                     </template>
                 </div>
@@ -233,96 +201,58 @@ onUnmounted(() => {
                     v-show="mobileOpen"
                     class="mt-3 flex max-h-[70vh] flex-col gap-2 overflow-y-auto border-t border-gray-200 pt-3 xl:hidden"
                 >
-<<<<<<< HEAD
                     <template v-for="(item, i) in navItems" :key="item.name">
+                        <!-- single link -->
                         <Link
                             v-if="!item.items"
                             :href="item.href"
                             class="block rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100"
-                            @click="mobileOpen = false"
+                            :class="[
+                                item.href === currentUrl
+                                    ? 'bg-[var(--background-green)] text-[var(--dark-green)]'
+                                    : '',
+                            ]"
+                            @click="closeMobileMenu"
                         >
                             {{ item.name }}
                         </Link>
 
+                        <!-- dropdown in mobile -->
                         <div v-else class="navbar-dropdown">
                             <button
                                 @click="toggleMenu(i)"
                                 class="flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100"
-=======
-                        <template v-for="(item, i) in navItems" :key="item.name">
-                            <!-- single link -->
-                            <Link
-                                v-if="!item.items"
-                                :href="item.href"
-                                class="block rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100"
-                                :class="[
-                                    item.href === currentUrl
-                                        ? 'bg-[var(--background-green)] text-[var(--dark-green)]'
-                                        : '',
-                                ]"
-                                @click="closeMobileMenu"
->>>>>>> 1bc9b9c6f1da323f3e7ce0fdad287c8199107246
                             >
-                                {{ item.name }}
-                            </Link>
+                                <span>{{ item.name }}</span>
+                                <ChevronDown
+                                    :class="[
+                                        'h-4 w-4 transition-transform',
+                                        openIndex === i ? 'rotate-180' : '',
+                                    ]"
+                                />
+                            </button>
 
-<<<<<<< HEAD
-                            <Transition
-                                enter-active-class="transition ease-out duration-300"
-                                enter-from-class="opacity-0 -translate-y-2"
-                                enter-to-class="opacity-100 translate-y-0"
-                                leave-active-class="transition ease-in duration-200"
-                                leave-from-class="opacity-100 translate-y-0"
-                                leave-to-class="opacity-0 -translate-y-2"
+                            <div
+                                v-show="openIndex === i"
+                                class="flex flex-col gap-1 py-1 pl-5"
+                            >
+                                <Link
+                                    v-for="subItem in item.items"
+                                    :key="subItem.name"
+                                    :href="subItem.href"
+                                    class="block rounded-md px-3 py-1 text-sm text-gray-600 hover:bg-gray-100"
+                                    :class="[
+                                        subItem.href === currentUrl
+                                            ? 'bg-[var(--background-green)] text-[var(--dark-green)]'
+                                            : '',
+                                    ]"
+                                    @click="closeMobileMenu"
                                 >
-=======
-                            <!-- dropdown in mobile -->
-                            <div v-else class="navbar-dropdown">
-                                <button
-                                    @click="toggleMenu(i)"
-                                    class="flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100"
-                                >
-                                    <span>{{ item.name }}</span>
-                                    <ChevronDown
-                                        :class="[
-                                            'h-4 w-4 transition-transform',
-                                            openIndex === i ? 'rotate-180' : '',
-                                        ]"
-                                    />
-                                </button>
->>>>>>> 1bc9b9c6f1da323f3e7ce0fdad287c8199107246
-
-                                <div
-                                    v-show="openIndex === i"
-                                    class="flex flex-col gap-1 py-1 pl-5"
-                                >
-                                    <Link
-                                        v-for="subItem in item.items"
-                                        :key="subItem.name"
-                                        :href="subItem.href"
-                                        class="block rounded-md px-3 py-1 text-sm text-gray-600 hover:bg-gray-100"
-<<<<<<< HEAD
-                                        @click="mobileOpen = false"
-=======
-                                        :class="[
-                                            subItem.href === currentUrl
-                                                ? 'bg-[var(--background-green)] text-[var(--dark-green)]'
-                                                : '',
-                                        ]"
-                                        @click="closeMobileMenu"
->>>>>>> 1bc9b9c6f1da323f3e7ce0fdad287c8199107246
-                                    >
-                                        {{ subItem.name }}
-                                    </Link>
-                                </div>
-<<<<<<< HEAD
-                            </Transition>
+                                    {{ subItem.name }}
+                                </Link>
+                            </div>
                         </div>
                     </template>
-=======
-                            </div>
-                        </template>
->>>>>>> 1bc9b9c6f1da323f3e7ce0fdad287c8199107246
                 </div>
             </transition>
         </div>
