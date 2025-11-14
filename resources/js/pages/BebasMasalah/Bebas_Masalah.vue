@@ -13,11 +13,11 @@ const activeTab = ref('alur');
         <div class="min-h-screen bg-gray-50 py-12">
             <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
                 <!-- Breadcrumb -->
-                <div class="mb-8">
+                <!-- <div class="mb-8">
                     <p class="mt-2 text-gray-600">
                         Informasi dan persyaratan untuk wisudawan
                     </p>
-                </div>
+                </div> -->
 
                 <!-- Tabs -->
                 <div class="rounded-lg bg-white p-6 shadow">

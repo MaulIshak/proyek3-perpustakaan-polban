@@ -32,12 +32,14 @@ const navItems = [
     {
         name: 'Koleksi',
         items: [
-            { name: 'Buku', href: '/books' },
-            { name: 'Jurnal', href: '/journals' },
+            { name: 'Katalog Digital', href: 'https://elib.polban.ac.id/' },
+            { name: 'Digilib', href: 'https://digilib.polban.ac.id/' },
+            { name: 'E-Journal', href: '/' },
+            { name: 'Form Usulan Buku' },
         ],
     },
     {
-        name: 'Informasi',
+        name: 'Arsip',
         items: [
             { name: 'Berita', href: '/berita' },
             { name: 'Pengumuman', href: '/pengumuman' },
@@ -108,7 +110,7 @@ onUnmounted(() => {
 
 <template>
     <nav
-        class="bg-grey border-b border-gray-200 bg-white/90 py-3 text-black backdrop-blur-md"
+        class="bg-grey border-b border-gray-200 bg-white/90 py-3 text-[var(--dark-green)] backdrop-blur-md"
     >
         <div class="container mx-auto px-4">
             <div class="flex h-16 items-center justify-between">
@@ -122,7 +124,7 @@ onUnmounted(() => {
                         />
                         <div class="leading-tight sm:block">
                             <h1 class="text-sm font-bold md:text-lg">
-                                PERPUSTAKAAN POLBAN
+                                PERPUSTAKAAN POLITEKNIK NEGERI BANDUNG
                             </h1>
                             <p class="text-md text-gray-600 md:text-lg">
                                 NPP: 321702200000001
@@ -181,7 +183,22 @@ onUnmounted(() => {
                                     :key="subItem.name"
                                     class="p-3 hover:bg-[var(--background-green)]"
                                 >
+                                    <a
+                                        v-if="
+                                            subItem.href &&
+                                            subItem.href.startsWith('http')
+                                        "
+                                        :href="subItem.href"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="block text-sm text-gray-700"
+                                        @click="closeAll"
+                                    >
+                                        {{ subItem.name }}
+                                    </a>
+
                                     <Link
+                                        v-else
                                         :href="subItem.href"
                                         class="block text-sm text-gray-700"
                                         @click="closeAll"
