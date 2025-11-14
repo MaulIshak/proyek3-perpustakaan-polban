@@ -165,8 +165,6 @@ onUnmounted(() => {
                         <div
                             v-else
                             class="navbar-dropdown relative"
-                            @mouseenter="showDropdown(i)"
-                            @mouseleave="hideDropdown(i)"
                         >
                             <button
                                 @click="toggleMenu(i)"
