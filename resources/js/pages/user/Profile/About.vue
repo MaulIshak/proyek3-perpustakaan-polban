@@ -20,17 +20,19 @@ const breadcrumb = [{ label: 'Profil' }, { label: 'Tentang Perpustakaan' }];
 <template>
     <Layout :page="true" :breadcrumb="breadcrumb" :title="title">
         <div
-            class="container mx-auto px-4 py-10 leading-relaxed sm:px-6 lg:px-8"
+            class="container mx-auto px-4 py-6 sm:px-6 lg:px-8 leading-relaxed"
         >
-            <div class="space-y-10 rounded-2xl bg-white p-8 shadow-lg">
+            <div
+                class="space-y-10 rounded-2xl bg-white p-4 sm:p-6 md:p-8 shadow-lg"
+            >
                 <!-- Sejarah -->
                 <section>
                     <h2
-                        class="mb-4 flex items-center text-2xl font-semibold text-gray-800"
+                        class="mb-3 flex items-center text-xl sm:text-2xl font-semibold text-gray-800"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            class="mr-3 h-6 w-6 text-green-600"
+                            class="mr-2 h-5 w-5 sm:h-6 sm:w-6 text-green-600 flex-shrink-0"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -45,37 +47,32 @@ const breadcrumb = [{ label: 'Profil' }, { label: 'Tentang Perpustakaan' }];
                         {{ subjudul_1 }}
                     </h2>
 
-                    <div class="space-y-4 pl-9 text-justify text-gray-700">
+                    <div class="space-y-3 pl-2 sm:pl-9 text-justify text-gray-700">
                         <p>
-                            Perpustakaan Polban hadir bersamaan dengan
-                            berdirinya Politeknik ITB pada tahun 1982. Awalnya,
-                            perpustakaan berlokasi di Gedung Direktorat lantai 3
-                            dengan koleksi sebanyak 3000 eksemplar yang
-                            diperoleh melalui bantuan Bank Dunia dan Project
-                            SIAPP (Second Indonesia Australia Polytechnic
-                            Project).
+                            Perpustakaan Polban hadir bersamaan dengan berdirinya
+                            Politeknik ITB pada tahun 1982. Awalnya, perpustakaan
+                            berlokasi di Gedung Direktorat lantai 3 dengan koleksi
+                            sebanyak 3000 eksemplar yang diperoleh melalui bantuan
+                            Bank Dunia dan Project SIAPP (Second Indonesia Australia
+                            Polytechnic Project).
                         </p>
                         <p>
-                            Tahun 1992, perpustakaan mendapatkan bantuan dari
-                            PT. Dirgantara Indonesia (d/h IPTN) dan Yayasan Asia
-                            untuk pengembangan koleksi. Sejak saat itu,
-                            perpustakaan mulai memiliki anggaran sendiri dan
-                            pelayanan berbasis komputer hasil bantuan project
-                            SIAPP.
+                            Tahun 1992, perpustakaan mendapatkan bantuan dari PT.
+                            Dirgantara Indonesia (d/h IPTN) dan Yayasan Asia untuk
+                            pengembangan koleksi. Sejak saat itu, perpustakaan mulai
+                            memiliki anggaran sendiri dan pelayanan berbasis komputer
+                            hasil bantuan project SIAPP.
                         </p>
                         <p>
                             Pada tahun 2004, Perpustakaan Polban mengikuti hibah
-                            kompetisi TPSDP dari Asia Development Bank dan
-                            berhasil mengembangkannya menjadi sistem manajemen
-                            berbasis digital. Sistem ini memudahkan proses
-                            pengelolaan serta pelayanan.
+                            kompetisi TPSDP dari Asia Development Bank dan berhasil
+                            mengembangkannya menjadi sistem manajemen berbasis digital.
                         </p>
                         <p>
-                            Sejak April 2016, perpustakaan menempati Gedung H
-                            lantai 1. Kini, pengguna dapat mengakses katalog
-                            buku dan koleksi digital selama 24 jam. Koleksi
-                            e-book, e-journal, dan repositori dapat diunduh
-                            secara gratis.
+                            Sejak April 2016, perpustakaan menempati Gedung H lantai 1.
+                            Kini, pengguna dapat mengakses katalog buku dan koleksi digital
+                            selama 24 jam. Koleksi e-book, e-journal, dan repositori dapat
+                            diunduh secara gratis.
                         </p>
                     </div>
                 </section>
@@ -83,11 +80,11 @@ const breadcrumb = [{ label: 'Profil' }, { label: 'Tentang Perpustakaan' }];
                 <!-- Visi -->
                 <section>
                     <h2
-                        class="mb-4 flex items-center text-2xl font-semibold text-gray-800"
+                        class="mb-3 flex items-center text-xl sm:text-2xl font-semibold text-gray-800"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            class="mr-3 h-6 w-6 text-green-600"
+                            class="mr-2 h-5 w-5 sm:h-6 sm:w-6 text-green-600 flex-shrink-0"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -101,23 +98,22 @@ const breadcrumb = [{ label: 'Profil' }, { label: 'Tentang Perpustakaan' }];
                         </svg>
                         {{ subjudul_2 }}
                     </h2>
-                    <p class="pl-9 text-justify text-gray-700">
-                        Menjadi Pusat Sumber Belajar (Learning Resource Centre)
-                        yang mampu memenuhi beragam informasi mutakhir melalui
-                        beragam media dalam upaya membantu meningkatkan kualitas
-                        dan kemampuan kerja para lulusan Politeknik Negeri
-                        Bandung.
+                    <p class="pl-2 sm:pl-9 text-justify text-gray-700">
+                        Menjadi Pusat Sumber Belajar (Learning Resource Centre) yang mampu
+                        memenuhi beragam informasi mutakhir melalui beragam media dalam
+                        upaya membantu meningkatkan kualitas dan kemampuan kerja para lulusan
+                        Politeknik Negeri Bandung.
                     </p>
                 </section>
 
                 <!-- Misi -->
                 <section>
                     <h2
-                        class="mb-4 flex items-center text-2xl font-semibold text-gray-800"
+                        class="mb-3 flex items-center text-xl sm:text-2xl font-semibold text-gray-800"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            class="mr-3 h-6 w-6 text-green-600"
+                            class="mr-2 h-5 w-5 sm:h-6 sm:w-6 text-green-600 flex-shrink-0"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -131,7 +127,9 @@ const breadcrumb = [{ label: 'Profil' }, { label: 'Tentang Perpustakaan' }];
                         </svg>
                         {{ subjudul_3 }}
                     </h2>
-                    <ul class="list-disc space-y-3 pl-12 text-gray-700">
+                    <ul
+                        class="list-disc space-y-2 pl-6 sm:pl-12 text-gray-700"
+                    >
                         <li v-for="(item, index) in misi" :key="index">
                             {{ item }}
                         </li>

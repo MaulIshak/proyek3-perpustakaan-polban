@@ -13,13 +13,26 @@ const quickLinks = [
 <template>
     <footer class="bg-[var(--background-green)] text-[var(--dark-green)]">
         <div class="container mx-auto px-4 py-8">
-            <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
+            <div class="grid grid-cols-1 gap-8  md:text-left md:grid-cols-3">
                 <!-- About -->
                 <div>
-                    <h2 class="mb-2 text-lg font-bold">
-                        PERPUSTAKAAN POLITEKNIK NEGERI BANDUNG
-                    </h2>
-                    <p class="mb-4 text-sm">NPP: 321702200000001</p>
+                <div class="flex items-center gap-3 mb-6">
+                    <Link href="/" class="flex items-center gap-6">
+                        <img
+                            src="/Images/logo-polban-ori.png"
+                            alt="Logo Politeknik Negeri Bandung"
+                            class="h-10 w-auto md:h-14 object-contain"
+                        />
+                        <div class=" sm:block leading-tight">
+                            <h1 class="text-sm font-bold md:text-lg">
+                                PERPUSTAKAAN POLITEKNIK NEGERI BANDUNG
+                            </h1>
+                            <p class="text-md text-gray-600 md:text-lg">
+                                NPP: 321702200000001
+                            </p>
+                        </div>
+                    </Link>
+                </div>
                     <p class="mb-2 text-sm">
                         Pusat informasi dan layanan perpustakaan untuk mendukung
                         kegiatan akademik Politeknik Negeri Bandung.
@@ -63,3 +76,4 @@ const quickLinks = [
         </div>
     </footer>
 </template>
+

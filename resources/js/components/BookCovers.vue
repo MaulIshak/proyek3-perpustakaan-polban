@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Book, BookMarked } from 'lucide-vue-next';
 import BookCoverLink from './BookCoverLink.vue';
 const books = [
     {
@@ -30,10 +29,8 @@ const books = [
 </script>
 
 <template>
-    <section
-        class="bg-gradient-to-b from-white to-[var(--background-green)] py-16"
-    >
-        <div class="mx-auto max-w-7xl">
+    <section class="py-16">
+        <div class="mx-auto">
             <!-- Title -->
             <div class="mb-8 flex items-center justify-between">
                 <div class="inline-block">
@@ -80,24 +77,6 @@ const books = [
                         :href="book.href"
                         :src="book.src"
                     />
-                    <div class="flex flex-col justify-evenly">
-                        <a
-                            class="flex w-35 items-center justify-evenly gap-1 rounded-xl border border-transparent bg-[var(--dark-green)] p-2 py-10 text-center text-sm font-medium text-white transition-all duration-300 hover:border-[var(--dark-green)] hover:bg-white hover:text-[var(--dark-green)]"
-                            href="/usulan-buku"
-                            data-discover="true"
-                        >
-                            <BookMarked />
-                            Booking Buku
-                        </a>
-                        <a
-                            class="flex w-35 items-center justify-evenly gap-1 rounded-xl border border-transparent bg-[var(--dark-green)] p-2 py-10 text-center text-sm font-medium text-white transition-all duration-300 hover:border-[var(--dark-green)] hover:bg-white hover:text-[var(--dark-green)]"
-                            href="/booking-buku"
-                            data-discover="true"
-                        >
-                            <Book />
-                            Usulkan Buku
-                        </a>
-                    </div>
                 </div>
             </div>
         </div>

@@ -5,7 +5,7 @@ defineProps<{
 </script>
 
 <template>
-  <nav class="flex items-center py-3" aria-label="Breadcrumb">
+  <nav class="flex items-center py-3 overflow-x-auto" aria-label="Breadcrumb">
     <ol class="flex items-center gap-2">
       <li v-for="(item, index) in itemRoti" :key="index" class="flex items-center">
         <a

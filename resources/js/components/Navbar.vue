@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
 import { ChevronDown, Menu, X } from 'lucide-vue-next';
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref, watch, watch } from 'vue';
 
 defineProps({
     title: String,
@@ -33,12 +33,14 @@ const navItems = [
     {
         name: 'Koleksi',
         items: [
-            { name: 'Buku', href: '/books' },
-            { name: 'Jurnal', href: '/journals' },
+            { name: 'Katalog Digital', href: 'https://elib.polban.ac.id/' },
+            { name: 'Digilib', href: 'https://digilib.polban.ac.id/' },
+            { name: 'E-Journal', href: '/' },
+            { name: 'Form Usulan Buku' },
         ],
     },
     {
-        name: 'Informasi',
+        name: 'Arsip',
         items: [
             { name: 'Berita', href: '/berita' },
             { name: 'Pengumuman', href: '/pengumuman' },
@@ -59,44 +61,77 @@ const mobileOpen = ref(false);
 function toggleMenu(i: number) {
     openIndex.value = openIndex.value === i ? null : i;
 }
+
 function closeAll() {
     openIndex.value = null;
 }
+
+function closeMobileMenu() {
+    mobileOpen.value = false;
+    openIndex.value = null;
+}
+
 function onDocumentClick(e: MouseEvent) {
     const target = e.target as HTMLElement | null;
     if (!target) return;
     if (target.closest('.navbar-dropdown')) return;
     closeAll();
 }
+
 function onEsc(e: KeyboardEvent) {
-    if (e.key === 'Escape') closeAll();
+    if (e.key === 'Escape') {
+        closeAll();
+        if (mobileOpen.value) {
+            closeMobileMenu();
+        }
+    }
 }
+
+// Mencegah scroll pada body ketika mobile menu terbuka
+watch(mobileOpen, (isOpen) => {
+    if (isOpen) {
+        document.body.style.overflow = 'hidden';
+    } else {
+        document.body.style.overflow = '';
+    }
+});
+
 onMounted(() => {
     document.addEventListener('click', onDocumentClick, true);
     document.addEventListener('keydown', onEsc);
 });
+
 onUnmounted(() => {
     document.removeEventListener('click', onDocumentClick, true);
     document.removeEventListener('keydown', onEsc);
+    // Reset body overflow saat component unmount
+    document.body.style.overflow = '';
 });
 </script>
 
 <template>
     <nav
-        class="bg-grey border-b border-gray-200 bg-white/90 py-3 text-[var(--dark-green)] backdrop-blur-md"
+        class="bg-grey border-b border-gray-200 bg-white/90 py-3 text-black backdrop-blur-md"
     >
         <div class="container mx-auto px-4">
             <div class="flex h-16 items-center justify-between">
                 <!-- Logo -->
                 <div class="flex items-center gap-3">
-                    <div>
-                        <h1 class="text-lg font-bold">
-                            PERPUSTAKAAN POLITEKNIK NEGERI BANDUNG
-                        </h1>
-                        <p class="text-lg text-gray-600">
-                            NPP: 321702200000001
-                        </p>
-                    </div>
+                    <Link href="/" class="flex items-center gap-6">
+                        <img
+                            src="/Images/logo-polban-ori.png"
+                            alt="Logo Politeknik Negeri Bandung"
+                            class="h-10 w-auto object-contain md:h-14"
+                        />
+                        <div class="leading-tight sm:block">
+                            <h1 class="text-sm font-bold md:text-lg">
+                                PERPUSTAKAAN POLITEKNIK NEGERI BANDUNG
+                            </h1>
+                            <p class="text-md text-gray-600 md:text-lg">
+                                NPP: 321702200000001
+                            </p>
+                        </div>
+                    </Link>
                 </div>
 
                 <!-- Tombol Mobile -->
@@ -130,7 +165,8 @@ onUnmounted(() => {
                         <div
                             v-else
                             class="navbar-dropdown relative"
-                            @click.stop
+                            @mouseenter="showDropdown(i)"
+                            @mouseleave="hideDropdown(i)"
                         >
                             <button
                                 @click="toggleMenu(i)"
@@ -149,7 +185,22 @@ onUnmounted(() => {
                                     :key="subItem.name"
                                     class="p-3 hover:bg-[var(--background-green)]"
                                 >
+                                    <a
+                                        v-if="
+                                            subItem.href &&
+                                            subItem.href.startsWith('http')
+                                        "
+                                        :href="subItem.href"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="block text-sm text-gray-700"
+                                        @click="closeAll"
+                                    >
+                                        {{ subItem.name }}
+                                    </a>
+
                                     <Link
+                                        v-else
                                         :href="subItem.href"
                                         class="block text-sm text-gray-700"
                                         @click="closeAll"
@@ -167,33 +218,38 @@ onUnmounted(() => {
             <transition name="fade">
                 <div
                     v-show="mobileOpen"
-                    class="mt-3 flex flex-col gap-2 border-t border-gray-200 pt-3 xl:hidden"
+                    class="mt-3 flex max-h-[70vh] flex-col gap-2 overflow-y-auto border-t border-gray-200 pt-3 xl:hidden"
                 >
-                    <template v-for="(item, i) in navItems" :key="item.name">
-                        <!-- single link -->
-                        <Link
-                            v-if="!item.items"
-                            :href="item.href"
-                            class="block rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100"
-                            @click="mobileOpen = false"
-                        >
-                            {{ item.name }}
-                        </Link>
-
-                        <!-- dropdown in mobile -->
-                        <div v-else class="navbar-dropdown">
-                            <button
-                                @click="toggleMenu(i)"
-                                class="flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100"
+                        <template v-for="(item, i) in navItems" :key="item.name">
+                            <!-- single link -->
+                            <Link
+                                v-if="!item.items"
+                                :href="item.href"
+                                class="block rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100"
+                                :class="[
+                                    item.href === currentUrl
+                                        ? 'bg-[var(--background-green)] text-[var(--dark-green)]'
+                                        : '',
+                                ]"
+                                @click="closeMobileMenu"
                             >
-                                <span>{{ item.name }}</span>
-                                <ChevronDown
-                                    :class="[
-                                        'h-4 w-4 transition-transform',
-                                        openIndex === i ? 'rotate-180' : '',
-                                    ]"
-                                />
-                            </button>
+                                {{ item.name }}
+                            </Link>
+
+                            <!-- dropdown in mobile -->
+                            <div v-else class="navbar-dropdown">
+                                <button
+                                    @click="toggleMenu(i)"
+                                    class="flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100"
+                                >
+                                    <span>{{ item.name }}</span>
+                                    <ChevronDown
+                                        :class="[
+                                            'h-4 w-4 transition-transform',
+                                            openIndex === i ? 'rotate-180' : '',
+                                        ]"
+                                    />
+                                </button>
 
                             <div
                                 v-show="openIndex === i"
@@ -204,13 +260,22 @@ onUnmounted(() => {
                                     :key="subItem.name"
                                     :href="subItem.href"
                                     class="block rounded-md px-3 py-1 text-sm text-gray-600 hover:bg-gray-100"
-                                    @click="mobileOpen = false"
+                                    :class="[
+                                        subItem.href === currentUrl
+                                            ? 'bg-[var(--background-green)] text-[var(--dark-green)]'
+                                            : '',
+                                    ]"
+                                    @click="closeMobileMenu"
                                 >
                                     {{ subItem.name }}
                                 </Link>
                             </div>
                         </div>
                     </template>
+=======
+                            </div>
+                        </template>
+>>>>>>> 1bc9b9c6f1da323f3e7ce0fdad287c8199107246
                 </div>
             </transition>
         </div>

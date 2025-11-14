@@ -30,9 +30,9 @@ const beritaList = [
 
 <template>
     <section
-        class="bg-gradient-to-br from-white to-[var(--background-green)] py-16"
+        class="bg-gradient-to-br py-16"
     >
-        <div class="mx-auto max-w-7xl">
+        <div class="mx-auto">
             <div class="mb-8 flex items-center justify-between">
                 <div class="inline-block">
                     <h2
