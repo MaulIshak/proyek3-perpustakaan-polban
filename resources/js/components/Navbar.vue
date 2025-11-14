@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
 import { ChevronDown, Menu, X } from 'lucide-vue-next';
-import { onMounted, onUnmounted, ref, watch, watch } from 'vue';
+import { onMounted, onUnmounted, ref, watch } from 'vue';
 
 defineProps({
     title: String,
@@ -220,36 +220,29 @@ onUnmounted(() => {
                     v-show="mobileOpen"
                     class="mt-3 flex max-h-[70vh] flex-col gap-2 overflow-y-auto border-t border-gray-200 pt-3 xl:hidden"
                 >
-                        <template v-for="(item, i) in navItems" :key="item.name">
-                            <!-- single link -->
-                            <Link
-                                v-if="!item.items"
-                                :href="item.href"
-                                class="block rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100"
-                                :class="[
-                                    item.href === currentUrl
-                                        ? 'bg-[var(--background-green)] text-[var(--dark-green)]'
-                                        : '',
-                                ]"
-                                @click="closeMobileMenu"
-                            >
-                                {{ item.name }}
-                            </Link>
+                    <template v-for="(item, i) in navItems" :key="item.name">
+                        <!-- single link -->
+                        <Link
+                            v-if="!item.items"
+                            :href="item.href"
+                            class="block rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100"
+                            :class="[ item.href === currentUrl ? 'bg-[var(--background-green)] text-[var(--dark-green)]' : '' ]"
+                            @click="closeMobileMenu"
+                        >
+                            {{ item.name }}
+                        </Link>
 
-                            <!-- dropdown in mobile -->
-                            <div v-else class="navbar-dropdown">
-                                <button
-                                    @click="toggleMenu(i)"
-                                    class="flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100"
-                                >
-                                    <span>{{ item.name }}</span>
-                                    <ChevronDown
-                                        :class="[
-                                            'h-4 w-4 transition-transform',
-                                            openIndex === i ? 'rotate-180' : '',
-                                        ]"
-                                    />
-                                </button>
+                        <!-- dropdown in mobile -->
+                        <div v-else class="navbar-dropdown">
+                            <button
+                                @click="toggleMenu(i)"
+                                class="flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100"
+                            >
+                                <span>{{ item.name }}</span>
+                                <ChevronDown
+                                    :class="[ 'h-4 w-4 transition-transform', openIndex === i ? 'rotate-180' : '' ]"
+                                />
+                            </button>
 
                             <div
                                 v-show="openIndex === i"
@@ -260,11 +253,7 @@ onUnmounted(() => {
                                     :key="subItem.name"
                                     :href="subItem.href"
                                     class="block rounded-md px-3 py-1 text-sm text-gray-600 hover:bg-gray-100"
-                                    :class="[
-                                        subItem.href === currentUrl
-                                            ? 'bg-[var(--background-green)] text-[var(--dark-green)]'
-                                            : '',
-                                    ]"
+                                    :class="[ subItem.href === currentUrl ? 'bg-[var(--background-green)] text-[var(--dark-green)]' : '' ]"
                                     @click="closeMobileMenu"
                                 >
                                     {{ subItem.name }}
@@ -272,10 +261,6 @@ onUnmounted(() => {
                             </div>
                         </div>
                     </template>
-=======
-                            </div>
-                        </template>
->>>>>>> 1bc9b9c6f1da323f3e7ce0fdad287c8199107246
                 </div>
             </transition>
         </div>

@@ -114,6 +114,7 @@ Route::get('/jam-layanan', function (){
     return Inertia::render('user/Profile/JamLayanan', $data);
 });
 
+
 Route::prefix('admin')->name('admin.')->group(function () {
     // show login form (only for guests of admin guard)
     Route::get('login', [LoginController::class, 'showLogin'])->middleware('guest.admin')->name('login');
