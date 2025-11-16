@@ -1,8 +1,10 @@
 <script setup>
 import ArticleCard from '@/components/admin/ArticleCard.vue';
 import CreateWithSearch from '@/components/admin/CreateWithSearch.vue';
+import { useConfirmModal } from '@/composables/userConfirmModal';
 import AdminLayout from '@/layouts/AdminLayout.vue';
-
+import { router } from '@inertiajs/vue3';
+const { open } = useConfirmModal();
 const { articles } = defineProps({
     articles: {
         type: Array,
@@ -14,8 +16,8 @@ defineOptions({
         h(
             AdminLayout,
             {
-                title: '',
-                subTitle: '',
+                title: 'Berita',
+                subTitle: 'Kelola berita perpustakaan',
             },
             { default: () => page },
         ),
@@ -94,7 +96,21 @@ const berita = [
     },
 ];
 
-const handleCreate = () => {};
+function handleDelete(article) {
+    open({
+        title: 'Hapus Berita?',
+        message: 'Pastikan data yang akan dihapus sudah benar.',
+        actionLabel: 'Hapus',
+        payload: {
+            Judul: article.judul,
+            Status: article.status,
+            Tanggal: article.created_date,
+        },
+        onConfirm: () => {
+            router.delete(`/admin/berita/delete/${article.article_id}`);
+        },
+    });
+}
 </script>
 
 <template>
@@ -114,11 +130,11 @@ const handleCreate = () => {};
             :content="berita.content"
             :status="berita.status"
             :time="berita.created_date"
-            :delete-action="`/admin/berita/${berita.article_id}/delete`"
             :thumbnail-url="berita.url_thumbnail"
             :view-href="`/admin/berita/detail/${berita.article_id}/`"
             :update-href="`/admin/berita/edit/${berita.article_id}/`"
             class="flex-1"
+            @delete="handleDelete(berita)"
         />
     </div>
 </template>

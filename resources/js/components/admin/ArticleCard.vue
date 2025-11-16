@@ -1,16 +1,25 @@
 <script setup lang="ts">
+import { useForm } from '@inertiajs/vue3';
 import { Calendar, Eye, Pencil, Trash } from 'lucide-vue-next';
+import { defineProps } from 'vue';
 
-defineProps<{
+const props = defineProps<{
     title: string;
     content: string;
     status: string;
     time: string;
-    deleteAction: string;
     thumbnailUrl: string;
     viewHref: string;
     updateHref: string;
 }>();
+
+const form = useForm({});
+
+// const deleteArticle = () => {
+//     if (confirm('Apakah Anda yakin ingin menghapus berita ini?')) {
+//         form.delete(props.deleteAction);
+//     }
+// };
 
 function formatDate(dateString: string) {
     if (!dateString) return '-'; // fallback kalau null
@@ -76,15 +85,13 @@ function stripHtml(html: string) {
                     <Pencil class="mr-1 inline-block h-4 w-4" />
                     Edit
                 </a>
-                <form :action="deleteAction" method="POST">
-                    <button
-                        type="submit"
-                        class="rounded-lg border border-red-600 px-2 py-2 text-center font-medium text-red-600 transition hover:bg-red-600 hover:text-white"
-                    >
-                        <Trash class="mr-1 inline-block h-4 w-4" />
-                        Hapus
-                    </button>
-                </form>
+                <button
+                    @click="$emit('delete')"
+                    class="rounded-lg border border-red-600 px-2 py-2 text-center font-medium text-red-600 transition hover:bg-red-600 hover:text-white"
+                >
+                    <Trash class="mr-1 inline-block h-4 w-4" />
+                    Hapus
+                </button>
             </div>
         </div>
     </div>

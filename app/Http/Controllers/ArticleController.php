@@ -151,4 +151,24 @@ public function updateBerita(Request $request, $id)
         return inertia('user/Pengumuman');
     }
 
+    public function destroyBerita($id)
+    {
+        $article = Article::where('article_id', $id)->firstOrFail();
+
+        // Hapus thumbnail dari storage jika ada
+        if ($article->url_thumbnail) {
+            Storage::disk('public')->delete(str_replace('/storage/', '', $article->url_thumbnail));
+        }
+
+        // Hapus lampiran dari storage jika ada
+        if ($article->url_attachment) {
+            Storage::disk('public')->delete(str_replace('/storage/', '', $article->url_attachment));
+        }
+
+        $article->delete();
+
+        return redirect()
+            ->to('/admin/berita')
+            ->with('success', 'Berita berhasil dihapus.');
+    }
 }
