@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Calendar, Eye, Pencil, Trash } from 'lucide-vue-next';
-import { defineEmits, defineProps } from 'vue';
+import { Eye, Pencil, Trash } from 'lucide-vue-next';
+import { computed, defineEmits, defineProps } from 'vue';
 
 const props = defineProps<{
     title: string;
@@ -14,16 +14,18 @@ const props = defineProps<{
 
 const emit = defineEmits(['delete', 'view']);
 
-function formatDate(dateString: string) {
-    if (!dateString) return '-'; // fallback kalau null
-    const date = new Date(dateString);
+const formattedDate = computed(() => {
+    if (!props.time) return { day: '-', monthYear: '-' };
+    const date = new Date(props.time);
     const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
-}
+    const monthYear = new Intl.DateTimeFormat('id-ID', {
+        month: 'short',
+        year: 'numeric',
+    }).format(date);
+    return { day, monthYear };
+});
 
-function truncateText(text: string, maxLength: number = 120): string {
+function truncateText(text: string, maxLength: number = 110): string {
     if (text.length <= maxLength) return text;
     return text.slice(0, maxLength) + '...';
 }
@@ -39,12 +41,15 @@ function stripHtml(html: string) {
     <div
         class="position-relative flex flex-col justify-between rounded-xl border border-gray-100 bg-white p-5 shadow-sm transition-shadow duration-300 hover:shadow-lg"
     >
-        <div class="h-40 w-full overflow-hidden rounded-lg bg-gray-200">
-            <img
-                :src="thumbnailUrl"
-                alt="Thumbnail"
-                class="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
-            />
+        <div
+            class="flex h-16 w-16 flex-col items-center justify-center rounded-lg bg-[var(--primary-green)] p-1 text-white"
+        >
+            <span class="text-2xl leading-none font-bold">{{
+                formattedDate.day
+            }}</span>
+            <span class="text-xs leading-none">{{
+                formattedDate.monthYear
+            }}</span>
         </div>
         <div class="mt-4 space-y-2">
             <h1 class="text-md font-bold text-gray-800">
@@ -57,22 +62,12 @@ function stripHtml(html: string) {
                 >
             </div>
 
-            <p class="flex items-center gap-1 text-xs text-gray-500">
-                <Calendar class="h-3.5 w-3.5" />{{ formatDate(time) }}
-            </p>
             <div class="mt-3 text-sm text-gray-700">
                 {{ truncateText(stripHtml(content), 110) }}
             </div>
             <div class="mt-4 flex justify-end gap-2 text-sm">
                 <button
-                    @click="
-                        $emit('view', {
-                            title,
-                            content,
-                            imageUrl: thumbnailUrl,
-                            publishedAt: time,
-                        })
-                    "
+                    @click="emit('view')"
                     class="rounded-lg border border-blue-600 px-2 py-2 text-center font-medium text-blue-600 transition hover:bg-blue-600 hover:text-white"
                 >
                     <Eye class="mr-1 inline-block h-4 w-4" />
@@ -86,7 +81,7 @@ function stripHtml(html: string) {
                     Edit
                 </a>
                 <button
-                    @click="$emit('delete')"
+                    @click="emit('delete')"
                     class="rounded-lg border border-red-600 px-2 py-2 text-center font-medium text-red-600 transition hover:bg-red-600 hover:text-white"
                 >
                     <Trash class="mr-1 inline-block h-4 w-4" />

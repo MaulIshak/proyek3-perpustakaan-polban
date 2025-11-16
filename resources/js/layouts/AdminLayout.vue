@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import ConfirmModal from '@/components/admin/ConfirmModal.vue';
 import Header from '@/components/admin/Header.vue';
 import Sidebar from '@/components/admin/Sidebar.vue';
 import { computed, ref } from 'vue';
 
-const sidebarOpen = ref(false);
+const sidebarOpen = ref(true);
 const profileMenuOpen = ref(false);
 
 const toggleSidebar = () => (sidebarOpen.value = !sidebarOpen.value);
@@ -93,5 +94,6 @@ const sidebarWidth = computed(() => (sidebarOpen.value ? 256 : 80)); // px
             </div>
             <slot />
         </main>
+        <ConfirmModal />
     </div>
 </template>

@@ -9,8 +9,8 @@ defineOptions({
         h(
             AdminLayout,
             {
-                title: 'Buat Berita Baru',
-                subTitle: 'Kelola konten berita perpustakaan baru',
+                title: 'Buat Pengumuman Baru',
+                subTitle: 'Kelola konten pengumuman perpustakaan baru',
             },
             { default: () => page },
         ),
@@ -51,7 +51,7 @@ watch(
 );
 
 const handleSubmit = () => {
-    form.post('/admin/berita/store', {
+    form.post('/admin/pengumuman/store', {
         forceFormData: true,
         onSuccess: () => {
             form.reset();
@@ -83,7 +83,7 @@ const handleSubmit = () => {
         <!-- Komponen Form -->
         <ArticleForm
             v-model="article"
-            :show-attachment="false"
+            :show-attachment="true"
             @submit="handleSubmit"
         />
 
@@ -133,7 +133,7 @@ const handleSubmit = () => {
                         ></path>
                     </svg>
                     <p class="mt-4 text-sm font-medium text-gray-600">
-                        Menyimpan berita...
+                        Menyimpan pengumuman...
                     </p>
                 </div>
             </div>

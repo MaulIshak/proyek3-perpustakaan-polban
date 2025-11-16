@@ -121,6 +121,22 @@ Route::prefix('admin')->name('admin.')->group(function () {
     ->name('beritaStore');
 
     Route::get('berita/detail/{id}', [ArticleController::class, 'showBerita'])->middleware('auth:admin')->name('beritaShow');
+    Route::get('berita/edit/{id}', [ArticleController::class, 'editBerita'])->middleware('auth:admin');
+    Route::post('berita/update/{id}', [ArticleController::class, 'updateBerita'])->middleware('auth:admin');
+    Route::delete('berita/delete/{id}', [ArticleController::class, 'destroyBerita'])->middleware('auth:admin');
+    
+    // Pengumuman
+    Route::get('pengumuman', [ArticleController::class, 'indexPengumuman'])->middleware('auth:admin')->name('pengumumanIndex');
+    Route::get('pengumuman/create', function(){
+        return Inertia::render('admin/pengumuman/Create');
+    })->middleware('auth:admin')->name('pengumumanCreate');
+    Route::post('pengumuman/store', [ArticleController::class, 'storePengumuman'])
+    ->middleware('auth:admin')
+    ->name('pengumumanStore');
+    Route::get('pengumuman/detail/{id}', [ArticleController::class, 'showPengumuman'])->middleware('auth:admin')->name('pengumumanShow');
+    Route::get('pengumuman/edit/{id}', [ArticleController::class, 'editPengumuman'])->middleware('auth:admin');
+    Route::post('pengumuman/update/{id}', [ArticleController::class, 'updatePengumuman'])->middleware('auth:admin');
+    Route::delete('pengumuman/delete/{id}', [ArticleController::class, 'destroyPengumuman'])->middleware('auth:admin');
 
     // Tim manajemen
     Route::get('tim-manajemen', [TimManajemen::class, 'TmAdminPage']);
