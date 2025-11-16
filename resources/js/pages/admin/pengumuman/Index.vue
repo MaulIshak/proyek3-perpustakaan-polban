@@ -1,10 +1,12 @@
 <script setup>
+import ArticleModal from '@/components/admin/ArticleModal.vue';
 import CreateWithSearch from '@/components/admin/CreateWithSearch.vue';
 import PengumumanCard from '@/components/admin/PengumumanCard.vue';
 import { useConfirmModal } from '@/composables/userConfirmModal';
 import AdminLayout from '@/layouts/AdminLayout.vue';
 import { router } from '@inertiajs/vue3';
 import { FileSearch } from 'lucide-vue-next';
+import { ref } from 'vue';
 
 const { open } = useConfirmModal();
 const { articles } = defineProps({
@@ -40,6 +42,14 @@ function handleDelete(article) {
         },
     });
 }
+
+const modalOpen = ref(false);
+const selectedArticle = ref(null);
+
+function openModal(article) {
+    selectedArticle.value = article;
+    modalOpen.value = true;
+}
 </script>
 
 <template>
@@ -61,10 +71,10 @@ function handleDelete(article) {
             :status="pengumuman.status"
             :time="pengumuman.created_date"
             :thumbnail-url="pengumuman.url_thumbnail"
-            :view-href="`/admin/pengumuman/detail/${pengumuman.article_id}/`"
             :update-href="`/admin/pengumuman/edit/${pengumuman.article_id}/`"
             class="flex-1"
             @delete="handleDelete(pengumuman)"
+            @view="openModal(pengumuman)"
         />
     </div>
     <div
@@ -90,6 +100,11 @@ function handleDelete(article) {
             Buat Pengumuman Baru
         </a>
     </div>
+    <ArticleModal
+        :open="modalOpen"
+        :article="selectedArticle"
+        @close="modalOpen = false"
+    />
 </template>
 
 <style scoped>

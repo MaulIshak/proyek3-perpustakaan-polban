@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { Download } from 'lucide-vue-next';
 
 // Define the props for the component to make it reusable.
 // It accepts an object with title, imageUrl, content, and an optional publishedAt date.
@@ -9,6 +10,8 @@ const props = defineProps<{
         imageUrl: string;
         content: string;
         publishedAt?: string;
+        url_attachment?: string;
+        attachment_name?: string;
     };
 }>();
 
@@ -30,7 +33,7 @@ const formattedDate = computed(() => {
         <!-- Article Header -->
         <header class="mb-8">
             <h1
-                class="text-3xl leading-tight font-bold text-gray-900 md:text-4xl"
+                class="text-3xl font-bold leading-tight text-gray-900 md:text-4xl"
             >
                 {{ article.title }}
             </h1>
@@ -62,6 +65,22 @@ const formattedDate = computed(() => {
       Make sure you have `@tailwindcss/typography` plugin installed and configured.
     -->
         <div class="prose max-w-none" v-html="article.content"></div>
+
+        <!-- Attachment Section -->
+        <div v-if="article.url_attachment" class="mt-8 border-t pt-6">
+            <h2 class="mb-3 text-lg font-semibold text-gray-700">
+                Lampiran
+            </h2>
+            <a
+                :href="article.url_attachment"
+                target="_blank"
+                :download="article.attachment_name"
+                class="inline-flex items-center rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700"
+            >
+                <Download class="mr-2 h-4 w-4" />
+                Unduh {{ article.attachment_name || 'Lampiran' }}
+            </a>
+        </div>
     </article>
 </template>
 
