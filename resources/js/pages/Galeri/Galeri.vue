@@ -4,7 +4,7 @@ import { X } from 'lucide-vue-next';
 import { ref } from 'vue';
 
 const props = defineProps({
-    photos: Array,
+    photos: Object,
 });
 
 // Gambar yang sedang dipilih
