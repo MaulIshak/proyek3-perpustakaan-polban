@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\GaleriController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -17,9 +18,7 @@ Route::get('/bebas_masalah', function () {
     return Inertia::render('BebasMasalah/Bebas_Masalah');
 });
 
-Route::get('/gallery', function() {
-    return Inertia::render('Galeri/Galeri');
-});
+Route::get('/gallery', [GaleriController::class, 'index']);
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', function () {

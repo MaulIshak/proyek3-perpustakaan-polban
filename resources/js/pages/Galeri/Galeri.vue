@@ -3,15 +3,9 @@ import Layout from '@/layouts/UserAppLayout.vue';
 import { X } from 'lucide-vue-next';
 import { ref } from 'vue';
 
-// Data galeri (nanti bisa diganti import dari file JS atau dari backend)
-const galeriData = [
-    { id: 1, image: '/hero-bg.jpg', caption: 'Kegiatan Literasi 2024' },
-    { id: 2, image: '/hero-bg.jpg', caption: 'Ruang Baca Mahasiswa' },
-    { id: 3, image: '/hero-bg.jpg', caption: 'Workshop Referensi' },
-    { id: 4, image: '/hero-bg.jpg', caption: 'Pelatihan Mendeley' },
-    { id: 5, image: '/hero-bg.jpg', caption: 'Koleksi Buku Baru' },
-    { id: 6, image: '/hero-bg.jpg', caption: 'Layanan Pustakawan' },
-];
+const props = defineProps({
+    photos: Array,
+});
 
 // Gambar yang sedang dipilih
 const selectedImage = ref(null);
@@ -27,13 +21,13 @@ const breadcrumb = [{ label: 'Profil' }, { label: 'Tentang Perpustakaan' }];
                     class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
                 >
                     <div
-                        v-for="item in galeriData"
-                        :key="item.id"
+                        v-for="item in photos"
+                        :key="item.foto_id"
                         class="group relative cursor-pointer overflow-hidden rounded-lg"
-                        @click="selectedImage = item.image"
+                        @click="selectedImage = item.url_foto"
                     >
                         <img
-                            :src="item.image"
+                            :src="item.url_foto"
                             :alt="item.caption"
                             class="h-64 w-full object-cover transition-transform group-hover:scale-110"
                         />

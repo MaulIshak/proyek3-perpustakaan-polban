@@ -1,82 +1,147 @@
-# Proyek Perpustakaan POLBAN
+# Proyek 3 - Sistem Informasi Perpustakaan Polban
 
-Ini adalah sistem manajemen perpustakaan untuk Politeknik Negeri Bandung (POLBAN). Proyek ini dibangun menggunakan Laravel, Vue.js, dan Inertia.js.
+Dokumentasi ini memandu developer untuk melakukan setup dan menjalankan aplikasi menggunakan Docker. Proyek ini menggunakan arsitektur kontainerisasi penuh untuk memisahkan concern antara Web Server (Nginx), Aplikasi (Laravel/PHP-FPM), dan Database (PostgreSQL).
 
-## Ringkasan Proyek
+## 🛠 Tech Stack
 
-Sistem ini menyediakan platform bagi mahasiswa dan staf untuk mengelola peminjaman buku, melihat katalog, dan mengakses layanan perpustakaan lainnya. Ini juga mencakup dasbor admin untuk mengelola artikel (berita) dan konten lainnya.
+- **Backend Framework:** Laravel 12
+- **Frontend:** Vue.js 3 (via Inertia.js)
+- **Styling:** Tailwind CSS
+- **Database:** PostgreSQL
+- **Web Server:** Nginx (Alpine)
+- **Containerization:** Docker & Docker Compose
 
-## Teknologi yang Digunakan
+## 📋 Prasyarat
 
-*   **Backend:** Laravel
-*   **Frontend:** Vue.js
-*   **Framework:** Inertia.js
-*   **Styling:** Tailwind CSS
-*   **Build Tool:** Vite
+Pastikan mesin lokal Anda telah terinstal:
 
-## Cara Menjalankan Proyek
+- Docker dan Docker Compose (versi terbaru disarankan)
+- Git
 
-1.  **Clone repositori:**
+> **Catatan:** Jangan mencoba menjalankan `php artisan serve` atau `npm run dev` di mesin lokal jika Anda berniat menggunakan Docker sepenuhnya. Kita akan menjalankannya dalam lingkungan yang terisolasi agar konsisten.
 
-    ```bash
-    git clone <URL_REPOSITORI>
-    ```
+## 🚀 Instalasi & Setup (Docker)
 
-2.  **Install dependensi:**
+Ikuti langkah-langkah ini secara berurutan. Jangan melompat-lompat.
 
-    ```bash
-    composer install
-    npm install
-    ```
+### 1. Clone Repository
 
-3.  **Konfigurasi environment:**
+```bash
+git clone <repository_url>
+cd proyek3-perpustakaan-polban
+```
 
-    Salin file `.env.example` menjadi `.env` dan konfigurasi database Anda.
+### 2. Konfigurasi Environment
 
-    ```bash
-    cp .env.example .env
-    ```
+Salin file contoh environment:
 
-4.  **Generate kunci aplikasi:**
+```bash
+cp .env.example .env
+```
 
-    ```bash
-    php artisan key:generate
-    ```
+#### ⚠️ PENTING: Konfigurasi Database untuk Docker
 
-5.  **Jalankan migrasi database:**
+Secara default, `.env.example` dikonfigurasi untuk pengembangan lokal (host). Agar aplikasi di dalam container bisa berkomunikasi dengan container database, Anda wajib mengubah `DB_HOST`.
 
-    ```bash
-    php artisan migrate
-    ```
+Buka file `.env` dan sesuaikan variabel berikut:
 
-6.  **Jalankan server pengembangan:**
+```ini
+# Ganti localhost menjadi 'db' (nama service di docker-compose.yml)
+DB_CONNECTION=pgsql
+DB_HOST=db
+DB_PORT=5432
+DB_DATABASE=perpustakaan_db
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
 
-    Gunakan skrip `dev` dari `composer.json` untuk menjalankan server PHP, antrian, dan Vite secara bersamaan.
+# Sesuaikan URL aplikasi agar asset loading (Vite) berjalan benar
+APP_URL=http://localhost
+```
 
-    ```bash
-    composer run dev
-    ```
+### 3. Jalankan Container
 
-    Atau, jalankan secara manual:
+Jalankan perintah berikut untuk membangun image dan menyalakan container di background:
 
-    ```bash
-    php artisan serve
-    ```
+```bash
+docker-compose up -d --build
+```
 
-    Dan di terminal lain, jalankan:
+### 4. Proses Automatisasi (Entrypoint)
 
-    ```bash
-    npm run dev
-    ```
+Anda tidak perlu menjalankan `composer install`, `npm install`, atau `php artisan migrate` secara manual. Script `scripts/php-fpm-entrypoint` telah dikonfigurasi untuk menangani hal berikut secara otomatis saat container pertama kali berjalan:
 
-7.  **Akses aplikasi:**
+- **Permissions:** Memperbaiki permission folder `storage` dan `bootstrap/cache`
+- **Dependencies:** Menjalankan `npm ci` dan `npm run build` untuk meng-compile aset frontend (Vite)
+- **Database:** Menunggu service database siap, lalu menjalankan migrasi (`php artisan migrate`)
+- **Optimization:** Membersihkan dan melakukan cache config
 
-    Buka browser Anda dan kunjungi `http://localhost:8000`.
+⏳ Tunggu beberapa saat (3-5 menit tergantung kecepatan internet) pada run pertama kali agar proses build aset dan instalasi dependensi selesai. Anda bisa memantau progress dengan:
 
-## Struktur Direktori
+```bash
+docker-compose logs -f app
+```
 
-*   `app/`: Berisi semua logika sisi server (controller, model, dll.).
-*   `resources/js/`: Berisi semua komponen Vue.js, halaman, dan aset frontend lainnya.
-*   `routes/`: Berisi definisi rute untuk web dan admin.
-*   `database/`: Berisi migrasi dan seeder database.
-*   `public/`: Titik masuk publik untuk aplikasi.
+## 🌐 Akses Aplikasi
+
+Setelah container berjalan stabil (tidak ada error di logs), buka browser:
+
+- **URL Utama:** http://localhost
+
+## 🔧 Perintah Pengembangan (Development Cheatsheet)
+
+Karena aplikasi berjalan dalam container, Anda harus mengeksekusi perintah artisan atau npm di dalam container `app`, bukan di terminal host Anda.
+
+### Masuk ke Shell Container
+
+```bash
+docker-compose exec app bash
+```
+
+### Menjalankan Perintah Artisan
+
+Contoh membuat controller baru tanpa masuk ke shell:
+
+```bash
+docker-compose exec app php artisan make:controller ArticleController
+```
+
+### Rebuild Frontend Assets
+
+Jika Anda mengubah file `.vue` atau `.css`, Anda perlu me-rebuild aset (karena kita tidak mengekspos port dev server Vite di konfigurasi `docker-compose.yml` saat ini):
+
+```bash
+docker-compose exec app npm run build
+```
+
+### Reset Database
+
+Jika ingin mereset database sepenuhnya:
+
+```bash
+docker-compose exec app php artisan migrate:fresh --seed
+```
+
+## 🐛 Troubleshooting Umum
+
+### 1. Error "Connection Refused" pada Database
+
+Pastikan Anda sudah mengubah `DB_HOST=db` di file `.env`. Container aplikasi tidak mengenal `localhost` sebagai database, karena `localhost` bagi container adalah dirinya sendiri.
+
+### 2. Halaman Putih / 500 Server Error
+
+Cek permission folder `storage`:
+
+```bash
+docker-compose exec app chmod -R 775 storage
+```
+
+Pastikan `APP_KEY` sudah digenerate. Jika kosong di `.env`, jalankan:
+
+```bash
+docker-compose exec app php artisan key:generate
+docker-compose restart app
+```
+
+### 3. Aset (CSS/JS) Tidak Berubah
+
+Karena Dockerfile ini menjalankan `npm run build` (mode produksi), Hot Module Replacement (HMR) tidak aktif. Setiap perubahan kode frontend memerlukan perintah `npm run build` ulang di dalam container.
