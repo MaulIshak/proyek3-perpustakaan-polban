@@ -13,21 +13,24 @@ defineProps({
 <template>
     <Link
         :href="to"
-        class="flex items-center gap-3 rounded-lg p-2 text-[var(--dark-green)] hover:bg-white"
+        class="group flex items-center gap-3 rounded-lg p-2 text-[var(--dark-green)]"
         :class="{
-            'bg-white text-[var(--dark-green)]': $page.url === to,
+            'bg-[var(--primary-green)]': $page.url.startsWith(to),
+            'hover:bg-white': !$page.url.startsWith(to),
         }"
     >
         <component
             :is="Icons[icon]"
             class="min-w-7 text-xl"
-            :class="{ 'text-[var(--dark-green)]': $page.url === to }"
+            :class="{
+                'text-[var(--background-green)]': $page.url.startsWith(to),
+            }"
         />
         <span
             v-show="true"
             class="text-wrap whitespace-nowrap transition-opacity duration-300"
             :class="{
-                'text-[var(--dark-green)]': $page.url === to,
+                'text-[var(--background-green)]': $page.url.startsWith(to),
                 'opacity-0': !sidebarOpen,
             }"
         >

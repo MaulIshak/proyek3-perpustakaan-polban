@@ -17,31 +17,6 @@ const emit = defineEmits(['toggle-sidebar']);
             sidebarOpen ? 'w-64' : 'w-20',
         ]"
     >
-        <!-- Header Logo
-        <div
-            class="flex min-h-20 items-center justify-between gap-3 border-b p-4"
-        >
-            <div v-if="sidebarOpen" class="flex items-center gap-3">
-                <div>
-                    <h1
-                        class="text-md font-bold whitespace-nowrap text-[var(--dark-green)]"
-                    >
-                        Perpustakaan POLBAN
-                    </h1>
-                    <h3 class="text-sm text-[var(--secondary-green)]">
-                        Pustakawan
-                    </h3>
-                </div>
-            </div>
-            <button
-                @click="emit('toggle-sidebar')"
-                class="rounded-lg p-2 transition hover:bg-gray-100"
-            >
-                <X v-if="sidebarOpen" class="text-2xl text-gray-700" />
-                <PanelLeft v-else class="text-2xl text-gray-700" />
-            </button>
-        </div> -->
-
         <!-- Navigation -->
         <nav
             class="flex-1 space-y-4 overflow-hidden overflow-y-auto p-3 text-sm font-medium"

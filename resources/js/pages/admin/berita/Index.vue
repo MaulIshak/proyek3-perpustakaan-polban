@@ -1,9 +1,13 @@
 <script setup>
 import ArticleCard from '@/components/admin/ArticleCard.vue';
+import ArticleModal from '@/components/admin/ArticleModal.vue';
 import CreateWithSearch from '@/components/admin/CreateWithSearch.vue';
 import { useConfirmModal } from '@/composables/userConfirmModal';
 import AdminLayout from '@/layouts/AdminLayout.vue';
 import { router } from '@inertiajs/vue3';
+import { FileSearch } from 'lucide-vue-next';
+import { ref } from 'vue';
+
 const { open } = useConfirmModal();
 const { articles } = defineProps({
     articles: {
@@ -23,79 +27,6 @@ defineOptions({
         ),
 });
 
-const berita = [
-    {
-        id: 1,
-        title: 'Perpanjangan Waktu Peminjaman',
-        type: 'Berita',
-        status: 'Published',
-        time: '25-06-2024',
-        content:
-            'Perpustakaan UPT Polban mengumumkan perpanjangan waktu peminjaman buku hingga 2 minggu ke depan. Manfaatkan kesempatan ini untuk menambah koleksi bacaan Anda!',
-        thumbnailUrl: '/hero-bg.jpg',
-    },
-    {
-        id: 1,
-        title: 'Perpanjangan Waktu Peminjaman',
-        type: 'Berita',
-        status: 'Published',
-        time: '25-06-2024',
-        content:
-            'Perpustakaan UPT Polban mengumumkan perpanjangan waktu peminjaman buku hingga 2 minggu ke depan. Manfaatkan kesempatan ini untuk menambah koleksi bacaan Anda!',
-        thumbnailUrl: '/hero-bg.jpg',
-    },
-    {
-        id: 1,
-        title: 'Perpanjangan Waktu Peminjaman',
-        type: 'Berita',
-        status: 'Published',
-        time: '25-06-2024',
-        content:
-            'Perpustakaan UPT Polban mengumumkan perpanjangan waktu peminjaman buku hingga 2 minggu ke depan. Manfaatkan kesempatan ini untuk menambah koleksi bacaan Anda!',
-        thumbnailUrl: '/hero-bg.jpg',
-    },
-    {
-        id: 1,
-        title: 'Perpanjangan Waktu Peminjaman',
-        type: 'Berita',
-        status: 'Published',
-        time: '25-06-2024',
-        content:
-            'Perpustakaan UPT Polban mengumumkan perpanjangan waktu peminjaman buku hingga 2 minggu ke depan. Manfaatkan kesempatan ini untuk menambah koleksi bacaan Anda!',
-        thumbnailUrl: '/hero-bg.jpg',
-    },
-    {
-        id: 1,
-        title: 'Perpanjangan Waktu Peminjaman',
-        type: 'Berita',
-        status: 'Published',
-        time: '25-06-2024',
-        content:
-            'Perpustakaan UPT Polban mengumumkan perpanjangan waktu peminjaman buku hingga 2 minggu ke depan. Manfaatkan kesempatan ini untuk menambah koleksi bacaan Anda!',
-        thumbnailUrl: '/hero-bg.jpg',
-    },
-    {
-        id: 1,
-        title: 'Perpanjangan Waktu Peminjaman',
-        type: 'Berita',
-        status: 'Published',
-        time: '25-06-2024',
-        content:
-            'Perpustakaan UPT Polban mengumumkan perpanjangan waktu peminjaman buku hingga 2 minggu ke depan. Manfaatkan kesempatan ini untuk menambah koleksi bacaan Anda!',
-        thumbnailUrl: '/hero-bg.jpg',
-    },
-    {
-        id: 1,
-        title: 'Perpanjangan Waktu Peminjaman',
-        type: 'Berita',
-        status: 'Published',
-        time: '25-06-2024',
-        content:
-            'Perpustakaan UPT Polban mengumumkan perpanjangan waktu peminjaman buku hingga 2 minggu ke depan. Manfaatkan kesempatan ini untuk menambah koleksi bacaan Anda!',
-        thumbnailUrl: '/hero-bg.jpg',
-    },
-];
-
 function handleDelete(article) {
     open({
         title: 'Hapus Berita?',
@@ -111,16 +42,25 @@ function handleDelete(article) {
         },
     });
 }
+
+const modalOpen = ref(false);
+const selectedArticle = ref(null);
+
+function openModal(article) {
+    selectedArticle.value = article;
+    modalOpen.value = true;
+}
 </script>
 
 <template>
     <CreateWithSearch
         placeholder="Cari berita..."
-        create-text="Buat Berita Baru"
+        create-label="Buat Berita Baru"
         create-href="/admin/berita/create"
         class="mb-3"
     />
     <div
+        v-if="articles.length != 0"
         class="grid gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4"
     >
         <ArticleCard
@@ -131,12 +71,38 @@ function handleDelete(article) {
             :status="berita.status"
             :time="berita.created_date"
             :thumbnail-url="berita.url_thumbnail"
-            :view-href="`/admin/berita/detail/${berita.article_id}/`"
+            @view="openModal"
             :update-href="`/admin/berita/edit/${berita.article_id}/`"
             class="flex-1"
             @delete="handleDelete(berita)"
         />
     </div>
+    <div
+        v-else
+        class="flex flex-col items-center justify-center py-20 text-center"
+    >
+        <!-- Icon dari lucide -->
+        <FileSearch class="mb-4 h-20 w-20 text-gray-400" />
+
+        <h3 class="text-2xl font-semibold text-gray-600">Belum Ada Berita</h3>
+
+        <p class="mt-2 max-w-sm text-gray-500">
+            Sistem tidak menemukan berita apapun. Buat berita baru atau ubah
+            kata kunci pencarian.
+        </p>
+
+        <a
+            href="/admin/berita/create"
+            class="mt-6 rounded-xl bg-[var(--primary-green)] px-5 py-3 font-medium text-white transition hover:opacity-90"
+        >
+            Buat Berita Baru
+        </a>
+    </div>
+    <ArticleModal
+        :open="modalOpen"
+        :article="selectedArticle"
+        @close="modalOpen = false"
+    />
 </template>
 
 <style scoped>

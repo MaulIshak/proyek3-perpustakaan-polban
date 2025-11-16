@@ -62,7 +62,7 @@ const handleCreate = () => {
         <!-- Create Button -->
         <a
             :href="createHref"
-            class="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500 px-4 py-2 font-medium text-white transition-all hover:bg-emerald-700"
+            class="inline-flex items-center justify-center gap-2 rounded-lg bg-[var(--primary-green)] px-4 py-2 font-medium text-white transition-all hover:bg-emerald-700"
         >
             <Plus class="h-4 w-4" />
             <span>{{ createLabel }}</span>

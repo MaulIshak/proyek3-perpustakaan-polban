@@ -8,11 +8,12 @@ const props = defineProps<{
     status: string;
     time: string;
     thumbnailUrl: string;
+    viewHref: string;
     updateHref: string;
     deleteAction: string;
 }>();
 
-const emit = defineEmits(['delete', 'view']);
+const emit = defineEmits(['delete']);
 
 function formatDate(dateString: string) {
     if (!dateString) return '-'; // fallback kalau null
@@ -39,12 +40,27 @@ function stripHtml(html: string) {
     <div
         class="position-relative flex flex-col justify-between rounded-xl border border-gray-100 bg-white p-5 shadow-sm transition-shadow duration-300 hover:shadow-lg"
     >
-        <div class="h-40 w-full overflow-hidden rounded-lg bg-gray-200">
-            <img
-                :src="thumbnailUrl"
-                alt="Thumbnail"
-                class="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
-            />
+        <div
+            class="flex h-16 w-16 items-center justify-center rounded-lg bg-[var(--primary-green)]"
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="lucide lucide-calendar h-8 w-8 text-white"
+                aria-hidden="true"
+            >
+                <path d="M8 2v4"></path>
+                <path d="M16 2v4"></path>
+                <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+                <path d="M3 10h18"></path>
+            </svg>
         </div>
         <div class="mt-4 space-y-2">
             <h1 class="text-md font-bold text-gray-800">
@@ -64,20 +80,13 @@ function stripHtml(html: string) {
                 {{ truncateText(stripHtml(content), 110) }}
             </div>
             <div class="mt-4 flex justify-end gap-2 text-sm">
-                <button
-                    @click="
-                        $emit('view', {
-                            title,
-                            content,
-                            imageUrl: thumbnailUrl,
-                            publishedAt: time,
-                        })
-                    "
+                <a
+                    :href="viewHref"
                     class="rounded-lg border border-blue-600 px-2 py-2 text-center font-medium text-blue-600 transition hover:bg-blue-600 hover:text-white"
                 >
                     <Eye class="mr-1 inline-block h-4 w-4" />
                     Lihat
-                </button>
+                </a>
                 <a
                     :href="updateHref"
                     class="rounded-lg border border-yellow-500 px-2 py-2 text-center font-medium text-yellow-500 transition hover:bg-yellow-500 hover:text-white"

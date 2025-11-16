@@ -94,19 +94,21 @@
             </h3>
 
             <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-                <button
+                <a
+                    href="/admin/berita/create"
                     class="flex flex-col items-center justify-center rounded-xl bg-[var(--primary-green)] p-6 text-white shadow-sm transition hover:brightness-110"
                 >
                     <Newspaper class="mb-2 h-7 w-7" />
                     <span class="text-sm font-medium">Buat Berita</span>
-                </button>
+                </a>
 
-                <button
+                <a
+                    href="/admin/pengumuman/create"
                     class="flex flex-col items-center justify-center rounded-xl bg-emerald-100 p-6 text-[var(--dark-green)] shadow-sm transition hover:bg-emerald-200"
                 >
                     <Megaphone class="mb-2 h-7 w-7" />
-                    <span class="text-sm font-medium">Pengumuman</span>
-                </button>
+                    <span class="text-sm font-medium">Buat Pengumuman</span>
+                </a>
 
                 <button
                     class="flex flex-col items-center justify-center rounded-xl bg-yellow-100 p-6 text-yellow-700 shadow-sm transition hover:bg-yellow-200"

@@ -114,6 +114,26 @@ public function updateBerita(Request $request, $id)
         ->to('/admin/berita')
         ->with('success', 'Berita berhasil diperbarui.');
 }
+   public function destroyBerita($id)
+    {
+        $article = Article::where('article_id', $id)->firstOrFail();
+
+        // Hapus thumbnail dari storage jika ada
+        if ($article->url_thumbnail) {
+            Storage::disk('public')->delete(str_replace('/storage/', '', $article->url_thumbnail));
+        }
+
+        // Hapus lampiran dari storage jika ada
+        if ($article->url_attachment) {
+            Storage::disk('public')->delete(str_replace('/storage/', '', $article->url_attachment));
+        }
+
+        $article->delete();
+
+        return redirect()
+            ->to('/admin/berita')
+            ->with('success', 'Berita berhasil dihapus.');
+    }
 
 
     public function showBerita($id)
@@ -151,16 +171,124 @@ public function updateBerita(Request $request, $id)
         return inertia('user/Pengumuman');
     }
 
-    public function destroyBerita($id)
+    public function indexPengumuman()
+    {
+        $articles = Article::where('type', 'pengumuman')->get();
+        return inertia('admin/pengumuman/Index', [
+            'articles' => $articles,
+        ]);
+    }
+
+    public function storePengumuman(Request $request)
+    {
+        $validated = $request->validate([
+            'judul' => ['required', 'string', 'max:255'],
+            'content' => ['required', 'string'],
+            'status' => ['required', Rule::in(['published', 'draft'])],
+            'date' => ['required', 'date'],
+            'thumbnail' => ['required', 'image', 'max:2048'],
+            'attachment' => ['nullable', 'file', 'max:5120'],
+        ]);
+
+        $thumbnailPath = null;
+        if ($request->hasFile('thumbnail')) {
+            $thumbnailPath = $request->file('thumbnail')->store('articles/thumbnails', 'public');
+        }
+
+        $attachmentPath = null;
+        $attachmentName = null;
+        if ($request->hasFile('attachment')) {
+            $attachmentName = $request->file('attachment')->getClientOriginalName();
+            $attachmentPath = $request->file('attachment')->storeAs('articles/attachments', $attachmentName, 'public');
+        }
+
+        $article = new Article([
+            'url_thumbnail' => $thumbnailPath ? Storage::url($thumbnailPath) : null,
+            'url_attachment' => $attachmentPath ? Storage::url($attachmentPath) : null,
+            'attachment_name' => $attachmentName,
+            'judul' => $validated['judul'],
+            'content' => $validated['content'],
+            'type' => 'pengumuman',
+            'status' => $validated['status'],
+        ]);
+
+        $article->article_id = Str::uuid()->toString();
+        $article->created_date = $validated['date'];
+        $article->save();
+
+        return redirect()
+            ->to('/admin/pengumuman')
+            ->with('success', 'Pengumuman berhasil dibuat.');
+    }
+
+    public function editPengumuman($id)
+    {
+        $article = Article::where('article_id', $id)->firstOrFail();
+        return inertia('admin/pengumuman/Edit', [
+            'article' => $article,
+        ]);
+    }
+
+    public function updatePengumuman(Request $request, $id)
     {
         $article = Article::where('article_id', $id)->firstOrFail();
 
-        // Hapus thumbnail dari storage jika ada
+        $validated = $request->validate([
+            'judul' => ['required', 'string', 'max:255'],
+            'content' => ['required', 'string'],
+            'status' => ['required', Rule::in(['published', 'draft'])],
+            'date' => ['required', 'date'],
+            'thumbnail' => ['nullable', 'image', 'max:2048'],
+            'attachment' => ['nullable', 'file', 'max:5120'],
+        ]);
+
+        if ($request->hasFile('thumbnail')) {
+            if ($article->url_thumbnail) {
+                Storage::disk('public')->delete(str_replace('/storage/', '', $article->url_thumbnail));
+            }
+            $thumbnailPath = $request->file('thumbnail')->store('articles/thumbnails', 'public');
+            $article->url_thumbnail = Storage::url($thumbnailPath);
+        }
+
+        if ($request->hasFile('attachment')) {
+            if ($article->url_attachment) {
+                Storage::disk('public')->delete(str_replace('/storage/', '', $article->url_attachment));
+            }
+            $attachmentName = $request->file('attachment')->getClientOriginalName();
+            $attachmentPath = $request->file('attachment')->storeAs('articles/attachments', $attachmentName, 'public');
+            $article->url_attachment = Storage::url($attachmentPath);
+            $article->attachment_name = $attachmentName;
+        }
+
+        $article->update([
+            'judul' => $validated['judul'],
+            'content' => $validated['content'],
+            'status' => $validated['status'],
+            'created_date' => $validated['date'],
+        ]);
+
+        return redirect()
+            ->to('/admin/pengumuman')
+            ->with('success', 'Pengumuman berhasil diperbarui.');
+    }
+
+    public function showPengumuman($id)
+    {
+        $article = Article::where('article_id', $id)->firstOrFail();
+
+        return inertia('admin/pengumuman/Detail', [
+            'article' => $article,
+        ]);
+    }
+
+    public function destroyPengumuman($id)
+    {
+        $article = Article::where('article_id', $id)->firstOrFail();
+
         if ($article->url_thumbnail) {
             Storage::disk('public')->delete(str_replace('/storage/', '', $article->url_thumbnail));
         }
 
-        // Hapus lampiran dari storage jika ada
         if ($article->url_attachment) {
             Storage::disk('public')->delete(str_replace('/storage/', '', $article->url_attachment));
         }
@@ -168,7 +296,7 @@ public function updateBerita(Request $request, $id)
         $article->delete();
 
         return redirect()
-            ->to('/admin/berita')
-            ->with('success', 'Berita berhasil dihapus.');
+            ->to('/admin/pengumuman')
+            ->with('success', 'Pengumuman berhasil dihapus.');
     }
 }
