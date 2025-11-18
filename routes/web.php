@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\RencanaStrategi;
 use App\Http\Controllers\TimManajemen;
 
 Route::get('/pelayanan/{slug}', function (string $slug) {
@@ -102,7 +103,6 @@ Route::get('/E_Journal', function () {
 Route::get('/berita', [ArticleController::class, 'beritaUser'])->name('beritaUser');
 Route::get('/pengumuman', [ArticleController::class, 'pengumumanUser'])->name('pengumumanUser');
 
-
 // Peraturan Perpustakaan
 Route::get('/peraturan', function (){
     $data = [
@@ -130,6 +130,10 @@ Route::get('/book-reservation', function(){
 
     return Inertia::render('user/BookingBuku', $data);
 });
+
+// Renstra
+Route::get('/renstra', [RencanaStrategi::class, 'viewPDF'])->name('renstra');
+
 Route::prefix('admin')->name('admin.')->group(function () {
     // show login form (only for guests of admin guard)
     Route::get('login', [LoginController::class, 'showLogin'])->middleware('guest.admin')->name('login');
@@ -163,6 +167,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::put('tim-manajemen/update/{id}', [TimManajemen::class, 'update'])->middleware('auth:admin')->name('tim.update');
     Route::delete('tim-manajemen/delete/{id}', [TimManajemen::class, 'destroy'])->middleware('auth:admin')->name('tim.destroy');
 
+    // Renstra
+    Route::get('renstra', [RencanaStrategi::class, 'index'])->middleware('auth:admin')->name('renstra.index');
+    Route::post('renstra/store', [RencanaStrategi::class, 'store'])->middleware('auth:admin')->name('renstra.store');
+    Route::put('renstra/update/{id}', [RencanaStrategi::class, 'update'])->middleware('auth:admin')->name('renstra.update');
+    Route::delete('renstra/delete/{id}', [RencanaStrategi::class, 'destroy'])->middleware('auth:admin')->name('renstra.destroy');
 });
 
 require __DIR__.'/settings.php';
