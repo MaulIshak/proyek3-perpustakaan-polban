@@ -118,9 +118,9 @@ onUnmounted(() => {
                 <div class="flex items-center gap-3">
                     <Link href="/" class="flex items-center gap-6">
                         <img
-                            src="/Images/logo-polban-ori.png"
+                            src="/logo-polban.png"
                             alt="Logo Politeknik Negeri Bandung"
-                            class="h-10 w-auto object-contain md:h-14"
+                            class="h-12 w-auto object-contain md:h-16"
                         />
                         <div class="leading-tight sm:block">
                             <h1 class="text-sm font-bold md:text-lg">

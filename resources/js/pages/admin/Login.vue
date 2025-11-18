@@ -125,14 +125,14 @@
             <div
                 class="bg-opacity-10 hidden w-1/2 items-center justify-center bg-[var(--background-green)] lg:flex"
             >
-                <LoginPerson class="w-4/5 max-w-md" />
+                <BookShelves class="w-4/5 max-w-md" />
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import LoginPerson from '@/components/admin/ilust/LoginPerson.vue';
+import BookShelves from '@/components/admin/ilust/BookShelves.vue';
 import { useForm, usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 
