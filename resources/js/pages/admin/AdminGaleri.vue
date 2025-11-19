@@ -17,6 +17,8 @@ const props = defineProps({
   photos: { type: Object, required: true },
 })
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
 // Modal State
 const showCreateModal = ref(false)
 const showEditModal = ref(false)
@@ -36,11 +38,27 @@ const editForm = useForm({
 
 // File input handlers
 const onCreateFileChange = (e) => {
-  createForm.foto = e.target.files?.[0] ?? null
+  const file = e.target.files?.[0] ?? null;
+  if (file) {
+    if (file.size > MAX_FILE_SIZE) {
+      createForm.setError('foto', 'Ukuran file tidak boleh lebih dari 5MB.');
+    } else {
+      createForm.clearErrors('foto');
+    }
+  }
+  createForm.foto = file;
 }
 
 const onEditFileChange = (e) => {
-  editForm.foto = e.target.files?.[0] ?? null
+  const file = e.target.files?.[0] ?? null;
+  if (file) {
+    if (file.size > MAX_FILE_SIZE) {
+      editForm.setError('foto', 'Ukuran file tidak boleh lebih dari 5MB.');
+    } else {
+      editForm.clearErrors('foto');
+    }
+  }
+  editForm.foto = file;
 }
 
 // Open Create Modal
@@ -50,10 +68,8 @@ function openCreate() {
   showCreateModal.value = true
 }
 
-// Submit Create (TANPA ROUTE)
+// Submit Create
 function submitCreate() {
-  if (!createForm.foto) return alert('Pilih foto terlebih dahulu.')
-
   createForm.post('/admin/galeri/store', {
     forceFormData: true,
     preserveScroll: true,
@@ -73,7 +89,7 @@ function openEdit(photo) {
   showEditModal.value = true
 }
 
-// Submit Edit (TANPA ROUTE)
+// Submit Edit
 function submitEdit() {
   if (!editItem.value) return
 
@@ -93,7 +109,7 @@ function closeEditModal() {
   editItem.value = null
 }
 
-// Delete Photo (TANPA ROUTE)
+// Delete Photo
 function remove(photo) {
   if (!confirm('Yakin ingin menghapus foto ini?')) return
 
@@ -109,7 +125,7 @@ function remove(photo) {
       <h1 class="text-2xl font-bold text-[var(--dark-green)]">Galeri Foto</h1>
       <button
         @click="openCreate"
-        class="px-4 py-2 bg-[var(--primary-green)] text-white rounded-lg transition-all duration-200 ease-in-out hover:opacity-80 hover:scale-105"
+        class="px-4 py-2 bg-(--primary-green) text-white rounded-lg transition-all duration-200 ease-in-out hover:opacity-80 hover:scale-105 cursor-pointer"
       >
         Upload Foto Baru
       </button>
@@ -118,13 +134,14 @@ function remove(photo) {
     <!-- Grid List -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div
-            v-for="item in (props.photos.data ?? props.photos)"
+            v-for="item in props.photos.data"
             :key="item?.foto_id"
             class="border rounded-lg p-3 bg-[var(--card)] shadow transition-all duration-200 ease-in-out hover:scale-105"
         >
 
         <img
           :src="item.url_foto"
+          alt="galeri"
           class="w-full h-32 object-cover rounded"
         />
 
@@ -136,14 +153,14 @@ function remove(photo) {
         <div class="flex gap-2 mt-3">
           <button
             @click="openEdit(item)"
-            class="px-3 py-1 bg-[var(--dark-green)]  text-white rounded transition-all duration-200 ease-in-out hover:opacity-80 hover:scale-105"
+            class="px-3 py-1 bg-[var(--dark-green)]  text-white rounded transition-all duration-200 ease-in-out hover:opacity-80 hover:scale-105 cursor-pointer"
           >
             Edit
           </button>
 
           <button
             @click="remove(item)"
-            class="px-3 py-1 bg-[var(--destructive)] text-white rounded transition-all duration-200 ease-in-out hover:opacity-80 hover:scale-105"
+            class="px-3 py-1 bg-[var(--destructive)] text-white rounded transition-all duration-200 ease-in-out hover:opacity-80 hover:scale-105 cursor-pointer"
           >
             Delete
           </button>
@@ -164,17 +181,21 @@ function remove(photo) {
           <span v-if="createForm.foto" class="text-sm text-gray-500">{{ createForm.foto.name }}</span>
           <span v-else class="text-sm text-gray-500">No file chosen</span>
         </div>
+        <div v-if="createForm.errors.foto" class="text-sm text-red-500 mt-2">
+          {{ createForm.errors.foto }}
+        </div>
 
         <div class="flex justify-end gap-2 mt-4">
           <button
             @click="submitCreate"
-            class="px-4 py-2 bg-[var(--primary-green)] text-white rounded transition-all duration-200 ease-in-out hover:opacity-80 hover:scale-105"
+            :disabled="createForm.processing || createForm.errors.foto"
+            class="px-4 py-2 bg-[var(--primary-green)] text-white rounded transition-all duration-200 ease-in-out hover:opacity-80 hover:scale-105 cursor-pointer disabled:opacity-50"
           >
-            Upload
+            {{ createForm.processing ? 'Uploading...' : 'Upload' }}
           </button>
           <button
             @click="showCreateModal = false"
-            class="px-4 py-2 bg-[var(--muted)] rounded transition-all duration-200 ease-in-out hover:opacity-80 hover:scale-105"
+            class="px-4 py-2 bg-[var(--muted)] rounded transition-all duration-200 ease-in-out hover:opacity-80 hover:scale-105 cursor-pointer"
           >
             Batal
           </button>
@@ -188,22 +209,26 @@ function remove(photo) {
         <h2 class="text-lg font-bold mb-4">Edit Foto</h2>
 
         <div class="flex items-center space-x-4">
-          <label for="edit-file-input" class="cursor-pointer px-4 py-2 bg-[var(--secondary-green)] text-white rounded-lg transition-all duration-200 ease-in-out hover:opacity-80 hover:scale-105">
+          <label for="edit-file-input" class="cursor-pointer px-4 py-2 bg-[var(--primary-green)] text-white rounded-lg transition-all duration-200 ease-in-out hover:opacity-80 hover:scale-105">
             Choose File
           </label>
           <input id="edit-file-input" type="file" @change="onEditFileChange" class="hidden" />
           <span v-if="editForm.foto" class="text-sm text-gray-500">{{ editForm.foto.name }}</span>
           <span v-else class="text-sm text-gray-500">No file chosen</span>
         </div>
+        <div v-if="editForm.errors.foto" class="text-sm text-red-500 mt-2">
+          {{ editForm.errors.foto }}
+        </div>
 
         <div class="flex justify-end gap-2 mt-4">
           <button
             @click="submitEdit"
-            class="px-4 py-2 bg-[var(--secondary-green)] text-white rounded transition-all duration-200 ease-in-out hover:opacity-80 hover:scale-105"
+            :disabled="editForm.processing || editForm.errors.foto"
+            class="px-4 py-2 bg-[var(--secondary-green)] text-white rounded transition-all duration-200 ease-in-out hover:opacity-80 hover:scale-105 cursor-pointer disabled:opacity-50"
           >
-            Simpan
+            {{ editForm.processing ? 'Saving...' : 'Simpan' }}
           </button>
-          <button @click="closeEditModal" class="px-4 py-2 bg-[var(--muted)] rounded transition-all duration-200 ease-in-out hover:opacity-80 hover:scale-105">
+          <button @click="closeEditModal" class="px-4 py-2 bg-[var(--muted)] rounded transition-all duration-200 ease-in-out hover:opacity-80 hover:scale-105 cursor-pointer">
             Batal
           </button>
         </div>

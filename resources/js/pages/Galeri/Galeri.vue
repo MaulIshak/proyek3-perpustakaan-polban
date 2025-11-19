@@ -17,9 +17,7 @@ const breadcrumb = [{ label: 'Profil' }, { label: 'Tentang Perpustakaan' }];
         <div class="min-h-screen bg-gray-50 py-12">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <!-- Grid Galeri -->
-                <div
-                    class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-                >
+                <div v-if="photos.length > 0" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     <div
                         v-for="item in photos"
                         :key="item.foto_id"
@@ -28,7 +26,8 @@ const breadcrumb = [{ label: 'Profil' }, { label: 'Tentang Perpustakaan' }];
                     >
                         <img
                             :src="item.url_foto"
-                            :alt="item.caption"
+                            :alt="'Galeri Foto ' + item.foto_id"
+                            loading="lazy"
                             class="h-64 w-full object-cover transition-transform group-hover:scale-110"
                         />
                         <div
@@ -41,6 +40,9 @@ const breadcrumb = [{ label: 'Profil' }, { label: 'Tentang Perpustakaan' }];
                             </span>
                         </div>
                     </div>
+                </div>
+                <div v-else class="text-center text-gray-500">
+                    <p>Belum ada foto di galeri.</p>
                 </div>
             </div>
 

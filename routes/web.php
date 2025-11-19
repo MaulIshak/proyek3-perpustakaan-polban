@@ -1,7 +1,7 @@
 <?php
 
 
-use App\Http\Controllers\GaleriController;
+use App\Http\Controllers\BookProposalController;
 use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
@@ -77,9 +77,8 @@ Route::get('/contact', function () {
     return Inertia::render('user/Kontak/Kontak', $data);
 });
 
-Route::get('/usulan_buku', function () {
-    return Inertia::render('user/Koleksi/Usulan_Buku');
-});
+Route::get('usulan_buku', [BookProposalController::class, 'create'])->name('user.book-proposals.create');
+Route::post('usulan-buku/store', [BookProposalController::class, 'store'])->name('user.book-proposals.store');
 
 Route::get('/E_Journal', function () {
     return Inertia::render('user/Koleksi/EJournal');
@@ -144,6 +143,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('galeri/store', [PhotoController::class, 'store'])->name('store');
     Route::put('galeri/{foto_id}', [PhotoController::class, 'update'])->name('update');
     Route::delete('galeri/{foto_id}', [PhotoController::class, 'destroy'])->name('delete');
+
+    // usulan
+    Route::get('usulan-buku', [BookProposalController::class, 'index'])->name('book-proposals.index');
+    Route::patch('usulan-buku/{id}/status', [BookProposalController::class, 'updateStatus'])->name('book-proposals.update-status');
+    Route::delete('usulan-buku/{id}', [BookProposalController::class, 'destroy'])->name('book-proposals.destroy');
+    Route::get('usulan-buku/export', [BookProposalController::class, 'export'])->name('book-proposals.export');
+    
+
 
     // Tim manajemen
     Route::get('tim-manajemen', [TimManajemen::class, 'TmAdminPage']);
