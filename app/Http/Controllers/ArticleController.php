@@ -20,7 +20,6 @@ class ArticleController extends Controller
 
     public function storeBerita(Request $request)
     {
-        var_dump($request->all());
            // Validasi input
         $validated = $request->validate([
             'judul' => ['required', 'string', 'max:255'],
@@ -41,15 +40,18 @@ class ArticleController extends Controller
 
         // Simpan lampiran jika ada
         $attachmentPath = null;
+        $attachmentName = null;
         if ($request->hasFile('attachment')) {
-            $attachmentPath = $request->file('attachment')
-                ->store('articles/attachments', 'public');
+            $attachmentFile = $request->file('attachment');
+            $attachmentName = $attachmentFile->getClientOriginalName();
+            $attachmentPath = $attachmentFile->store('articles/attachments', 'public');
         }
 
         // Buat artikel baru
         $article = new Article([
             'url_thumbnail' => $thumbnailPath ? Storage::url($thumbnailPath) : null,
             'url_attachment' => $attachmentPath ? Storage::url($attachmentPath) : null,
+            'attachment_name' => $attachmentName,
             'judul' => $validated['judul'],
             'content' => $validated['content'],
             'type' => 'berita',
@@ -58,7 +60,7 @@ class ArticleController extends Controller
 
         // Karena kita punya UUID primary key, generate manual jika belum ada
         $article->article_id = Str::uuid()->toString();
-        $article->created_date = $validated['date']; // gunakan tanggal publikasi dari form
+        $article->created_date = now(); // gunakan tanggal publikasi dari form
         $article->save();
         // Response
         return redirect()
@@ -99,15 +101,18 @@ public function updateBerita(Request $request, $id)
         if ($article->url_attachment) {
             Storage::disk('public')->delete(str_replace('/storage/', '', $article->url_attachment));
         }
-        $attachmentPath = $request->file('attachment')->store('articles/attachments', 'public');
+        $attachmentFile = $request->file('attachment');
+        $attachmentName = $attachmentFile->getClientOriginalName();
+        $attachmentPath = $attachmentFile->store('articles/attachments', 'public');
         $article->url_attachment = Storage::url($attachmentPath);
+        $article->attachment_name = $attachmentName;
     }
 
     $article->update([
         'judul' => $validated['judul'],
         'content' => $validated['content'],
         'status' => $validated['status'],
-        'created_date' => $validated['date'],
+        'updated_date' => now(),
     ]);
 
     return redirect()
@@ -213,7 +218,7 @@ public function updateBerita(Request $request, $id)
         ]);
 
         $article->article_id = Str::uuid()->toString();
-        $article->created_date = $validated['date'];
+        $article->created_date = now();
         $article->save();
 
         return redirect()
@@ -264,7 +269,7 @@ public function updateBerita(Request $request, $id)
             'judul' => $validated['judul'],
             'content' => $validated['content'],
             'status' => $validated['status'],
-            'created_date' => $validated['date'],
+            'updated_date' => now(),
         ]);
 
         return redirect()

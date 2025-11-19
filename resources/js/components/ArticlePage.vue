@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue';
 import { Download } from 'lucide-vue-next';
+import { computed } from 'vue';
 
 // Define the props for the component to make it reusable.
 // It accepts an object with title, imageUrl, content, and an optional publishedAt date.
@@ -12,6 +12,7 @@ const props = defineProps<{
         publishedAt?: string;
         url_attachment?: string;
         attachment_name?: string;
+        type: 'berita' | 'pengumuman';
     };
 }>();
 
@@ -29,11 +30,11 @@ const formattedDate = computed(() => {
 </script>
 
 <template>
-    <article class="mx-auto max-w-5xl rounded-3xl px-10 py-8 backdrop-blur-3xl">
+    <article class="mx-auto max-w-5xl rounded-3xl px-10 py-8">
         <!-- Article Header -->
         <header class="mb-8">
             <h1
-                class="text-3xl font-bold leading-tight text-gray-900 md:text-4xl"
+                class="text-3xl leading-tight font-bold text-gray-900 md:text-4xl"
             >
                 {{ article.title }}
             </h1>
@@ -42,20 +43,28 @@ const formattedDate = computed(() => {
             </p>
         </header>
         <!-- Hero Image Section -->
-        <div
-            class="mb-6 w-full overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-700"
-        >
-            <!--
-        The image will maintain a 16:9 aspect ratio.
-        `object-cover` ensures the image covers the area, cropping as needed.
-      -->
-            <img
-                :src="article.imageUrl"
-                :alt="`Image for ${article.title}`"
-                class="aspect-[16/9] h-auto w-full object-cover"
-                width="1280"
-                height="720"
-            />
+        <!-- Hero Image Section -->
+        <div class="mb-6 w-full" v-if="article.imageUrl">
+            <!-- BERITA → 16:9 dengan max height -->
+            <div
+                v-if="article.type === 'berita'"
+                class="overflow-hidden rounded-lg"
+            >
+                <img
+                    :src="article.imageUrl"
+                    :alt="`Image for ${article.title}`"
+                    class="aspect-[16/9] max-h-[400px] w-full object-cover"
+                />
+            </div>
+
+            <!-- PENGUMUMAN → fleksibel, tanpa crop, dengan max height -->
+            <div v-else>
+                <img
+                    :src="article.imageUrl"
+                    :alt="`Image for ${article.title}`"
+                    class="h-auto max-h-[500px] w-auto max-w-full rounded-lg object-contain"
+                />
+            </div>
         </div>
 
         <!-- Article Content -->
@@ -68,9 +77,7 @@ const formattedDate = computed(() => {
 
         <!-- Attachment Section -->
         <div v-if="article.url_attachment" class="mt-8 border-t pt-6">
-            <h2 class="mb-3 text-lg font-semibold text-gray-700">
-                Lampiran
-            </h2>
+            <h2 class="mb-3 text-lg font-semibold text-gray-700">Lampiran</h2>
             <a
                 :href="article.url_attachment"
                 target="_blank"

@@ -38,7 +38,7 @@ const sidebarWidth = computed(() => (sidebarOpen.value ? 256 : 80)); // px
         <Sidebar
             :sidebar-open="sidebarOpen"
             @toggle-sidebar="toggleSidebar"
-            class="absolute top-11 left-0 z-30 transition-all duration-300"
+            class="absolute top-11 left-0 transition-all duration-300"
             :style="{
                 width: sidebarOpen ? '256px' : '80px',
 

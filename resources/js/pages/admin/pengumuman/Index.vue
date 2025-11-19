@@ -47,7 +47,14 @@ const modalOpen = ref(false);
 const selectedArticle = ref(null);
 
 function openModal(article) {
-    selectedArticle.value = article;
+    selectedArticle.value = {
+        title: article.judul,
+        imageUrl: article.url_thumbnail,
+        content: article.content,
+        publishedAt: article.created_date,
+        url_attachment: article.url_attachment,
+        attachment_name: article.attachment_name,
+    };
     modalOpen.value = true;
 }
 </script>
