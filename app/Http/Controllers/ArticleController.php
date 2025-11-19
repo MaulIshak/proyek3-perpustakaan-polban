@@ -10,11 +10,22 @@ use Illuminate\Validation\Rule;
 
 class ArticleController extends Controller
 {
-    public function index(){
-        // Menampilkan halaman daftar berita
-        $articles = Article::where('type', 'berita')->get();
+    public function index(Request $request)
+    {
+        $search = $request->input('search');
+
+        $articles = Article::where('type', 'berita')
+            ->when($search, function ($query, $search) {
+                $lowerSearch = strtolower($search);
+                $query->whereRaw('LOWER(judul) LIKE ?', ["%{$lowerSearch}%"]);
+            })
+            ->orderBy('created_date', 'desc')
+            ->paginate(8)
+            ->withQueryString();
+
         return inertia('admin/berita/Index', [
             'articles' => $articles,
+            'searchQuery' => $search,
         ]);
     }
 
@@ -190,11 +201,22 @@ public function updateBerita(Request $request, $id)
     }
 
 
-    public function indexPengumuman()
+    public function indexPengumuman(Request $request)
     {
-        $articles = Article::where('type', 'pengumuman')->get();
+        $search = $request->input('search');
+
+        $articles = Article::where('type', 'pengumuman')
+            ->when($search, function ($query, $search) {
+                $lowerSearch = strtolower($search);
+                $query->whereRaw('LOWER(judul) LIKE ?', ["%{$lowerSearch}%"]);
+            })
+            ->orderBy('created_date', 'desc')
+            ->paginate(8)
+            ->withQueryString();
+
         return inertia('admin/pengumuman/Index', [
             'articles' => $articles,
+            'searchQuery' => $search,
         ]);
     }
 

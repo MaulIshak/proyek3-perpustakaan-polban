@@ -44,19 +44,19 @@ function extractDateParts(dateString: string) {
 
 <template>
     <div
-        class="group flex flex-col overflow-hidden rounded-xl border bg-card text-card-foreground shadow transition-shadow hover:shadow-xl sm:flex-row"
+        class="group flex flex-col overflow-hidden rounded-xl border bg-white shadow-sm transition-all hover:shadow-md sm:flex-row"
     >
         <!-- Kotak Tanggal -->
-        <div
-            class="flex items-center justify-start p-6 sm:w-1/4 sm:justify-center"
-        >
+        <div class="flex items-center justify-center p-6 sm:w-1/4">
             <div
-                class="flex flex-col items-center justify-center rounded-lg border bg-[var(--primary-green)] p-4 shadow-sm"
+                class="flex flex-col items-center justify-center rounded-xl bg-[var(--primary-green)]/90 px-5 py-4 text-white shadow"
             >
-                <span class="text-4xl leading-none font-extrabold text-white">
+                <span class="text-4xl leading-none font-extrabold">
                     {{ extractDateParts(date).day }}
                 </span>
-                <span class="text-xs tracking-wide text-white uppercase">
+                <span
+                    class="mt-1 text-xs font-medium tracking-widest uppercase opacity-90"
+                >
                     {{ extractDateParts(date).month }}
                     {{ extractDateParts(date).year }}
                 </span>
@@ -64,9 +64,11 @@ function extractDateParts(dateString: string) {
         </div>
 
         <!-- Konten -->
-        <div class="flex flex-col justify-between p-5 sm:w-3/4">
+        <div class="flex flex-col justify-between p-6 sm:w-3/4">
             <div>
-                <h3 class="mb-2 line-clamp-2 text-xl font-bold text-gray-800">
+                <h3
+                    class="mb-2 line-clamp-2 text-lg font-semibold text-gray-900 transition-colors group-hover:text-[var(--primary-green)]"
+                >
                     {{ title }}
                 </h3>
 
@@ -76,12 +78,10 @@ function extractDateParts(dateString: string) {
             </div>
 
             <a
-                class="mt-4 flex w-fit items-center gap-1 self-start rounded-3xl border border-transparent bg-[var(--primary-green)] px-4 py-2 text-sm font-medium text-white transition-all duration-300 hover:border-[var(--primary-green)] hover:bg-white hover:text-[var(--primary-green)]"
+                class="flex w-45 items-center justify-evenly gap-1 rounded-3xl border border-transparent bg-[var(--primary-green)] p-2 text-center text-sm font-medium text-white transition-all duration-300 hover:border-[var(--primary-green)] hover:bg-white hover:text-[var(--primary-green)]"
                 :href="`/pengumuman/${id}`"
                 data-discover="true"
-            >
-                Lihat Selengkapnya
-                <ArrowRight class="h-4 w-4" />
+                >Baca Selengkapnya <ArrowRight class="w-5" />
             </a>
         </div>
     </div>

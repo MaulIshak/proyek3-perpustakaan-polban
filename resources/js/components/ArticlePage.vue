@@ -53,7 +53,7 @@ const formattedDate = computed(() => {
                 <img
                     :src="article.imageUrl"
                     :alt="`Image for ${article.title}`"
-                    class="aspect-[16/9] max-h-[400px] w-full object-cover"
+                    class="aspect-video max-h-[400px] w-full object-cover"
                 />
             </div>
 
