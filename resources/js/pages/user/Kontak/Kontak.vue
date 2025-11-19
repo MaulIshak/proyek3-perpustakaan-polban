@@ -44,7 +44,7 @@ const breadcrumb = [{ label: 'Profil' }, { label: 'Kontak' }];
                     <div class="space-y-6 p-6 pt-0 text-sm text-gray-700">
                         <div class="flex items-start space-x-3">
                             <div
-                                class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-emerald-100/50"
+                                class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-emerald-100/50"
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -74,7 +74,7 @@ const breadcrumb = [{ label: 'Profil' }, { label: 'Kontak' }];
                         </div>
                         <div class="flex items-start space-x-3">
                             <div
-                                class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-100 to-emerald-200"
+                                class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-linear-to-br from-emerald-100 to-emerald-200"
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -103,7 +103,7 @@ const breadcrumb = [{ label: 'Profil' }, { label: 'Kontak' }];
                         </div>
                         <div class="flex items-start space-x-3">
                             <div
-                                class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-100 to-emerald-200"
+                                class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-linear-to-br from-emerald-100 to-emerald-200"
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -143,7 +143,7 @@ const breadcrumb = [{ label: 'Profil' }, { label: 'Kontak' }];
                         </div>
                         <div class="flex items-start space-x-3">
                             <div
-                                class="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-100 to-emerald-200"
+                                class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-linear-to-br from-emerald-100 to-emerald-200"
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -192,11 +192,8 @@ const breadcrumb = [{ label: 'Profil' }, { label: 'Kontak' }];
                             <div class="embed-map-responsive">
                                 <div class="embed-map-container">
                                     <iframe
+                                        title=""
                                         class="embed-map-frame"
-                                        frameborder="0"
-                                        scrolling="no"
-                                        marginheight="0"
-                                        marginwidth="0"
                                         src="https://maps.google.com/maps?width=600&height=400&hl=en&q=Politeknik%20Negeri%20Bandung&t=&z=15&ie=UTF8&iwloc=B&output=embed"
                                     ></iframe
                                     ><a
@@ -217,9 +214,10 @@ const breadcrumb = [{ label: 'Profil' }, { label: 'Kontak' }];
                             </div>
                         </div>
                     </div>
+                    </div>
+                    
                 </div>
             </div>
-        </div>
     </UserAppLayout>
 </template>
 <style>

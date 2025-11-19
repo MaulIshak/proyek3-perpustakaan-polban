@@ -17,30 +17,30 @@ const emit = defineEmits(['toggle-sidebar']);
             sidebarOpen ? 'w-64' : 'w-20',
         ]"
     >
-        <!-- Header Logo
-        <div
-            class="flex min-h-20 items-center justify-between gap-3 border-b p-4"
-        >
-            <div v-if="sidebarOpen" class="flex items-center gap-3">
-                <div>
-                    <h1
-                        class="text-md font-bold whitespace-nowrap text-[var(--dark-green)]"
-                    >
-                        Perpustakaan POLBAN
-                    </h1>
-                    <h3 class="text-sm text-[var(--secondary-green)]">
-                        Pustakawan
-                    </h3>
-                </div>
+        <!-- HEADER -->
+        <div class="flex items-center gap-3 border-b border-white/10 px-4 py-4">
+            <!-- Logo -->
+            <img
+                src="/logo-polban.png"
+                alt="Polban"
+                class="h-12 w-12 object-contain"
+            />
+
+            <!-- Title + Subtitle -->
+            <div v-if="sidebarOpen" class="flex flex-col">
+                <span
+                    class="text-sm font-bold tracking-wide text-wrap whitespace-nowrap text-[var(--dark-green)]"
+                >
+                    PERPUSTAKAAN POLBAN
+                </span>
+
+                <span
+                    class="text-[10px] font-medium tracking-wide text-wrap whitespace-nowrap text-gray-600"
+                >
+                    Laman Pustakawan
+                </span>
             </div>
-            <button
-                @click="emit('toggle-sidebar')"
-                class="rounded-lg p-2 transition hover:bg-gray-100"
-            >
-                <X v-if="sidebarOpen" class="text-2xl text-gray-700" />
-                <PanelLeft v-else class="text-2xl text-gray-700" />
-            </button>
-        </div> -->
+        </div>
 
         <!-- Navigation -->
         <nav
@@ -68,7 +68,7 @@ const emit = defineEmits(['toggle-sidebar']);
             <div>
                 <template v-if="sidebarOpen">
                     <h2
-                        class="mb-2 px-2 text-xs font-semibold text-wrap whitespace-nowrap text-[var(--secondary-green)] uppercase"
+                        class="mb-2 px-2 text-xs font-semibold whitespace-nowrap text-[var(--secondary-green)] uppercase"
                     >
                         Konten & Informasi Publik
                     </h2>
@@ -115,7 +115,7 @@ const emit = defineEmits(['toggle-sidebar']);
             <div>
                 <template v-if="sidebarOpen">
                     <h2
-                        class="mb-2 px-2 text-xs font-semibold text-wrap whitespace-nowrap text-[var(--secondary-green)] uppercase"
+                        class="mb-2 px-2 text-xs font-semibold whitespace-nowrap text-[var(--secondary-green)] uppercase"
                     >
                         Layanan Perpustakaan
                     </h2>
@@ -144,7 +144,7 @@ const emit = defineEmits(['toggle-sidebar']);
             <div>
                 <template v-if="sidebarOpen">
                     <h2
-                        class="mb-2 px-2 text-xs font-semibold text-wrap whitespace-nowrap text-[var(--secondary-green)] uppercase"
+                        class="mb-2 px-2 text-xs font-semibold whitespace-nowrap text-[var(--secondary-green)] uppercase"
                     >
                         Sumber Daya Digital
                     </h2>

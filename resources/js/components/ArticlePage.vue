@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Link } from '@inertiajs/vue3';
+import { Download } from 'lucide-vue-next';
 import { computed } from 'vue';
 
 // Define the props for the component to make it reusable.
@@ -9,6 +11,9 @@ const props = defineProps<{
         imageUrl: string;
         content: string;
         publishedAt?: string;
+        url_attachment?: string;
+        attachment_name?: string;
+        type: 'berita' | 'pengumuman';
     };
 }>();
 
@@ -23,27 +28,35 @@ const formattedDate = computed(() => {
         day: 'numeric',
     });
 });
+
+const backUrl = computed(() => {
+    return props.article.type === 'berita' ? '/berita' : '/pengumuman';
+});
 </script>
 
 <template>
-    <article class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-        <!-- Hero Image Section -->
-        <div
-            class="mb-6 w-full overflow-hidden rounded-lg bg-gray-200 dark:bg-gray-700"
+    <article class="mx-auto max-w-5xl rounded-3xl px-10 py-8">
+        <!-- Back Button -->
+        <Link
+            :href="backUrl"
+            class="mb-6 inline-flex items-center text-gray-600 transition hover:cursor-pointer hover:text-gray-800"
         >
-            <!--
-        The image will maintain a 16:9 aspect ratio.
-        `object-cover` ensures the image covers the area, cropping as needed.
-      -->
-            <img
-                :src="article.imageUrl"
-                :alt="`Image for ${article.title}`"
-                class="aspect-[16/9] h-auto w-full object-cover"
-                width="1280"
-                height="720"
-            />
-        </div>
-
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="mr-1 h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M15 19l-7-7 7-7"
+                />
+            </svg>
+            <span>Kembali</span>
+        </Link>
         <!-- Article Header -->
         <header class="mb-8">
             <h1
@@ -55,6 +68,30 @@ const formattedDate = computed(() => {
                 <time :datetime="article.publishedAt">{{ formattedDate }}</time>
             </p>
         </header>
+        <!-- Hero Image Section -->
+        <!-- Hero Image Section -->
+        <div class="mb-6 w-full" v-if="article.imageUrl">
+            <!-- BERITA → 16:9 dengan max height -->
+            <div
+                v-if="article.type === 'berita'"
+                class="overflow-hidden rounded-lg"
+            >
+                <img
+                    :src="article.imageUrl"
+                    :alt="`Image for ${article.title}`"
+                    class="aspect-video max-h-[400px] w-full object-cover"
+                />
+            </div>
+
+            <!-- PENGUMUMAN → fleksibel, tanpa crop, dengan max height -->
+            <div v-else>
+                <img
+                    :src="article.imageUrl"
+                    :alt="`Image for ${article.title}`"
+                    class="h-auto max-h-[500px] w-auto max-w-full rounded-lg object-contain"
+                />
+            </div>
+        </div>
 
         <!-- Article Content -->
         <!--
@@ -62,10 +99,21 @@ const formattedDate = computed(() => {
       typographic defaults for HTML content.
       Make sure you have `@tailwindcss/typography` plugin installed and configured.
     -->
-        <div
-            class="prose dark:prose-invert max-w-none"
-            v-html="article.content"
-        ></div>
+        <div class="prose max-w-none" v-html="article.content"></div>
+
+        <!-- Attachment Section -->
+        <div v-if="article.url_attachment" class="mt-8 border-t pt-6">
+            <h2 class="mb-3 text-lg font-semibold text-gray-700">Lampiran</h2>
+            <a
+                :href="article.url_attachment"
+                target="_blank"
+                :download="article.attachment_name"
+                class="inline-flex items-center rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700"
+            >
+                <Download class="mr-2 h-4 w-4" />
+                Unduh {{ article.attachment_name || 'Lampiran' }}
+            </a>
+        </div>
     </article>
 </template>
 

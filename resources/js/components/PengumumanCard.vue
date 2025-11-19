@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { ArrowRight } from 'lucide-vue-next';
+import { defineProps } from 'vue';
 
-defineProps({
-    id: Number,
-    title: String,
-    date: String,
-    content: {
-        type: String,
-        default: '',
-    },
-});
+const props = defineProps<{
+    // Prop ID diubah menjadi string (UUID)
+    id: string;
+    title: string;
+    content: string;
+    // PengumumanCard tidak selalu punya thumbnail, jadi dihapus atau jadikan opsional jika ada
+    date: string;
+}>();
 
 function formatDate(dateString: string) {
-    if (!dateString) return '-'; // fallback kalau null
+    if (!dateString) return '-';
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -20,7 +20,8 @@ function formatDate(dateString: string) {
     return `${day}-${month}-${year}`;
 }
 
-function truncateText(text: string, maxLength: number = 120): string {
+function truncateText(text: string, maxLength: number = 150): string {
+    // Pengumuman biasanya lebih panjang, gunakan maksimal 150 karakter untuk pratinjau
     if (text.length <= maxLength) return text;
     return text.slice(0, maxLength) + '...';
 }
@@ -31,54 +32,57 @@ function stripHtml(html: string) {
     tmp.innerHTML = html;
     return tmp.textContent || tmp.innerText || '';
 }
+
+function extractDateParts(dateString: string) {
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = date.toLocaleString('id-ID', { month: 'short' }); // Jan, Feb, dst
+    const year = date.getFullYear();
+    return { day, month, year };
+}
 </script>
 
 <template>
     <div
-        class="mb-4 rounded-xl border bg-card p-6 text-card-foreground shadow transition-shadow hover:shadow-lg"
+        class="group flex flex-col overflow-hidden rounded-xl border bg-white shadow-sm transition-all hover:shadow-md sm:flex-row"
     >
-        <div class="flex items-start gap-4">
-            <div class="flex-shrink-0">
-                <div
-                    class="flex h-16 w-16 items-center justify-center rounded-lg bg-[var(--primary-green)]"
+        <!-- Kotak Tanggal -->
+        <div class="flex items-center justify-center p-6 sm:w-1/4">
+            <div
+                class="flex flex-col items-center justify-center rounded-xl bg-[var(--primary-green)]/90 px-5 py-4 text-white shadow"
+            >
+                <span class="text-4xl leading-none font-extrabold">
+                    {{ extractDateParts(date).day }}
+                </span>
+                <span
+                    class="mt-1 text-xs font-medium tracking-widest uppercase opacity-90"
                 >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        class="lucide lucide-calendar h-8 w-8 text-white"
-                        aria-hidden="true"
-                    >
-                        <path d="M8 2v4"></path>
-                        <path d="M16 2v4"></path>
-                        <rect width="18" height="18" x="3" y="4" rx="2"></rect>
-                        <path d="M3 10h18"></path>
-                    </svg>
-                </div>
+                    {{ extractDateParts(date).month }}
+                    {{ extractDateParts(date).year }}
+                </span>
             </div>
-            <div class="flex-1">
-                <div class="mb-2 flex items-center justify-between">
-                    <span class="text-sm text-gray-500">{{ date }}</span>
-                </div>
-                <h3 class="mb-2 text-xl font-bold text-gray-800">
+        </div>
+
+        <!-- Konten -->
+        <div class="flex flex-col justify-between p-6 sm:w-3/4">
+            <div>
+                <h3
+                    class="mb-2 line-clamp-2 text-lg font-semibold text-gray-900 transition-colors group-hover:text-[var(--primary-green)]"
+                >
                     {{ title }}
                 </h3>
-                <p class="mb-4 text-gray-600">
+
+                <p class="mb-4 line-clamp-3 text-sm text-gray-600">
                     {{ truncateText(stripHtml(content)) }}
                 </p>
-                <a
-                    class="flex w-45 items-center justify-evenly gap-1 rounded-3xl border border-transparent bg-[var(--primary-green)] p-2 text-center text-sm font-medium text-white transition-all duration-300 hover:border-[var(--primary-green)] hover:bg-white hover:text-[var(--primary-green)]"
-                    :href="`/pengumuman${id}`"
-                    data-discover="true"
-                    >Baca Selengkapnya <ArrowRight class="w-5" />
-                </a>
             </div>
+
+            <a
+                class="flex w-45 items-center justify-evenly gap-1 rounded-3xl border border-transparent bg-[var(--primary-green)] p-2 text-center text-sm font-medium text-white transition-all duration-300 hover:border-[var(--primary-green)] hover:bg-white hover:text-[var(--primary-green)]"
+                :href="`/pengumuman/${id}`"
+                data-discover="true"
+                >Baca Selengkapnya <ArrowRight class="w-5" />
+            </a>
         </div>
     </div>
 </template>

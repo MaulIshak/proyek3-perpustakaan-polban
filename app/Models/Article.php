@@ -47,6 +47,7 @@ class Article extends Model
     protected $fillable = [
         'url_thumbnail',
         'url_attachment',
+        'attachment_name',
         'judul',
         'content',
         'type',

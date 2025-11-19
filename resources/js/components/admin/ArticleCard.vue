@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import DOMPurify from 'dompurify';
 import { Calendar, Eye, Pencil, Trash } from 'lucide-vue-next';
+import { defineEmits, defineProps } from 'vue';
 
-defineProps<{
+const props = defineProps<{
     title: string;
     content: string;
     status: string;
     time: string;
+    thumbnailUrl: string;
+    updateHref: string;
     deleteAction: string;
-    thumbnailUrl: string
-    viewHref: string;
 }>();
 
+const emit = defineEmits(['delete', 'view']);
 
 function formatDate(dateString: string) {
     if (!dateString) return '-'; // fallback kalau null
@@ -63,28 +64,34 @@ function stripHtml(html: string) {
                 {{ truncateText(stripHtml(content), 110) }}
             </div>
             <div class="mt-4 flex justify-end gap-2 text-sm">
-                <a
-                :href="viewHref"
+                <button
+                    @click="
+                        $emit('view', {
+                            title,
+                            content,
+                            imageUrl: thumbnailUrl,
+                            publishedAt: time,
+                        })
+                    "
                     class="rounded-lg border border-blue-600 px-2 py-2 text-center font-medium text-blue-600 transition hover:bg-blue-600 hover:text-white"
                 >
                     <Eye class="mr-1 inline-block h-4 w-4" />
                     Lihat
-                </a>
+                </button>
                 <a
+                    :href="updateHref"
                     class="rounded-lg border border-yellow-500 px-2 py-2 text-center font-medium text-yellow-500 transition hover:bg-yellow-500 hover:text-white"
                 >
                     <Pencil class="mr-1 inline-block h-4 w-4" />
                     Edit
                 </a>
-                <form :action="deleteAction" method="POST">
-                    <button
-                        type="submit"
-                        class="rounded-lg border border-red-600 px-2 py-2 text-center font-medium text-red-600 transition hover:bg-red-600 hover:text-white"
-                    >
-                        <Trash class="mr-1 inline-block h-4 w-4" />
-                        Hapus
-                    </button>
-                </form>
+                <button
+                    @click="$emit('delete')"
+                    class="rounded-lg border border-red-600 px-2 py-2 text-center font-medium text-red-600 transition hover:bg-red-600 hover:text-white"
+                >
+                    <Trash class="mr-1 inline-block h-4 w-4" />
+                    Hapus
+                </button>
             </div>
         </div>
     </div>

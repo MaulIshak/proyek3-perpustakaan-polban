@@ -1,17 +1,157 @@
 <script setup>
+import ArticleModal from '@/components/admin/ArticleModal.vue';
+import CreateWithSearch from '@/components/admin/CreateWithSearch.vue';
+import PengumumanCard from '@/components/admin/PengumumanCard.vue';
+import PaginationLink from '@/components/admin/PaginationLink.vue';
+import { useConfirmModal } from '@/composables/userConfirmModal';
 import AdminLayout from '@/layouts/AdminLayout.vue';
+import { router } from '@inertiajs/vue3';
+import { FileSearch } from 'lucide-vue-next';
+import { ref, watch } from 'vue';
+import debounce from 'lodash/debounce';
+
+const { open } = useConfirmModal();
+const props = defineProps({
+    articles: {
+        type: Object,
+        default: () => ({}),
+    },
+    searchQuery: {
+        type: String,
+        default: '',
+    },
+});
 
 defineOptions({
     layout: (h, page) =>
         h(
             AdminLayout,
             {
-                title: 'Buat Berita Baru',
-                subTitle: 'Kelola konten berita perpustakaan baru',
+                title: 'Pengumuman',
+                subTitle: 'Kelola pengumuman perpustakaan',
             },
             { default: () => page },
         ),
 });
+
+const searchQuery = ref(props.searchQuery);
+
+watch(
+    searchQuery,
+    debounce((value) => {
+        router.get(
+            '/admin/pengumuman',
+            { search: value },
+            {
+                preserveState: true,
+                replace: true,
+            },
+        );
+    }, 300),
+);
+
+function handleDelete(article) {
+    open({
+        title: 'Hapus Pengumuman?',
+        message: 'Pastikan data yang akan dihapus sudah benar.',
+        actionLabel: 'Hapus',
+        payload: {
+            Judul: article.judul,
+            Status: article.status,
+            Tanggal: article.created_date,
+        },
+        onConfirm: () => {
+            router.delete(`/admin/pengumuman/delete/${article.article_id}`);
+        },
+    });
+}
+
+const modalOpen = ref(false);
+const selectedArticle = ref(null);
+
+function openModal(article) {
+    selectedArticle.value = {
+        title: article.judul,
+        imageUrl: article.url_thumbnail,
+        content: article.content,
+        publishedAt: article.created_date,
+        url_attachment: article.url_attachment,
+        attachment_name: article.attachment_name,
+    };
+    modalOpen.value = true;
+}
 </script>
 
-<template></template>
+<template>
+    <CreateWithSearch
+        placeholder="Cari pengumuman..."
+        create-label="Buat Pengumuman Baru"
+        create-href="/admin/pengumuman/create"
+        class="mb-3"
+        v-model="searchQuery"
+    />
+    <div
+        v-if="articles.data.length > 0"
+        class="mb-6 grid gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4"
+    >
+        <PengumumanCard
+            v-for="pengumuman in articles.data"
+            :key="pengumuman.article_id"
+            :title="pengumuman.judul"
+            :content="pengumuman.content"
+            :status="pengumuman.status"
+            :time="pengumuman.created_date"
+            :thumbnail-url="pengumuman.url_thumbnail"
+            :update-href="`/admin/pengumuman/edit/${pengumuman.article_id}/`"
+            class="flex-1"
+            @delete="handleDelete(pengumuman)"
+            @view="openModal(pengumuman)"
+        />
+    </div>
+    <div
+        v-else
+        class="flex flex-col items-center justify-center py-20 text-center"
+    >
+        <!-- Icon dari lucide -->
+        <FileSearch class="mb-4 h-20 w-20 text-gray-400" />
+
+        <h3 class="text-2xl font-semibold text-gray-600">
+            {{
+                searchQuery
+                    ? 'Pengumuman Tidak Ditemukan'
+                    : 'Belum Ada Pengumuman'
+            }}
+        </h3>
+
+        <p class="mt-2 max-w-sm text-gray-500">
+            {{
+                searchQuery
+                    ? 'Sistem tidak menemukan pengumuman yang cocok dengan kata kunci pencarian Anda.'
+                    : 'Sistem tidak menemukan pengumuman apapun. Buat pengumuman baru atau ubah kata kunci pencarian.'
+            }}
+        </p>
+
+        <a
+            v-if="!searchQuery"
+            href="/admin/pengumuman/create"
+            class="mt-6 rounded-xl bg-[var(--primary-green)] px-5 py-3 font-medium text-white transition hover:opacity-90"
+        >
+            Buat Pengumuman Baru
+        </a>
+    </div>
+    <div class="mt-6">
+        <PaginationLink :links="articles.links" />
+    </div>
+    <ArticleModal
+        :open="modalOpen"
+        :article="selectedArticle"
+        @close="modalOpen = false"
+    />
+</template>
+
+<style scoped>
+.line-clamp-3 {
+    display: -webkit-box;
+    overflow: hidden;
+}
+</style>

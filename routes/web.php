@@ -1,6 +1,6 @@
 <?php
 
-
+use App\Http\Controllers\GaleriController;
 use App\Http\Controllers\BookProposalController;
 use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\HomeController;
@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\CoverBuku;
+use App\Http\Controllers\RencanaStrategi;
 use App\Http\Controllers\TimManajemen;
 
 Route::get('/pelayanan/{slug}', function (string $slug) {
@@ -44,17 +46,32 @@ Route::get('/facilities', function () {
         'subtitle' => 'Berbagai fasilitas modern untuk mendukung kegiatan belajar Anda',
         'facilities' => [
             [
-                'subjudul' => 'Ruang Baca',
-                'description' => 'Ruang baca dengan kapasitas 150 orang, dilengkapi dengan AC, pencahayaan yang baik, dan suasana tenang untuk mendukung aktivitas belajar mandiri.',
+                'subjudul' => 'Ruang Sirkulasi',
+                'description' => 'Fasilitas 40 unit komputer dengan akses internet cepat, tersedia untuk browsing, mengakses e-journal, dan mengerjakan tugas.',
                 'image' => 'https://library.polban.ac.id/wp-content/uploads/2024/09/Screenshot-2024-09-12-124117-10-1024x511.png',
             ],
             [
-                'subjudul' => 'Ruang Komputer',
-                'description' => 'Fasilitas 40 unit komputer dengan akses internet cepat, tersedia untuk browsing, mengakses e-journal, dan mengerjakan tugas.',
+                'subjudul' => 'Ruang Baca',
+                'description' => 'Ruang baca dengan kapasitas 150 orang, dilengkapi dengan AC, pencahayaan yang baik, dan suasana tenang untuk mendukung aktivitas belajar mandiri.',
                 'image' => 'https://library.polban.ac.id/wp-content/uploads/2024/09/Ruang-Baca-7-1024x682.jpg',
             ],
             [
                 'subjudul' => 'Ruang Referensi',
+                'description' => 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit excepturi quia a maxime quisquam impedit qui velit optio iusto. Voluptas beatae similique corporis ex ipsam eveniet assumenda, possimus nobis distinctio.',
+                'image' => 'https://library.polban.ac.id/wp-content/uploads/2024/09/Screenshot-2024-09-12-124117-10-1024x511.png'
+            ],
+            [
+                'subjudul' => 'Ruang Komputer',
+                'description' => 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit excepturi quia a maxime quisquam impedit qui velit optio iusto. Voluptas beatae similique corporis ex ipsam eveniet assumenda, possimus nobis distinctio.',
+                'image' => 'https://library.polban.ac.id/wp-content/uploads/2024/09/Screenshot-2024-09-12-124117-10-1024x511.png'
+            ],
+            [
+                'subjudul' => 'Ruang Belajar Mandiri',
+                'description' => 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit excepturi quia a maxime quisquam impedit qui velit optio iusto. Voluptas beatae similique corporis ex ipsam eveniet assumenda, possimus nobis distinctio.',
+                'image' => 'https://library.polban.ac.id/wp-content/uploads/2024/09/Screenshot-2024-09-12-124117-10-1024x511.png'
+            ],
+            [
+                'subjudul' => 'Ruang Loker',
                 'description' => 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit excepturi quia a maxime quisquam impedit qui velit optio iusto. Voluptas beatae similique corporis ex ipsam eveniet assumenda, possimus nobis distinctio.',
                 'image' => 'https://library.polban.ac.id/wp-content/uploads/2024/09/Screenshot-2024-09-12-124117-10-1024x511.png'
             ]
@@ -85,15 +102,45 @@ Route::get('/E_Journal', function () {
 });
 
 Route::get('/berita', [ArticleController::class, 'beritaUser'])->name('beritaUser');
+Route::get('/berita/{id}', [ArticleController::class, 'showBeritaUser'])->name('showBeritaUser');
 Route::get('/pengumuman', [ArticleController::class, 'pengumumanUser'])->name('pengumumanUser');
-
+Route::get('/pengumuman/{id}', [ArticleController::class, 'showPengumumanUser'])->name('showPengumumanUser');
 
 // Peraturan Perpustakaan
 Route::get('/peraturan', function (){
     $data = [
-        'title' => 'peraturan'
+        'title' => 'Peraturan Perpustakaan'
     ];
+
+    return Inertia::render('user/Profile/Peraturan', $data);
 });
+
+// Jam Layanan
+Route::get('/jam-layanan', function (){
+    $data = [
+        'title' => 'Jam Layanan',
+        
+    ];
+
+    return Inertia::render('user/Profile/JamLayanan', $data);
+});
+
+// Booking Buku 
+Route::get('/book-reservation', function(){
+    $data = [
+        'title' => 'Booking buku'
+    ];
+
+    return Inertia::render('user/BookingBuku', $data);
+});
+
+// Renstra
+Route::get('/renstra', [RencanaStrategi::class, 'viewPDF'])->name('renstra');
+
+
+// Cover Buku Baru USER
+// Route::get('/')
+
 
 Route::prefix('admin')->name('admin.')->group(function () {
     // show login form (only for guests of admin guard)
@@ -124,7 +171,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('berita/edit/{id}', [ArticleController::class, 'editBerita'])->middleware('auth:admin');
     Route::post('berita/update/{id}', [ArticleController::class, 'updateBerita'])->middleware('auth:admin');
     Route::delete('berita/delete/{id}', [ArticleController::class, 'destroyBerita'])->middleware('auth:admin');
-    
+
     // Pengumuman
     Route::get('pengumuman', [ArticleController::class, 'indexPengumuman'])->middleware('auth:admin')->name('pengumumanIndex');
     Route::get('pengumuman/create', function(){
@@ -137,25 +184,42 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('pengumuman/edit/{id}', [ArticleController::class, 'editPengumuman'])->middleware('auth:admin');
     Route::post('pengumuman/update/{id}', [ArticleController::class, 'updatePengumuman'])->middleware('auth:admin');
     Route::delete('pengumuman/delete/{id}', [ArticleController::class, 'destroyPengumuman'])->middleware('auth:admin');
+    Route::get('berita/edit/{id}', [ArticleController::class, 'editBerita'])->middleware('auth:admin');
+    Route::post('berita/update/{id}', [ArticleController::class, 'updateBerita'])->middleware('auth:admin');
+    Route::delete('berita/delete/{id}', [ArticleController::class, 'destroyBerita'])->middleware('auth:admin');
 
     // galeri
-    Route::get('galeri/', [PhotoController::class, 'index'])->name('index');
-    Route::post('galeri/store', [PhotoController::class, 'store'])->name('store');
-    Route::put('galeri/{foto_id}', [PhotoController::class, 'update'])->name('update');
-    Route::delete('galeri/{foto_id}', [PhotoController::class, 'destroy'])->name('delete');
+    Route::get('galeri/', [PhotoController::class, 'index'])->middleware('auth:admin')->name('index');
+    Route::post('galeri/store', [PhotoController::class, 'store'])->middleware('auth:admin')->name('store');
+    Route::put('galeri/{foto_id}', [PhotoController::class, 'update'])->middleware('auth:admin')->name('update');
+    Route::delete('galeri/{foto_id}', [PhotoController::class, 'destroy'])->middleware('auth:admin')->name('delete');
 
     // usulan
-    Route::get('usulan-buku', [BookProposalController::class, 'index'])->name('book-proposals.index');
-    Route::patch('usulan-buku/{id}/status', [BookProposalController::class, 'updateStatus'])->name('book-proposals.update-status');
-    Route::delete('usulan-buku/{id}', [BookProposalController::class, 'destroy'])->name('book-proposals.destroy');
-    Route::get('usulan-buku/export', [BookProposalController::class, 'export'])->name('book-proposals.export');
+    Route::get('usulan-buku', [BookProposalController::class, 'index'])->middleware('auth:admin')->name('book-proposals.index');
+    Route::patch('usulan-buku/{id}/status', [BookProposalController::class, 'updateStatus'])->middleware('auth:admin')->name('book-proposals.update-status');
+    Route::delete('usulan-buku/{id}', [BookProposalController::class, 'destroy'])->middleware('auth:admin')->name('book-proposals.destroy');
+    Route::get('usulan-buku/export', [BookProposalController::class, 'export'])->middleware('auth:admin')->name('book-proposals.export');
     
 
 
     // Tim manajemen
-    Route::get('tim-manajemen', [TimManajemen::class, 'TmAdminPage']);
+    Route::get('tim-manajemen', [TimManajemen::class, 'TmAdminPage'])->middleware('auth:admin')->name('tim.index');
+    Route::post('tim-manajemen/store', [TimManajemen::class, 'store'])->middleware('auth:admin')->name('tim.store');
+    Route::put('tim-manajemen/update/{id}', [TimManajemen::class, 'update'])->middleware('auth:admin')->name('tim.update');
+    Route::delete('tim-manajemen/delete/{id}', [TimManajemen::class, 'destroy'])->middleware('auth:admin')->name('tim.destroy');
 
+    // Renstra
+    Route::get('renstra', [RencanaStrategi::class, 'index'])->middleware('auth:admin')->name('renstra.index');
+    Route::post('renstra/store', [RencanaStrategi::class, 'store'])->middleware('auth:admin')->name('renstra.store');
+    Route::put('renstra/update/{id}', [RencanaStrategi::class, 'update'])->middleware('auth:admin')->name('renstra.update');
+    Route::delete('renstra/delete/{id}', [RencanaStrategi::class, 'destroy'])->middleware('auth:admin')->name('renstra.destroy');
 
+    // Cover Buku
+    Route::get('cover-buku', [CoverBuku::class, 'index'])->name('cover.index');
+    Route::post('cover-buku/store', [CoverBuku::class, 'store'])->name('cover.store');
+    // Kita pakai POST untuk update file (dengan _method: PUT di frontend)
+    Route::post('cover-buku/update/{id}', [CoverBuku::class, 'update'])->name('cover.update');
+    Route::delete('cover-buku/delete/{id}', [CoverBuku::class, 'destroy'])->name('cover.destroy');
 });
 
 require __DIR__.'/settings.php';

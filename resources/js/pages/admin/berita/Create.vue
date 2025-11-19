@@ -1,8 +1,8 @@
 <script setup>
 import ArticleForm from '@/components/admin/ArticleForm.vue';
 import AdminLayout from '@/layouts/AdminLayout.vue';
-import { useForm } from '@inertiajs/vue3';
-import { ref, watch } from 'vue';
+import { useForm, usePage } from '@inertiajs/vue3';
+import { computed, ref, watch } from 'vue';
 
 defineOptions({
     layout: (h, page) =>
@@ -16,7 +16,9 @@ defineOptions({
         ),
 });
 
-// Data model untuk v-model di komponen form
+const page = usePage();
+const successMessage = computed(() => page.props.flash?.success || null);
+
 const article = ref({
     title: '',
     content: '',
@@ -26,9 +28,8 @@ const article = ref({
     attachment: null,
 });
 
-// Ubah struktur form untuk mencocokkan dengan validasi backend
 const form = useForm({
-    judul: '', // sesuaikan dengan nama field di backend
+    judul: '',
     content: '',
     status: 'draft',
     date: '',
@@ -36,11 +37,10 @@ const form = useForm({
     attachment: null,
 });
 
-// Sinkronisasi data dari article ke form
 watch(
     article,
     (newVal) => {
-        form.judul = newVal.title; // title -> judul
+        form.judul = newVal.title;
         form.content = newVal.content;
         form.status = newVal.status;
         form.date = newVal.date;
@@ -48,14 +48,12 @@ watch(
         form.attachment = newVal.attachment;
     },
     { deep: true },
-); // tambahkan deep: true untuk memastikan perubahan terdeteksi
+);
 
-// Handle submit dari child component
 const handleSubmit = () => {
     form.post('/admin/berita/store', {
-        forceFormData: true, // penting agar file dikirim sebagai multipart/form-data
+        forceFormData: true,
         onSuccess: () => {
-            // Reset form dan tampilkan notifikasi
             form.reset();
             article.value = {
                 title: '',
@@ -66,15 +64,22 @@ const handleSubmit = () => {
                 attachment: null,
             };
         },
-        onError: (errors) => {
-            console.error('Validasi gagal:', errors);
-        },
+        onError: (errors) => console.error('Validasi gagal:', errors),
     });
 };
 </script>
 
 <template>
-    <div class="rounded-xl bg-white p-6 shadow">
+    <!-- Notifikasi Sukses -->
+    <transition name="fade">
+        <div
+            v-if="successMessage"
+            class="mb-4 rounded-md border border-green-300 bg-green-50 px-4 py-3 text-green-700 shadow-sm"
+        >
+            ✅ {{ successMessage }}
+        </div>
+    </transition>
+    <div class="relative rounded-xl bg-white p-6 shadow">
         <!-- Komponen Form -->
         <ArticleForm
             v-model="article"
@@ -97,5 +102,52 @@ const handleSubmit = () => {
         <div v-if="form.progress" class="mt-4 text-sm text-gray-600">
             Mengunggah... {{ Math.round(form.progress.percentage) }}%
         </div>
+
+        <!-- Modal Loading -->
+        <transition name="fade">
+            <div
+                v-if="form.processing"
+                class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            >
+                <div
+                    class="flex flex-col items-center rounded-lg bg-white px-8 py-6 shadow-xl"
+                >
+                    <svg
+                        class="h-10 w-10 animate-spin text-emerald-600"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                    >
+                        <circle
+                            class="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            stroke-width="4"
+                        ></circle>
+                        <path
+                            class="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8v8H4z"
+                        ></path>
+                    </svg>
+                    <p class="mt-4 text-sm font-medium text-gray-600">
+                        Menyimpan berita...
+                    </p>
+                </div>
+            </div>
+        </transition>
     </div>
 </template>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s;
+}
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+</style>

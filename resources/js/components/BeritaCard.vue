@@ -3,7 +3,8 @@ import { ArrowRight } from 'lucide-vue-next';
 import { defineProps } from 'vue';
 
 const props = defineProps<{
-    id: number;
+    // Mengubah tipe id menjadi string karena menggunakan UUID
+    id: string;
     title: string;
     content: string;
     thumbnail: string;

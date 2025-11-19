@@ -88,42 +88,44 @@
         <!-- Quick Actions -->
         <div>
             <h3
-                class="rounded-xl bg-[var(--background-green)] p-2 text-lg font-bold text-[var(--dark-green)]"
+                class="rounded-xl p-2 text-lg font-bold text-[var(--dark-green)]"
             >
                 Aksi Cepat
             </h3>
 
             <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-                <button
-                    class="flex flex-col items-center justify-center rounded-xl bg-[var(--primary-green)] p-6 text-white shadow-sm transition hover:brightness-110"
+                <a
+                    href="/admin/berita/create"
+                    class="flex flex-col items-center justify-center rounded-xl bg-gradient-to-br from-white/70 to-[var(--primary-green)] p-6 text-[var(--dark-green)] shadow-sm transition hover:brightness-110"
                 >
                     <Newspaper class="mb-2 h-7 w-7" />
                     <span class="text-sm font-medium">Buat Berita</span>
-                </button>
+                </a>
 
-                <button
-                    class="flex flex-col items-center justify-center rounded-xl bg-emerald-100 p-6 text-[var(--dark-green)] shadow-sm transition hover:bg-emerald-200"
+                <a
+                    href="/admin/pengumuman/create"
+                    class="flex flex-col items-center justify-center rounded-xl bg-gradient-to-br from-white/70 to-emerald-300 p-6 text-[var(--dark-green)] shadow-sm transition hover:brightness-110"
                 >
                     <Megaphone class="mb-2 h-7 w-7" />
-                    <span class="text-sm font-medium">Pengumuman</span>
-                </button>
+                    <span class="text-sm font-medium">Buat Pengumuman</span>
+                </a>
 
                 <button
-                    class="flex flex-col items-center justify-center rounded-xl bg-yellow-100 p-6 text-yellow-700 shadow-sm transition hover:bg-yellow-200"
+                    class="flex flex-col items-center justify-center rounded-xl bg-gradient-to-br from-white/70 to-yellow-200 p-6 text-yellow-700 shadow-sm transition hover:brightness-110"
                 >
                     <Image class="mb-2 h-7 w-7" />
                     <span class="text-sm font-medium">Upload Foto</span>
                 </button>
 
                 <button
-                    class="flex flex-col items-center justify-center rounded-xl bg-orange-100 p-6 text-orange-700 shadow-sm transition hover:bg-orange-200"
+                    class="flex flex-col items-center justify-center rounded-xl bg-gradient-to-br from-white/70 to-orange-200 p-6 text-orange-700 shadow-sm transition hover:brightness-110"
                 >
                     <BookOpen class="mb-2 h-7 w-7" />
                     <span class="text-sm font-medium">Booking Buku</span>
                 </button>
 
                 <button
-                    class="flex flex-col items-center justify-center rounded-xl bg-gray-100 p-6 text-gray-700 shadow-sm transition hover:bg-gray-200"
+                    class="flex flex-col items-center justify-center rounded-xl bg-gradient-to-br from-white/70 to-gray-200 p-6 text-gray-700 shadow-sm transition hover:brightness-110"
                 >
                     <LibraryBig class="mb-2 h-7 w-7" />
                     <span class="text-sm font-medium">Usulan Buku</span>
@@ -133,7 +135,7 @@
 
         <!-- Activity -->
         <h3
-            class="mb-2 rounded-xl bg-[var(--background-green)] p-2 text-lg font-bold text-[var(--dark-green)]"
+            class="mb-2 rounded-xl p-2 text-lg font-bold text-[var(--dark-green)]"
         >
             Aktivitas Terkini
         </h3>

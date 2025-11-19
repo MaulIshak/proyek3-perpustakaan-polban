@@ -29,9 +29,7 @@ const beritaList = [
 </script>
 
 <template>
-    <section
-        class="bg-gradient-to-br py-16"
-    >
+    <section class="bg-gradient-to-br py-12">
         <div class="mx-auto">
             <div class="mb-8 flex items-center justify-between">
                 <div class="inline-block">

@@ -9,4 +9,11 @@ class TeamManajemen extends Model
     protected $table = 'team_manajemen';
     protected $primaryKey = 'id_team';
     public $timestamps = false;
+
+    // Kolom yang boleh diisi massal (dari form)
+    protected $fillable = [
+        'nama',
+        'jabatan',
+        'gelar',
+    ];
 }

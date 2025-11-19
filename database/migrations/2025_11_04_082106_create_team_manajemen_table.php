@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('id_team')->primary();
             $table->string('nama', 100);
             $table->string('jabatan', 100);
-            $table->string('gelar', 100);
+            $table->string('gelar', 100)->nullable();
         });
     }
 
