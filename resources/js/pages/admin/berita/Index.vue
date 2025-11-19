@@ -6,7 +6,7 @@ import { useConfirmModal } from '@/composables/userConfirmModal';
 import AdminLayout from '@/layouts/AdminLayout.vue';
 import { router } from '@inertiajs/vue3';
 import { FileSearch } from 'lucide-vue-next';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 const { open } = useConfirmModal();
 const { articles } = defineProps({
@@ -50,6 +50,17 @@ function openModal(article) {
     selectedArticle.value = article;
     modalOpen.value = true;
 }
+
+const searchQuery = ref('');
+
+const filteredArticles = computed(() => {
+    if (!searchQuery.value) {
+        return articles;
+    }
+    return articles.filter((article) =>
+        article.judul.toLowerCase().includes(searchQuery.value.toLowerCase()),
+    );
+});
 </script>
 
 <template>
@@ -58,13 +69,14 @@ function openModal(article) {
         create-label="Buat Berita Baru"
         create-href="/admin/berita/create"
         class="mb-3"
+        @search="(query) => (searchQuery = query)"
     />
     <div
         v-if="articles.length != 0"
         class="grid gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4"
     >
         <ArticleCard
-            v-for="berita in articles"
+            v-for="berita in filteredArticles"
             :key="berita.article_id"
             :title="berita.judul"
             :content="berita.content"

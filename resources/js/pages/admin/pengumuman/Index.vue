@@ -6,7 +6,7 @@ import { useConfirmModal } from '@/composables/userConfirmModal';
 import AdminLayout from '@/layouts/AdminLayout.vue';
 import { router } from '@inertiajs/vue3';
 import { FileSearch } from 'lucide-vue-next';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 
 const { open } = useConfirmModal();
 const { articles } = defineProps({
@@ -25,6 +25,17 @@ defineOptions({
             },
             { default: () => page },
         ),
+});
+
+const searchQuery = ref('');
+
+const filteredArticles = computed(() => {
+    if (!searchQuery.value) {
+        return articles;
+    }
+    return articles.filter((article) =>
+        article.judul.toLowerCase().includes(searchQuery.value.toLowerCase())
+    );
 });
 
 function handleDelete(article) {
@@ -65,13 +76,14 @@ function openModal(article) {
         create-label="Buat Pengumuman Baru"
         create-href="/admin/pengumuman/create"
         class="mb-3"
+        @search="(query) => (searchQuery = query)"
     />
     <div
-        v-if="articles.length != 0"
+        v-if="filteredArticles.length > 0"
         class="grid gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4"
     >
         <PengumumanCard
-            v-for="pengumuman in articles"
+            v-for="pengumuman in filteredArticles"
             :key="pengumuman.article_id"
             :title="pengumuman.judul"
             :content="pengumuman.content"
@@ -101,6 +113,7 @@ function openModal(article) {
         </p>
 
         <a
+            v-if="searchQuery === ''"
             href="/admin/pengumuman/create"
             class="mt-6 rounded-xl bg-[var(--primary-green)] px-5 py-3 font-medium text-white transition hover:opacity-90"
         >
