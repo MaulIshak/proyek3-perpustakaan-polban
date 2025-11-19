@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\CoverBuku;
 use App\Http\Controllers\RencanaStrategi;
 use App\Http\Controllers\TimManajemen;
 
@@ -134,6 +135,11 @@ Route::get('/book-reservation', function(){
 // Renstra
 Route::get('/renstra', [RencanaStrategi::class, 'viewPDF'])->name('renstra');
 
+
+// Cover Buku Baru USER
+// Route::get('/')
+
+
 Route::prefix('admin')->name('admin.')->group(function () {
     // show login form (only for guests of admin guard)
     Route::get('login', [LoginController::class, 'showLogin'])->middleware('guest.admin')->name('login');
@@ -172,6 +178,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('renstra/store', [RencanaStrategi::class, 'store'])->middleware('auth:admin')->name('renstra.store');
     Route::put('renstra/update/{id}', [RencanaStrategi::class, 'update'])->middleware('auth:admin')->name('renstra.update');
     Route::delete('renstra/delete/{id}', [RencanaStrategi::class, 'destroy'])->middleware('auth:admin')->name('renstra.destroy');
+
+    // Cover Buku
+    Route::get('cover-buku', [CoverBuku::class, 'index'])->name('cover.index');
+    Route::post('cover-buku/store', [CoverBuku::class, 'store'])->name('cover.store');
+    // Kita pakai POST untuk update file (dengan _method: PUT di frontend)
+    Route::post('cover-buku/update/{id}', [CoverBuku::class, 'update'])->name('cover.update');
+    Route::delete('cover-buku/delete/{id}', [CoverBuku::class, 'destroy'])->name('cover.destroy');
 });
 
 require __DIR__.'/settings.php';

@@ -69,8 +69,10 @@ class RencanaStrategi extends Controller{
     {
         $pdf = PdfFile::findOrFail($id);
 
-        Storage::delete($pdf->path);
-
+        if ($pdf->path && Storage::disk('public')->exists($pdf->path)) {
+            Storage::disk('public')->delete($pdf->path);
+        }
+        
         $pdf->delete();
 
         return redirect()->route('admin.renstra.index')->with('success', 'File deleted successfully.');
