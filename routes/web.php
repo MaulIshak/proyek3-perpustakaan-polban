@@ -85,7 +85,9 @@ Route::get('/E_Journal', function () {
 });
 
 Route::get('/berita', [ArticleController::class, 'beritaUser'])->name('beritaUser');
+Route::get('/berita/{id}', [ArticleController::class, 'showBeritaUser'])->name('showBeritaUser');
 Route::get('/pengumuman', [ArticleController::class, 'pengumumanUser'])->name('pengumumanUser');
+Route::get('/pengumuman/{id}', [ArticleController::class, 'showPengumumanUser'])->name('showPengumumanUser');
 
 
 // Peraturan Perpustakaan
@@ -124,7 +126,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('berita/edit/{id}', [ArticleController::class, 'editBerita'])->middleware('auth:admin');
     Route::post('berita/update/{id}', [ArticleController::class, 'updateBerita'])->middleware('auth:admin');
     Route::delete('berita/delete/{id}', [ArticleController::class, 'destroyBerita'])->middleware('auth:admin');
-    
+
     // Pengumuman
     Route::get('pengumuman', [ArticleController::class, 'indexPengumuman'])->middleware('auth:admin')->name('pengumumanIndex');
     Route::get('pengumuman/create', function(){

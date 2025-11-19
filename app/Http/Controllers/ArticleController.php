@@ -161,6 +161,40 @@ public function updateBerita(Request $request, $id)
         ]);
     }
 
+
+    public function showBeritaUser($id)
+    {
+        $article = Article::where('article_id', $id)->firstOrFail();
+
+        return inertia('user/Berita/Detail', [
+            'article' => [
+                'title' => $article->judul,
+                'imageUrl' => $article->url_thumbnail,
+                'content' => $article->content,
+                'publishedAt' => $article->created_date,
+                'url_attachment' => $article->url_attachment,
+                'attachment_name' => $article->attachment_name,
+                'type' => $article->type,
+            ],
+        ]);
+    }
+    public function showPengumumanUser($id)
+    {
+        $article = Article::where('article_id', $id)->firstOrFail();
+
+        return inertia('user/Pengumuman/Detail', [
+            'article' => [
+                'title' => $article->judul,
+                'imageUrl' => $article->url_thumbnail,
+                'content' => $article->content,
+                'publishedAt' => $article->created_date,
+                'url_attachment' => $article->url_attachment,
+                'attachment_name' => $article->attachment_name,
+                'type' => $article->type,
+            ],
+        ]);
+    }
+
     public function beritaUser(Request $request)
     {
         $search = $request->input('search');

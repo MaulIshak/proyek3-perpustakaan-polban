@@ -57,7 +57,6 @@ watch(search, searchArticles);
 
 // Filter link pagination untuk menghilangkan link yang tidak diperlukan (seperti ellipsis)
 const paginationLinks = computed(() => {
-    // Kita hanya perlu link yang memiliki URL dan tidak merupakan label '...'
     return props.articles.links.filter(link => link.url || link.label.includes('...'));
 });
 </script>

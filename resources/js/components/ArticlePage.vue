@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Link } from '@inertiajs/vue3';
 import { Download } from 'lucide-vue-next';
 import { computed } from 'vue';
 
@@ -27,10 +28,35 @@ const formattedDate = computed(() => {
         day: 'numeric',
     });
 });
+
+const backUrl = computed(() => {
+    return props.article.type === 'berita' ? '/berita' : '/pengumuman';
+});
 </script>
 
 <template>
     <article class="mx-auto max-w-5xl rounded-3xl px-10 py-8">
+        <!-- Back Button -->
+        <Link
+            :href="backUrl"
+            class="mb-6 inline-flex items-center text-gray-600 transition hover:cursor-pointer hover:text-gray-800"
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="mr-1 h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M15 19l-7-7 7-7"
+                />
+            </svg>
+            <span>Kembali</span>
+        </Link>
         <!-- Article Header -->
         <header class="mb-8">
             <h1
