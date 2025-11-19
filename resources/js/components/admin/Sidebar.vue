@@ -23,7 +23,7 @@ const emit = defineEmits(['toggle-sidebar']);
             <img
                 src="/logo-polban.png"
                 alt="Polban"
-                class="h-10 w-10 object-contain"
+                class="h-12 w-12 object-contain"
             />
 
             <!-- Title + Subtitle -->
