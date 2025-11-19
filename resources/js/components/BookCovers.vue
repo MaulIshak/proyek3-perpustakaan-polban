@@ -68,7 +68,9 @@ const books = [
             </div>
 
             <!-- Cover Buku (Centered) -->
-            <div class="mt-8 grid place-items-stretch">
+            <div
+                class="scroll-container mt-8 grid place-items-center-safe overflow-auto"
+            >
                 <div class="flex justify-evenly gap-4 pb-4">
                     <BookCoverLink
                         v-for="(book, index) in books"
@@ -83,12 +85,16 @@ const books = [
             >
                 <div class="mx-auto max-w-3xl px-4">
                     <!-- Judul -->
-                    <h2 class="text-3xl font-bold md:text-4xl">
+                    <h2
+                        class="text-start text-3xl font-bold md:text-center md:text-4xl"
+                    >
                         Usulkan atau Booking Buku
                     </h2>
 
                     <!-- Subjudul -->
-                    <p class="mt-4 text-base opacity-90 md:text-lg">
+                    <p
+                        class="mt-4 text-start text-base opacity-90 md:text-center md:text-lg"
+                    >
                         Usulkan buku atau booking buku yang tersedia di katalog
                         online!
                     </p>
