@@ -69,8 +69,8 @@ const quickLinks = [
                 class="mt-8 border-t border-[var(--primary-green)] pt-8 text-center text-sm"
             >
                 <p>
-                    © 2025 UPT Perpustakaan Politeknik Negeri Bandung. All
-                    rights reserved.
+                    © 2025 Perpustakaan Politeknik Negeri Bandung. All rights
+                    reserved.
                 </p>
             </div>
         </div>

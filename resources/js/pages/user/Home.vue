@@ -42,7 +42,6 @@ const activeTab = ref('berita');
         :breadcrumb="breadcrumbs"
     >
         <!-- HERO -->
-  
 
         <!-- SECTION TAB -->
         <section
@@ -86,7 +85,7 @@ const activeTab = ref('berita');
                 <div class="tab-content rounded-b-2xl">
                     <BeritaHighlight v-if="activeTab === 'berita'" />
                     <BookCovers v-else-if="activeTab === 'buku'" />
-                    <div v-else-if="activeTab == 'pengumuman'" class="py-16">
+                    <div v-else-if="activeTab == 'pengumuman'" class="py-12">
                         <div class="mb-8 flex items-center justify-between">
                             <div class="inline-block">
                                 <h2
@@ -116,7 +115,8 @@ const activeTab = ref('berita');
                                     aria-hidden="true"
                                 >
                                     <path d="M5 12h14"></path>
-                                    <path d="m12 5 7 7-7 7"></path></svg>
+                                    <path d="m12 5 7 7-7 7"></path>
+                                </svg>
                             </a>
                         </div>
                         <PengumumanCard
@@ -125,6 +125,7 @@ const activeTab = ref('berita');
                             :title="pengumuman.title"
                             :content="pengumuman.content"
                             :date="pengumuman.date"
+                            class="mb-5 py-3"
                         />
                     </div>
                     <div

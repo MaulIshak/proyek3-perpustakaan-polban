@@ -1,160 +1,122 @@
 <script setup lang="ts">
 import BeritaCard from '@/components/BeritaCard.vue';
+import PaginationLink from '@/components/PaginationLink.vue';
 import UserAppLayout from '@/layouts/UserAppLayout.vue';
+import { router, usePage } from '@inertiajs/vue3';
 import { Search } from 'lucide-vue-next';
-const beritaList = [
-    {
-        id: 1,
-        title: 'Workshop Literasi Digital untuk Mahasiswa Baru 2025',
-        content:
-            '<p>Perpustakaan POLBAN mengadakan workshop literasi digital bagi mahasiswa baru tahun 2025...</p>',
-        thumbnail: '/hero-bg.jpg',
-        date: '2024-06-15',
-    },
-    {
-        id: 2,
-        title: 'Pameran Buku Langka di Perpustakaan POLBAN',
-        content:
-            '<p>Perpustakaan POLBAN mempersembahkan pameran buku langka yang berisi koleksi istimewa...</p>',
-        thumbnail: '/hero-bg.jpg',
-        date: '2024-06-10',
-    },
-    {
-        id: 3,
-        title: 'Peluncuran Aplikasi Mobile Perpustakaan POLBAN',
-        content:
-            '<p>Perpustakaan POLBAN meluncurkan aplikasi mobile terbaru untuk memudahkan akses koleksi...</p>',
-        thumbnail: '/hero-bg.jpg',
-        date: '2024-06-05',
-    },
-    {
-        id: 3,
-        title: 'Peluncuran Aplikasi Mobile Perpustakaan POLBAN',
-        content:
-            '<p>Perpustakaan POLBAN meluncurkan aplikasi mobile terbaru untuk memudahkan akses koleksi...</p>',
-        thumbnail: '/hero-bg.jpg',
-        date: '2024-06-05',
-    },
-    {
-        id: 3,
-        title: 'Peluncuran Aplikasi Mobile Perpustakaan POLBAN',
-        content:
-            '<p>Perpustakaan POLBAN meluncurkan aplikasi mobile terbaru untuk memudahkan akses koleksi...</p>',
-        thumbnail: '/hero-bg.jpg',
-        date: '2024-06-05',
-    },
-];
-defineProps({
-    title: String,
-    description: String,
-});
+import { watch, ref, computed } from 'vue';
+import { debounce } from 'lodash';
+
+// Tipe data untuk prop articles (menggunakan struktur pagination Laravel)
+interface Article {
+    article_id: string;
+    judul: string;
+    content: string;
+    url_thumbnail: string;
+    created_date: string;
+}
+
+const props = defineProps<{
+    articles: {
+        data: Article[];
+        links: {
+            url: string | null;
+            label: string;
+            active: boolean;
+        }[];
+        current_page: number;
+        last_page: number;
+        from: number;
+        to: number;
+        total: number;
+    };
+    searchQuery: string | null;
+}>();
 
 const breadcrumb = [{ label: 'Informasi' }, { label: 'Berita' }];
+
+// State untuk input pencarian, diinisialisasi dari URL query string
+const search = ref(props.searchQuery || '');
+
+// Debounced function untuk menjalankan Inertia visit
+const searchArticles = debounce(() => {
+    router.get(
+        '/berita',
+        { search: search.value },
+        {
+            preserveState: true,
+            replace: true,
+            // Hapus scroll agar tidak kembali ke atas saat live search
+            preserveScroll: true,
+        }
+    );
+}, 300); // Debounce selama 300ms
+
+// Watcher untuk memanggil fungsi search saat input berubah
+watch(search, searchArticles);
+
+// Filter link pagination untuk menghilangkan link yang tidak diperlukan (seperti ellipsis)
+const paginationLinks = computed(() => {
+    // Kita hanya perlu link yang memiliki URL dan tidak merupakan label '...'
+    return props.articles.links.filter(link => link.url || link.label.includes('...'));
+});
 </script>
 
 <template>
     <UserAppLayout :page="true" :breadcrumb="breadcrumb" title="Berita">
         <div class="mx-auto mt-10 mb-8 max-w-7xl px-4 sm:px-6 lg:px-8">
             <!-- Search Bar -->
-            <div class="relative mb-6 flex items-center">
+            <div class="relative mb-8 flex items-center">
                 <input
                     type="text"
                     placeholder="Cari berita..."
-                    class="w-full rounded-md border border-gray-300 p-3 pl-10 shadow-sm focus:border-[var(--primary-green)] focus:ring-[var(--primary-green)]"
+                    v-model="search"
+                    class="w-full rounded-xl border border-gray-300 p-3 pl-10 shadow-sm transition-shadow duration-300 focus:border-[var(--primary-green)] focus:ring-2 focus:ring-[var(--primary-green)]/50"
                 />
                 <Search class="absolute left-3 h-5 w-5 text-gray-400" />
             </div>
 
-            <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
-                <BeritaCard
-                    v-for="berita in beritaList"
-                    :key="berita.id"
-                    :id="berita.id"
-                    :title="berita.title"
-                    :content="berita.content"
-                    :thumbnail="berita.thumbnail"
-                    :date="berita.date"
-                />
-            </div>
+            <div v-if="props.articles.data.length > 0" class="space-y-10">
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+                    <BeritaCard
+                        v-for="berita in props.articles.data"
+                        :key="berita.article_id"
+                        :id="berita.article_id"
+                        :title="berita.judul"
+                        :content="berita.content"
+                        :thumbnail="berita.url_thumbnail || '/hero-bg.jpg'"
+                        :date="berita.created_date"
+                    />
+                </div>
 
-            <!-- Pagination -->
-            <div class="mt-10 flex justify-center">
-                <nav
-                    class="isolate inline-flex -space-x-px rounded-md shadow-sm"
-                    aria-label="Pagination"
-                >
-                    <a
-                        href="#"
-                        class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+                <!-- Pagination -->
+                <div class="mt-10 flex flex-col items-center justify-between gap-4 sm:flex-row">
+                    <div class="text-sm text-gray-600">
+                        Menampilkan {{ props.articles.from }} sampai
+                        {{ props.articles.to }} dari
+                        {{ props.articles.total }} hasil.
+                    </div>
+
+                    <nav
+                        class="isolate inline-flex -space-x-px rounded-xl shadow-sm"
+                        aria-label="Pagination"
                     >
-                        <span class="sr-only">Previous</span>
-                        <svg
-                            class="h-5 w-5"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                            aria-hidden="true"
-                        >
-                            <path
-                                fill-rule="evenodd"
-                                d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z"
-                                clip-rule="evenodd"
-                            />
-                        </svg>
-                    </a>
-                    <a
-                        href="#"
-                        aria-current="page"
-                        class="relative z-10 inline-flex items-center bg-[var(--primary-green)] px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary-green)]"
-                        >1</a
-                    >
-                    <a
-                        href="#"
-                        class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                        >2</a
-                    >
-                    <a
-                        href="#"
-                        class="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 md:inline-flex"
-                        >3</a
-                    >
-                    <span
-                        class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 ring-1 ring-inset ring-gray-300 focus:outline-offset-0"
-                        >...</span
-                    >
-                    <a
-                        href="#"
-                        class="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 md:inline-flex"
-                        >8</a
-                    >
-                    <a
-                        href="#"
-                        class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                        >9</a
-                    >
-                    <a
-                        href="#"
-                        class="relative inline-flex items-center rounded-r-md px-2 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                        >10</a
-                    >
-                    <a
-                        href="#"
-                        class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                    >
-                        <span class="sr-only">Next</span>
-                        <svg
-                            class="h-5 w-5"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                            aria-hidden="true"
-                        >
-                            <path
-                                fill-rule="evenodd"
-                                d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
-                                clip-rule="evenodd"
-                            />
-                        </svg>
-                    </a>
-                </nav>
+                        <!-- Menggunakan komponen PaginationLink -->
+                        <PaginationLink
+                            v-for="(link, index) in paginationLinks"
+                            :key="index"
+                            :link="link"
+                        />
+                    </nav>
+                </div>
+            </div>
+            <div v-else class="text-center py-20">
+                <h3 class="text-2xl font-bold text-gray-700">
+                    Tidak ditemukan berita.
+                </h3>
+                <p class="mt-2 text-gray-500">
+                    Coba ubah kata kunci pencarian Anda.
+                </p>
             </div>
         </div>
     </UserAppLayout>

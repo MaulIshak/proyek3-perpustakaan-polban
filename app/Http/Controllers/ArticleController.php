@@ -150,31 +150,45 @@ public function updateBerita(Request $request, $id)
         ]);
     }
 
-    public function beritaUser()
+    public function beritaUser(Request $request)
     {
-        // $articles = Article::where('type', 'berita')
-        //     ->where('status', 'published')
-        //     ->orderBy('created_date', 'desc')
-        //     ->get();
+        $search = $request->input('search');
 
-        // return inertia('user/Berita/BeritaList', [
-        //     'articles' => $articles,
-        // ]);
-        return inertia('user/Berita');
+        $articles = Article::where('type', 'berita')
+            ->where('status', 'published')
+            ->when($search, function ($query, $search) {
+                $lowerSearch = strtolower($search);
+                $query->whereRaw('LOWER(judul) LIKE ?', ["%{$lowerSearch}%"]);
+            })
+            ->orderBy('created_date', 'desc')
+            ->paginate(6)
+            ->withQueryString();
+
+        return inertia('user/Berita', [
+            'articles' => $articles,
+            'searchQuery' => $search,
+        ]);
+    }
+    public function pengumumanUser(Request $request)
+    {
+        $search = $request->input('search');
+
+        $articles = Article::where('type', 'pengumuman')
+            ->where('status', 'published')
+            ->when($search, function ($query, $search) {
+                $lowerSearch = strtolower($search);
+                $query->whereRaw('LOWER(judul) LIKE ?', ["%{$lowerSearch}%"]);
+            })
+            ->orderBy('created_date', 'desc')
+            ->paginate(3)
+            ->withQueryString();
+
+        return inertia('user/Pengumuman', [
+            'articles' => $articles,
+            'searchQuery' => $search,
+        ]);
     }
 
-    public function pengumumanUser()
-    {
-        // $articles = Article::where('type', 'pengumuman')
-        //     ->where('status', 'published')
-        //     ->orderBy('created_date', 'desc')
-        //     ->get();
-
-        // return inertia('user/Pengumuman/PengumumanList', [
-        //     'articles' => $articles,
-        // ]);
-        return inertia('user/Pengumuman');
-    }
 
     public function indexPengumuman()
     {
