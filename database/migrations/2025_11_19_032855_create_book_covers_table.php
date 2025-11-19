@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('team_manajemen', function (Blueprint $table) {
-            $table->id('id_team')->primary();
-            $table->string('nama', 100);
-            $table->string('jabatan', 100);
-            $table->string('gelar', 100)->nullable();
+        Schema::create('book_covers', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');      // Untuk menyimpan Judul Buku
+            $table->string('image_path'); // Untuk menyimpan lokasi file gambar
+            $table->timestamps();         // created_at & updated_at
         });
     }
 
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('team_manajemen');
+        Schema::dropIfExists('book_covers');
     }
 };

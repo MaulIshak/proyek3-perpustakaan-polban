@@ -17,6 +17,7 @@ const navItems = [
             { name: 'Tim Manajemen', href: '/tim-manajemen' },
             { name: 'Peraturan Perpustakaan', href: '/peraturan' },
             { name: 'Jam Layanan', href: '/jam-layanan' },
+            { name: 'Rencana Strategi', href: '/renstra'}
         ],
     },
     {
@@ -110,7 +111,7 @@ onUnmounted(() => {
 
 <template>
     <nav
-        class="bg-grey border-b border-gray-200 bg-white/90 py-3 text-[var(--dark-green)] backdrop-blur-md"
+        class="bg-grey border-b border-gray-200 bg-white/90 py-3 text-black backdrop-blur-md"
     >
         <div class="container mx-auto px-4">
             <div class="flex h-16 items-center justify-between">
@@ -164,7 +165,6 @@ onUnmounted(() => {
                         <div
                             v-else
                             class="navbar-dropdown relative"
-                            @click.stop
                         >
                             <button
                                 @click="toggleMenu(i)"
@@ -242,10 +242,7 @@ onUnmounted(() => {
                             >
                                 <span>{{ item.name }}</span>
                                 <ChevronDown
-                                    :class="[
-                                        'h-4 w-4 transition-transform',
-                                        openIndex === i ? 'rotate-180' : '',
-                                    ]"
+                                    :class="[ 'h-4 w-4 transition-transform', openIndex === i ? 'rotate-180' : '' ]"
                                 />
                             </button>
 
