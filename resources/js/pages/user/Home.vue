@@ -1,11 +1,14 @@
-<script setup lang="js">
+<script setup lang="ts">
 import BeritaHighlight from '@/components/BeritaHighlight.vue';
 import BookCovers from '@/components/BookCovers.vue';
 import PengumumanCard from '@/components/PengumumanCard.vue';
 import UserAppLayout from '@/layouts/UserAppLayout.vue';
+import { ArrowRight, BookOpen, Megaphone, Newspaper } from 'lucide-vue-next';
 import { ref } from 'vue';
 
 const breadcrumbs = [{ label: 'Home', link: '/' }];
+
+// Data Pengumuman
 const pengumumanList = [
     {
         id: 1,
@@ -16,21 +19,28 @@ const pengumumanList = [
     },
     {
         id: 2,
-        title: 'Perubahan Jam Operasional Perpustakaan Selama Ujian Akhir Semester',
+        title: 'Perubahan Jam Operasional Selama UAS',
         content:
             '<p>Selama periode ujian akhir semester, jam operasional perpustakaan akan diperpanjang hingga pukul 22.00 WIB.</p>',
         date: '2025-01-15',
     },
     {
-        id: 2,
-        title: 'Perubahan Jam Operasional Perpustakaan Selama Ujian Akhir Semester',
+        id: 3,
+        title: 'Maintenance Server E-Library',
         content:
-            '<p>Selama periode ujian akhir semester, jam operasional perpustakaan akan diperpanjang hingga pukul 22.00 WIB.</p>',
-        date: '2025-01-15',
+            '<p>Akan dilakukan pemeliharaan server pada tanggal 2 Februari 2025. Layanan katalog digital mungkin terganggu.</p>',
+        date: '2025-01-10',
     },
 ];
 
-// Tab aktif
+// Konfigurasi Tab
+const tabs = [
+    { key: 'berita', label: 'Berita Terbaru', icon: Newspaper },
+    { key: 'pengumuman', label: 'Pengumuman', icon: Megaphone },
+    { key: 'buku', label: 'Koleksi Terbaru', icon: BookOpen },
+];
+
+// State
 const activeTab = ref('berita');
 </script>
 
@@ -41,96 +51,85 @@ const activeTab = ref('berita');
         subtitle=""
         :breadcrumb="breadcrumbs"
     >
-        <!-- HERO -->
-
-        <!-- SECTION TAB -->
+        <!-- 2. Main Content Section -->
         <section
-            class="flex min-h-[60vh] flex-col items-center justify-center bg-gray-50 px-4 py-12 sm:px-10"
+            class="relative min-h-[80vh] overflow-hidden px-4 pt-6 pb-16 sm:px-6 lg:px-8"
         >
-            <div class="w-full">
-                <!-- TABS -->
-                <div
-                    class="tabs-container flex gap-3 overflow-x-auto pb-2 sm:gap-5"
-                >
+            <div class="relative z-10 container mx-auto max-w-7xl">
+                <!-- Modern Floating Tabs (Pills) -->
+                <div class="mb-12 flex flex-wrap justify-center gap-3">
                     <button
-                        v-for="tab in [
-                            {
-                                key: 'berita',
-                                label: 'Berita Terbaru',
-                                icon: '',
-                            },
-                            {
-                                key: 'pengumuman',
-                                label: 'Pengumuman Terbaru',
-                                icon: '',
-                            },
-                            {
-                                key: 'buku',
-                                label: 'Koleksi Terbaru',
-                                icon: 'Book',
-                            },
-                        ]"
+                        v-for="tab in tabs"
                         :key="tab.key"
                         @click="activeTab = tab.key"
-                        :class="[
-                            'tab text-md flex-shrink-0 px-4 py-2 sm:px-6 sm:text-lg',
-                            activeTab === tab.key ? 'active' : '',
-                        ]"
+                        class="flex items-center gap-2 rounded-full border px-6 py-3 font-bold shadow-sm transition-all duration-300"
+                        :class="
+                            activeTab === tab.key
+                                ? 'scale-105 border-[#99cc33] bg-[#99cc33] text-white shadow-lg shadow-[#99cc33]/30'
+                                : 'border-slate-200 bg-white text-slate-600 hover:border-[#99cc33]/50 hover:bg-[#99cc33]/5 hover:text-[#99cc33]'
+                        "
                     >
+                        <component :is="tab.icon" class="h-5 w-5" />
                         {{ tab.label }}
                     </button>
                 </div>
 
-                <!-- TAB CONTENT -->
-                <div class="tab-content rounded-b-2xl">
-                    <BeritaHighlight v-if="activeTab === 'berita'" />
-                    <BookCovers v-else-if="activeTab === 'buku'" />
-                    <div v-else-if="activeTab == 'pengumuman'" class="py-12">
-                        <div class="mb-8 flex items-center justify-between">
-                            <div class="inline-block">
-                                <h2
-                                    class="relative text-3xl font-bold text-[var(--dark-green)]"
-                                >
-                                    Pengumuman Terbaru
-                                </h2>
-                                <span
-                                    class="mt-1 block h-1 w-16 rounded-full bg-[var(--primary-green)]"
-                                ></span>
-                            </div>
-                            <a
-                                class="flex w-35 items-center justify-evenly gap-1 rounded-3xl border border-transparent bg-[var(--primary-green)] p-2 text-center text-sm font-medium text-white transition-all duration-300 hover:border-[var(--primary-green)] hover:bg-white hover:text-[var(--primary-green)]"
-                                href="/berita"
-                                data-discover="true"
-                                >Lihat Semua<svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="24"
-                                    height="24"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    class="lucide lucide-arrow-right h-5 w-5"
-                                    aria-hidden="true"
-                                >
-                                    <path d="M5 12h14"></path>
-                                    <path d="m12 5 7 7-7 7"></path>
-                                </svg>
-                            </a>
+                <!-- Tab Content Area with Transition -->
+                <div class="min-h-[400px]">
+                    <transition name="fade-slide" mode="out-in">
+                        <!-- CONTENT: BERITA -->
+                        <div v-if="activeTab === 'berita'" key="berita">
+                            <BeritaHighlight />
                         </div>
-                        <PengumumanCard
-                            v-for="pengumuman in pengumumanList"
-                            :key="pengumuman.id"
-                            :title="pengumuman.title"
-                            :content="pengumuman.content"
-                            :date="pengumuman.date"
-                            class="mb-5 py-3"
-                        />
-                    </div>
-                    <div
-                        class="mx-auto mt-10 mb-8 max-w-7xl px-4 sm:px-6 lg:px-8"
-                    ></div>
+
+                        <!-- CONTENT: PENGUMUMAN -->
+                        <div
+                            v-else-if="activeTab === 'pengumuman'"
+                            key="pengumuman"
+                            class="mx-auto max-w-5xl"
+                        >
+                            <div
+                                class="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end"
+                            >
+                                <div>
+                                    <h2
+                                        class="mb-2 text-3xl font-black tracking-tight text-slate-800"
+                                    >
+                                        Pengumuman Terbaru
+                                    </h2>
+                                    <div
+                                        class="h-1.5 w-20 rounded-full bg-[#99cc33]"
+                                    ></div>
+                                </div>
+
+                                <a
+                                    href="/pengumuman"
+                                    class="group flex items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 shadow-sm transition-all hover:border-[#99cc33] hover:text-[#99cc33]"
+                                >
+                                    Lihat Semua
+                                    <ArrowRight
+                                        class="h-4 w-4 transition-transform group-hover:translate-x-1"
+                                    />
+                                </a>
+                            </div>
+
+                            <div class="grid gap-6">
+                                <PengumumanCard
+                                    v-for="pengumuman in pengumumanList"
+                                    :key="pengumuman.id"
+                                    :title="pengumuman.title"
+                                    :content="pengumuman.content"
+                                    :date="pengumuman.date"
+                                    class="transform border-slate-200 bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                                />
+                            </div>
+                        </div>
+
+                        <!-- CONTENT: BUKU -->
+                        <div v-else-if="activeTab === 'buku'" key="buku">
+                            <BookCovers />
+                        </div>
+                    </transition>
                 </div>
             </div>
         </section>
@@ -138,40 +137,19 @@ const activeTab = ref('berita');
 </template>
 
 <style scoped>
-.tabs-container {
-    display: flex;
-    position: relative;
-    z-index: 10;
-    scrollbar-width: none;
-}
-.tabs-container::-webkit-scrollbar {
-    display: none;
+/* Animasi transisi custom yang lebih modern */
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+    transition: all 0.3s ease-out;
 }
 
-.tab {
-    position: relative;
-    background: #99cc33;
-    color: #f3fff3;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border-top-left-radius: 6px;
-    border-top-right-radius: 6px;
+.fade-slide-enter-from {
+    opacity: 0;
+    transform: translateY(20px);
 }
 
-.tab:hover {
-    background: #99cc33;
-}
-
-.tab.active {
-    background: white;
-    color: #99cc33;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-    z-index: 20;
-}
-
-.tab-content {
-    min-height: 300px;
-    border-top: 2px solid #99cc33;
+.fade-slide-leave-to {
+    opacity: 0;
+    transform: translateY(-20px);
 }
 </style>

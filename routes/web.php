@@ -47,32 +47,32 @@ Route::get('/facilities', function () {
             [
                 'subjudul' => 'Ruang Sirkulasi',
                 'description' => 'Fasilitas 40 unit komputer dengan akses internet cepat, tersedia untuk browsing, mengakses e-journal, dan mengerjakan tugas.',
-                'image' => 'https://library.polban.ac.id/wp-content/uploads/2024/09/Screenshot-2024-09-12-124117-10-1024x511.png',
+                'image' => '/Images/sirkulasi.jpeg',
             ],
             [
                 'subjudul' => 'Ruang Baca',
                 'description' => 'Ruang baca dengan kapasitas 150 orang, dilengkapi dengan AC, pencahayaan yang baik, dan suasana tenang untuk mendukung aktivitas belajar mandiri.',
-                'image' => 'https://library.polban.ac.id/wp-content/uploads/2024/09/Ruang-Baca-7-1024x682.jpg',
+                'image' => '/Images/ruang-baca.jpg',
             ],
             [
                 'subjudul' => 'Ruang Referensi',
                 'description' => 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit excepturi quia a maxime quisquam impedit qui velit optio iusto. Voluptas beatae similique corporis ex ipsam eveniet assumenda, possimus nobis distinctio.',
-                'image' => 'https://library.polban.ac.id/wp-content/uploads/2024/09/Screenshot-2024-09-12-124117-10-1024x511.png'
+                'image' => '/Images/referensi.jpeg'
             ],
             [
                 'subjudul' => 'Ruang Komputer',
                 'description' => 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit excepturi quia a maxime quisquam impedit qui velit optio iusto. Voluptas beatae similique corporis ex ipsam eveniet assumenda, possimus nobis distinctio.',
-                'image' => 'https://library.polban.ac.id/wp-content/uploads/2024/09/Screenshot-2024-09-12-124117-10-1024x511.png'
+                'image' => '/Images/komputer.jpeg'
             ],
             [
                 'subjudul' => 'Ruang Belajar Mandiri',
                 'description' => 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit excepturi quia a maxime quisquam impedit qui velit optio iusto. Voluptas beatae similique corporis ex ipsam eveniet assumenda, possimus nobis distinctio.',
-                'image' => 'https://library.polban.ac.id/wp-content/uploads/2024/09/Screenshot-2024-09-12-124117-10-1024x511.png'
+                'image' => '/Images/RBM.jpeg'
             ],
             [
-                'subjudul' => 'Ruang Loker',
+                'subjudul' => 'Self Loan Machine',
                 'description' => 'Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sit excepturi quia a maxime quisquam impedit qui velit optio iusto. Voluptas beatae similique corporis ex ipsam eveniet assumenda, possimus nobis distinctio.',
-                'image' => 'https://library.polban.ac.id/wp-content/uploads/2024/09/Screenshot-2024-09-12-124117-10-1024x511.png'
+                'image' => '/Images/selfloan.jpeg'
             ]
         ],
     ];
@@ -119,13 +119,13 @@ Route::get('/peraturan', function (){
 Route::get('/jam-layanan', function (){
     $data = [
         'title' => 'Jam Layanan',
-        
+
     ];
 
     return Inertia::render('user/Profile/JamLayanan', $data);
 });
 
-// Booking Buku 
+// Booking Buku
 Route::get('/book-reservation', function(){
     $data = [
         'title' => 'Booking buku'

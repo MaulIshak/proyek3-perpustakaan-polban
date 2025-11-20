@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import Layout from '@/layouts/UserAppLayout.vue';
+import { Building2 } from 'lucide-vue-next';
 
-// Definisikan tipe Props yang baru sesuai struktur Controller
+// Props definition remains exactly as requested
 defineProps<{
     title: string;
     subtitle: string;
@@ -16,54 +17,89 @@ const breadcrumb = [{ label: 'Profile' }, { label: 'Fasilitas' }];
 </script>
 
 <template>
-    <Layout :page="true" :breadcrumb="breadcrumb" :title="title">
-        <div class="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
-            <!-- <RemahanRoti :itemRoti="breadcrumb" />
-            <header class="mb-10">
-                <h1 class="text-3xl font-bold text-gray-900 mb-1">
+    <Layout
+        :page="true"
+        :breadcrumb="breadcrumb"
+        :title="title"
+        :subtitle="subtitle"
+    >
+        <!-- Background decoration (Consistent with LibraryAbout) -->
+        <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+            <div
+                class="absolute top-0 right-0 h-[600px] w-[600px] rounded-full bg-[#99cc33]/5 blur-3xl"
+            ></div>
+            <div
+                class="absolute bottom-0 left-0 h-[500px] w-[500px] rounded-full bg-gray-100 blur-3xl"
+            ></div>
+        </div>
+
+        <div class="relative container mx-auto px-4 py-8 sm:px-6 lg:px-8">
+            <!-- Header Section
+            <div class="mb-10 text-center max-w-3xl mx-auto">
+                <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-4">
                     {{ title }}
                 </h1>
-                <p class="text-gray-600">
+                <p class="text-slate-600 text-lg">
                     {{ subtitle }}
                 </p>
-            </header> -->
+                <div class="flex justify-center mt-6">
+                    <div class="h-1.5 w-20 bg-[#99cc33] rounded-full shadow-sm shadow-[#99cc33]/50"></div>
+                </div>
+            </div> -->
 
-            <div class="space-y-16">
+            <!-- Facilities Grid -->
+            <!-- Menggunakan Grid 2 kolom (md) dan 3 kolom (xl) untuk efisiensi ruang vertikal -->
+            <div
+                class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:gap-8 xl:grid-cols-3"
+            >
                 <div
                     v-for="(facility, index) in facilities"
                     :key="index"
-                    class="group"
+                    class="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-lg shadow-slate-200/60 transition-all duration-300 hover:-translate-y-1 hover:border-[#99cc33]/40 hover:shadow-xl hover:shadow-[#99cc33]/10"
                 >
-                    <div
-                        class="flex flex-col items-center overflow-hidden rounded-xl bg-white shadow-lg md:flex-row"
-                    >
+                    <!-- Image Container -->
+                    <!-- Tinggi gambar dibatasi h-52 (sekitar 200px) agar tidak memakan tempat -->
+                    <div class="relative h-52 overflow-hidden">
+                        <img
+                            :src="facility.image"
+                            :alt="'Gambar ' + facility.subjudul"
+                            class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        />
+                        <!-- Gradient Overlay agar teks/icon di atasnya (jika ada) lebih terbaca, atau sekadar estetika -->
                         <div
-                            :class="[
-                                'w-full md:w-1/2',
-                                { 'md:order-last': index % 2 !== 0 },
-                            ]"
+                            class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                        ></div>
+
+                        <!-- Floating Icon Badge -->
+                        <div
+                            class="absolute top-4 right-4 translate-y-2 rounded-xl bg-white/90 p-2 text-[#99cc33] opacity-0 shadow-sm backdrop-blur-sm transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100"
                         >
-                            <img
-                                :src="facility.image"
-                                :alt="'Gambar ' + facility.subjudul"
-                                class="h-96 w-full object-cover"
-                            />
+                            <Building2 class="h-5 w-5" />
+                        </div>
+                    </div>
+
+                    <!-- Content Container -->
+                    <div class="flex flex-grow flex-col p-6">
+                        <h3
+                            class="mb-3 flex items-start gap-2 text-xl font-bold text-slate-800 transition-colors group-hover:text-[#99cc33]"
+                        >
+                            {{ facility.subjudul }}
+                        </h3>
+
+                        <!-- Line clamp digunakan untuk memastikan kartu seragam tingginya jika deskripsi terlalu panjang -->
+                        <div
+                            class="prose prose-sm flex-grow text-justify leading-relaxed text-slate-600 prose-slate"
+                        >
+                            {{ facility.description }}
                         </div>
 
+                        <!-- Decorative bottom line -->
                         <div
-                            :class="[
-                                'w-full p-8 md:w-1/2',
-                                { 'md:order-first': index % 2 !== 0 },
-                            ]"
+                            class="mt-6 h-1 w-full overflow-hidden rounded-full bg-slate-100"
                         >
-                            <h3
-                                class="mb-3 text-2xl font-semibold text-gray-900"
-                            >
-                                {{ facility.subjudul }}
-                            </h3>
-                            <p class="leading-relaxed text-gray-700">
-                                {{ facility.description }}
-                            </p>
+                            <div
+                                class="h-full w-0 bg-[#99cc33] transition-all duration-500 ease-out group-hover:w-full"
+                            ></div>
                         </div>
                     </div>
                 </div>
