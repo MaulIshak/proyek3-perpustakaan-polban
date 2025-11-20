@@ -1,12 +1,15 @@
-
 <template>
-    <UserAppLayout :page="true" :breadcrumb="breadcrumb" title="Berita">
+    <UserAppLayout :page="true" :breadcrumb="breadcrumb" title="Detail Berita">
         <ArticlePage :article="article" />
     </UserAppLayout>
 </template>
 
 <script setup lang="ts">
-const breadcrumb = [{ label: 'Informasi' }, { label: 'Berita' }];
+const breadcrumb = [
+    { label: 'Home', link: '/' },
+    { label: 'Berita' },
+    { label: 'Detail Berita' },
+];
 import ArticlePage from '@/components/ArticlePage.vue';
 import UserAppLayout from '@/layouts/UserAppLayout.vue';
 

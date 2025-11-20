@@ -1,152 +1,140 @@
-<script setup>
+<script setup lang="ts">
 import Layout from '@/layouts/UserAppLayout.vue';
-import { X, Maximize2, Camera, ImageOff, ZoomIn } from 'lucide-vue-next';
-import { ref, onMounted, onUnmounted } from 'vue';
+import { Image as ImageIcon, X, ZoomIn } from 'lucide-vue-next';
+import { ref } from 'vue';
 
-const props = defineProps({
-    photos: Object,
-});
+// Definisi Tipe Data Foto (Sesuaikan dengan response backend Anda)
+interface PhotoItem {
+    foto_id: string | number;
+    url_foto: string;
+}
 
-const selectedImage = ref(null);
-const breadcrumb = [{ label: 'Profil' }, { label: 'Galeri Perpustakaan' }];
+const props = defineProps<{
+    photos: PhotoItem[];
+}>();
 
-// Menutup lightbox dengan tombol ESC
-const handleKeydown = (e) => {
-    if (e.key === 'Escape') selectedImage.value = null;
-};
+// State untuk Lightbox
+const selectedImage = ref<string | null>(null);
+const breadcrumb = [{ label: 'Profil' }, { label: 'Galeri' }];
 
-onMounted(() => window.addEventListener('keydown', handleKeydown));
-onUnmounted(() => window.removeEventListener('keydown', handleKeydown));
+// Actions
+function openLightbox(url: string) {
+    selectedImage.value = url;
+    document.body.style.overflow = 'hidden'; // Prevent scrolling background
+}
+
+function closeLightbox() {
+    selectedImage.value = null;
+    document.body.style.overflow = ''; // Restore scrolling
+}
 </script>
 
 <template>
     <Layout :page="true" :breadcrumb="breadcrumb" title="Galeri Foto">
-        <div class="min-h-screen bg-[#f3fff3] py-10 font-sans">
-            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                
-                <div class="mb-10 text-center space-y-3 animate-fade-in-up">
-                    <h1 class="text-3xl font-extrabold text-[#0f3800] tracking-tight flex items-center justify-center gap-3">
-                        <Camera class="w-8 h-8 text-[#99cc33]" /> Galeri Aktivitas
-                    </h1>
-                    <p class="mt-2 text-gray-600 max-w-2xl mx-auto text-base">
-                        Dokumentasi kegiatan, fasilitas, dan momen-momen berharga di lingkungan Perpustakaan Politeknik Negeri Bandung.
-                    </p>
-                    <div class="h-1 w-24 bg-gradient-to-r from-transparent via-[#99cc33] to-transparent mx-auto rounded-full mt-4"></div>
-                </div>
+        <!-- Background Decoration -->
+        <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+            <div
+                class="absolute top-0 right-0 h-[600px] w-[600px] rounded-full bg-[#99cc33]/5 blur-3xl"
+            ></div>
+            <div
+                class="absolute bottom-0 left-0 h-[500px] w-[500px] rounded-full bg-gray-100 blur-3xl"
+            ></div>
+        </div>
 
-                <div v-if="photos.length > 0" class="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6 animate-fade-in-up delay-100">
+        <div
+            class="relative container mx-auto min-h-[60vh] px-4 py-10 sm:px-6 lg:px-8"
+        >
+            <!-- Grid Galeri -->
+            <div
+                v-if="photos && photos.length > 0"
+                class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            >
+                <div
+                    v-for="item in photos"
+                    :key="item.foto_id"
+                    class="group relative aspect-[4/3] cursor-pointer overflow-hidden rounded-2xl bg-slate-200 shadow-md transition-all duration-500 hover:shadow-xl hover:shadow-[#99cc33]/20"
+                    @click="openLightbox(item.url_foto)"
+                >
+                    <!-- Image -->
+                    <img
+                        :src="item.url_foto"
+                        :alt="'Galeri Foto ' + item.foto_id"
+                        class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        loading="lazy"
+                    />
+
+                    <!-- Overlay Gradient -->
                     <div
-                        v-for="(item, index) in photos"
-                        :key="item.foto_id"
-                        class="group relative break-inside-avoid rounded-2xl overflow-hidden bg-white border border-[#99cc33]/20 shadow-sm hover:shadow-xl transition-all duration-500 cursor-zoom-in transform hover:-translate-y-1"
-                        @click="selectedImage = item.url_foto"
+                        class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                    ></div>
+
+                    <!-- Content Overlay (Center Icon) -->
+                    <div
+                        class="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity delay-75 duration-300 group-hover:opacity-100"
                     >
-                        <img
-                            :src="item.url_foto"
-                            :alt="'Dokumentasi ' + index"
-                            loading="lazy"
-                            class="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-110"
-                        />
-
-                        <div class="absolute inset-0 bg-gradient-to-t from-[#0f3800]/90 via-[#0f3800]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                            
-                            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-0 group-hover:scale-100 transition-transform duration-300 delay-100 bg-white/20 backdrop-blur-sm p-3 rounded-full text-white">
-                                <Maximize2 class="w-6 h-6" />
-                            </div>
-
-                            <span class="translate-y-4 group-hover:translate-y-0 transition-transform duration-300 text-white font-medium text-sm">
-                                Lihat Foto Lebih Jelas
-                            </span>
+                        <div
+                            class="rounded-full border border-white/30 bg-white/20 p-3 text-white backdrop-blur-sm"
+                        >
+                            <ZoomIn class="h-6 w-6" />
                         </div>
-                        
-                        <div class="absolute inset-0 border-2 border-[#99cc33] opacity-0 group-hover:opacity-100 rounded-2xl pointer-events-none transition-opacity duration-300"></div>
                     </div>
-                </div>
-
-                <div v-else class="flex flex-col items-center justify-center py-20 animate-fade-in-up">
-                    <div class="w-32 h-32 bg-[#e6ffe6] rounded-full flex items-center justify-center mb-6 border-2 border-[#99cc33]/30 border-dashed">
-                        <ImageOff class="w-12 h-12 text-[#99cc33]" />
-                    </div>
-                    <h3 class="text-xl font-bold text-[#0f3800]">Belum ada foto</h3>
-                    <p class="text-gray-500 mt-2">Galeri foto akan segera diperbarui.</p>
                 </div>
             </div>
 
-            <Transition name="fade">
+            <!-- Empty State -->
+            <div
+                v-else
+                class="flex flex-col items-center justify-center py-24 text-center"
+            >
+                <div
+                    class="mb-4 inline-flex h-20 w-20 items-center justify-center rounded-full bg-slate-100 text-slate-400"
+                >
+                    <ImageIcon class="h-10 w-10" />
+                </div>
+                <h3 class="mb-2 text-xl font-bold text-slate-700">
+                    Belum Ada Foto
+                </h3>
+                <p class="max-w-md text-slate-500">
+                    Saat ini belum ada foto yang diunggah ke dalam galeri.
+                    Silakan kembali lagi nanti.
+                </p>
+            </div>
+
+            <!-- Modern Lightbox -->
+            <transition
+                enter-active-class="transition ease-out duration-300"
+                enter-from-class="opacity-0"
+                enter-to-class="opacity-100"
+                leave-active-class="transition ease-in duration-200"
+                leave-from-class="opacity-100"
+                leave-to-class="opacity-0"
+            >
                 <div
                     v-if="selectedImage"
-                    class="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-[#0f3800]/90 backdrop-blur-md"
-                    @click="selectedImage = null"
+                    class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/95 p-4 backdrop-blur-sm sm:p-8"
+                    @click="closeLightbox"
                 >
+                    <!-- Close Button -->
                     <button
-                        class="absolute top-6 right-6 p-2 bg-white/10 hover:bg-white/20 rounded-full text-white transition-colors z-50 focus:outline-none"
-                        @click.stop="selectedImage = null"
+                        class="absolute top-6 right-6 z-10 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20 focus:outline-none"
+                        @click.stop="closeLightbox"
                     >
-                        <X class="w-8 h-8" />
+                        <X class="h-8 w-8" />
                     </button>
 
-                    <div 
-                        class="relative max-w-5xl w-full max-h-full flex items-center justify-center"
+                    <!-- Image Container -->
+                    <div
+                        class="relative flex max-h-full w-full max-w-5xl flex-col items-center justify-center"
                         @click.stop
                     >
                         <img
                             :src="selectedImage"
-                            alt="Full Preview"
-                            class="max-h-[85vh] w-auto max-w-full rounded-lg shadow-2xl border-4 border-white object-contain animate-scale-up"
+                            alt="Preview Galeri"
+                            class="max-h-[85vh] w-auto rounded-lg object-contain shadow-2xl"
                         />
                     </div>
                 </div>
-            </Transition>
+            </transition>
         </div>
     </Layout>
 </template>
-
-<style scoped>
-/* Animasi Fade In Up untuk konten halaman */
-.animate-fade-in-up {
-    animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    opacity: 0;
-}
-
-.delay-100 {
-    animation-delay: 0.1s;
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Animasi Transisi Modal Vue */
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-    opacity: 0;
-}
-
-/* Animasi Gambar saat Modal Muncul */
-.animate-scale-up {
-    animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes scaleUp {
-    from {
-        transform: scale(0.9);
-        opacity: 0;
-    }
-    to {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-</style>

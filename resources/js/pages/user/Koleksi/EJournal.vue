@@ -1,18 +1,29 @@
-<script setup>
+<script setup lang="ts">
+import { ref, computed } from 'vue';
 import Layout from '@/layouts/UserAppLayout.vue';
+import {
+    Search,
+    ExternalLink,
+    BookOpen,
+    AlertCircle,
+    Globe,
+    ShieldAlert,
+    CheckCircle2
+} from 'lucide-vue-next';
 
-// 1. Definisikan breadcrumb untuk layout
+// 1. Breadcrumb
 const breadcrumb = [
-    { label: 'Pelayanan' }, // Anda bisa sesuaikan label ini
+    { label: 'Koleksi' },
     { label: 'E-Journal' },
 ];
 
-// 2. Data untuk tabel e-journal (diambil dari file React Anda)
-const data = [
+// 2. Data E-Journal
+const journals = [
   {
     nama: "Emerald Insight",
     link: "https://www.emerald.com/insight/",
     subjek: "Manajemen, Ekonomi, Bisnis",
+    // Menggunakan placeholder yang lebih baik atau inisial jika null
     imgUrl: "https://placehold.co/120x50/00644D/FFFFFF?text=Emerald"
   },
   {
@@ -31,94 +42,168 @@ const data = [
     nama: "IEEE Xplore",
     link: "https://ieeexplore.ieee.org/",
     subjek: "Teknik Elektro, Ilmu Komputer",
-    imgUrl: "/hero-bg.jpg"
+    imgUrl: "https://placehold.co/120x50/00629B/FFFFFF?text=IEEE"
+    // Note: Saya ganti imgUrl hero-bg.jpg dummy dengan placeholder logo agar visual sesuai konteks
   },
   {
     nama: "JSTOR",
     link: "https://www.jstor.org/",
     subjek: "Humaniora, Ilmu Sosial",
-    imgUrl: ""
+    imgUrl: "https://placehold.co/120x50/990000/FFFFFF?text=JSTOR"
+    // Note: Saya tambahkan placeholder agar tidak kosong
   },
-  // -- CONTOH BARU UNTUK LINK TEKS --
   {
     nama: "Garuda Portal",
     link: "https://garuda.kemdikbud.go.id/",
     subjek: "Publikasi Ilmiah Indonesia",
-    imgUrl: ""
+    imgUrl: "" // Case tanpa gambar
   },
 ];
+
+// 3. Fitur Pencarian Sederhana
+const searchQuery = ref('');
+
+const filteredJournals = computed(() => {
+    if (!searchQuery.value) return journals;
+    const query = searchQuery.value.toLowerCase();
+    return journals.filter(journal =>
+        journal.nama.toLowerCase().includes(query) ||
+        journal.subjek.toLowerCase().includes(query)
+    );
+});
 </script>
 
 <template>
-    <!-- 3. Gunakan komponen Layout dengan props yang sesuai -->
-    <Layout :page="true" :breadcrumb="breadcrumb" title="Daftar E-Journal">
+    <Layout :page="true" :breadcrumb="breadcrumb" title="E-Journal & Database">
 
-        <!-- 4. Gunakan struktur container dari template -->
-        <div class="py-12">
-            <div class="mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Background Decoration -->
+        <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+            <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-[#99cc33]/5 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gray-100 rounded-full blur-3xl"></div>
+        </div>
 
-                <!-- 5. Gunakan struktur card dari template -->
-                <div class="flex justify-center">
-                    <div class="bg-white rounded-xl shadow-xl p-10 w-full max-w-7xl border border-[var(--primary-green)]">
+        <div class="container mx-auto px-4 py-10 sm:px-6 lg:px-8 relative">
 
-                        <!-- 6. TITLE (Diadaptasi dari template) -->
-                        <h1 class="text-4xl font-bold text-gray-900 mb-8 text-center">
-                            Daftar E-Journal
-                        </h1>
+            <!-- Header Section
+            <div class="mb-12 text-center max-w-3xl mx-auto">
+                <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-4">
+                    Akses Jurnal Digital
+                </h1>
+                <p class="text-slate-600 text-lg">
+                    Referensi ilmiah dan database internasional yang dilanggan oleh Politeknik Negeri Bandung untuk menunjang riset civitas akademika.
+                </p>
+                <div class="flex justify-center mt-6">
+                    <div class="h-1.5 w-20 bg-[#99cc33] rounded-full shadow-sm shadow-[#99cc33]/50"></div>
+                </div>
+            </div> -->
 
-                        <!-- 7. KONTEN TABEL (Diambil dari React, diubah ke v-for) -->
-                        <div class="rounded-xl overflow-hidden border border-gray-200 shadow-sm mb-10">
-                            <table class="w-full border-collapse">
-                                <thead class="bg-gray-200">
-                                    <tr class="text-left">
-                                        <th class="p-3 font-semibold text-gray-700">Nama</th>
-                                        <!-- Judul diubah agar lebih umum -->
-                                        <th class="p-3 font-semibold text-gray-700">Link</th>
-                                        <th class="p-3 font-semibold text-gray-700">Subjek</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Gunakan v-for untuk iterasi data -->
-                                    <tr v-for="(item, index) in data" :key="index" class="border-b border-gray-200 hover:bg-gray-50">
-                                        <td class="p-3 font-medium text-gray-800 text-center">
-                                            {{ item.nama }}
-                                        </td>
-                                        <td class="p-3 flex justify-center">
-                                            <!-- 1. Tampilkan gambar JIKA item.imgUrl ADA -->
-                                            <a v-if="item.imgUrl" :href="item.link" target="_blank" rel="noopener noreferrer" :title="'Buka ' + item.nama">
-                                                <img :src="item.imgUrl" :alt="item.nama + ' Logo'" class="h-30 w-70 rounded-md hover:opacity-80 transition-opacity" />
-                                            </a>
-                                            
-                                            <!-- 2. Tampilkan link teks JIKA item.imgUrl TIDAK ADA -->
-                                            <a v-else :href="item.link" target="_blank" rel="noopener noreferrer" class="text-blue-600 underline hover:text-blue-800">
-                                                {{ item.link }}
-                                            </a>
-                                        </td>
-                                        <td class="p-3 text-gray-700">
-                                            {{ item.subjek }}
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+            <!-- Search Bar -->
+            <div class="max-w-xl mx-auto mb-12">
+                <div class="relative group">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-[#99cc33] transition-colors">
+                        <Search class="w-5 h-5" />
+                    </div>
+                    <input
+                        v-model="searchQuery"
+                        type="text"
+                        class="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-slate-200 bg-white shadow-sm focus:border-[#99cc33] focus:ring-4 focus:ring-[#99cc33]/10 transition-all outline-none text-slate-700 placeholder:text-slate-400"
+                        placeholder="Cari nama jurnal atau subjek..."
+                    />
+                </div>
+            </div>
+
+            <!-- Content Grid -->
+            <div v-if="filteredJournals.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+                <div
+                    v-for="(item, index) in filteredJournals"
+                    :key="index"
+                    class="group bg-white rounded-2xl p-6 border border-slate-100 shadow-lg shadow-slate-200/50 hover:shadow-xl hover:shadow-[#99cc33]/10 hover:border-[#99cc33]/30 transition-all duration-300 flex flex-col"
+                >
+                    <!-- Header Card: Logo/Icon -->
+                    <div class="h-16 mb-6 flex items-center justify-start">
+                        <!-- Case 1: Ada Image -->
+                        <img
+                            v-if="item.imgUrl"
+                            :src="item.imgUrl"
+                            :alt="item.nama"
+                            class="h-full w-auto object-contain max-w-[180px] transition-transform duration-300 group-hover:scale-105"
+                        />
+
+                        <!-- Case 2: Tidak Ada Image (Fallback UI) -->
+                        <div v-else class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-xl bg-[#99cc33]/10 flex items-center justify-center text-[#99cc33]">
+                                <Globe class="w-6 h-6" />
+                            </div>
+                            <span class="font-bold text-xl text-slate-800">{{ item.nama }}</span>
                         </div>
+                    </div>
 
-                        <!-- 8. KONTEN ATURAN -->
-                        <h2 class="text-2xl font-semibold mt-10 mb-3 text-gray-800">
-                            Aturan Akses E-Journal
-                        </h2>
-                        <ul class="list-disc ml-6 space-y-2 text-gray-700 leading-relaxed">
-                            <li>E-Journal hanya dapat diakses menggunakan jaringan kampus.</li>
-                            <li>Dilarang membagikan akun akses kepada pihak luar.</li>
-                            <li>Pengguna wajib mematuhi lisensi dan aturan penggunaan database.</li>
-                            <li>Download artikel hanya untuk keperluan akademik.</li>
-                            <li>Menyebarkan file hasil download tanpa izin adalah pelanggaran.</li>
-                        </ul>
+                    <!-- Content Body -->
+                    <div class="flex-grow">
+                        <h3 v-if="item.imgUrl" class="text-lg font-bold text-slate-800 mb-2 group-hover:text-[#99cc33] transition-colors">
+                            {{ item.nama }}
+                        </h3>
 
+                        <div class="flex items-start gap-2 text-slate-500 text-sm mb-6">
+                            <BookOpen class="w-4 h-4 mt-0.5 shrink-0 text-slate-400" />
+                            <span class="leading-relaxed">{{ item.subjek }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Footer Action -->
+                    <div class="mt-auto pt-4 border-t border-slate-100">
+                        <a
+                            :href="item.link"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="flex items-center justify-between w-full px-4 py-2.5 rounded-xl bg-slate-50 text-slate-600 font-semibold text-sm group-hover:bg-[#99cc33] group-hover:text-white transition-all duration-300"
+                        >
+                            Akses Layanan
+                            <ExternalLink class="w-4 h-4" />
+                        </a>
                     </div>
                 </div>
-
             </div>
+
+            <!-- Empty State -->
+            <div v-else class="text-center py-16">
+                <div class="inline-flex justify-center items-center w-16 h-16 rounded-full bg-slate-100 mb-4">
+                    <Search class="w-8 h-8 text-slate-400" />
+                </div>
+                <h3 class="text-lg font-bold text-slate-700">Tidak Ditemukan</h3>
+                <p class="text-slate-500">Coba kata kunci pencarian lain.</p>
+            </div>
+
+            <!-- Rules Section (Card) -->
+            <div class="max-w-4xl mx-auto">
+                <div class="bg-amber-50 border border-amber-100 rounded-3xl p-8 relative overflow-hidden">
+                    <!-- Decorative Icon -->
+                    <ShieldAlert class="absolute -right-6 -bottom-6 w-32 h-32 text-amber-100 -rotate-12 pointer-events-none" />
+
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="p-2 bg-amber-100 rounded-lg text-amber-600">
+                                <AlertCircle class="w-6 h-6" />
+                            </div>
+                            <h2 class="text-2xl font-bold text-slate-800">Aturan Akses E-Journal</h2>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div v-for="(rule, idx) in [
+                                'E-Journal hanya dapat diakses menggunakan jaringan kampus (IP POLBAN).',
+                                'Dilarang membagikan akun akses (username/password) kepada pihak luar.',
+                                'Pengguna wajib mematuhi lisensi dan aturan penggunaan database.',
+                                'Download artikel hanya diperbolehkan untuk keperluan akademik/riset.',
+                                'Menyebarkan file hasil download secara massal tanpa izin adalah pelanggaran.'
+                            ]" :key="idx" class="flex items-start gap-3">
+                                <CheckCircle2 class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                                <span class="text-slate-700 text-sm leading-relaxed">{{ rule }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
-        
     </Layout>
 </template>

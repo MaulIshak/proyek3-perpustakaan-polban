@@ -1,0 +1,39 @@
+[33m939cffd[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m HEAD@{0}: commit: Crud Bebas Masalah
+[33mda6f203[m HEAD@{1}: commit (merge): membuat galeri dan usulan buku dari sisi admin
+[33m09a591c[m HEAD@{2}: commit: crud galeri dan crud usulan
+[33m0480e62[m[33m ([m[1;31morigin/galeri-dinamis[m[33m, [m[1;32mgaleri-dinamis[m[33m)[m HEAD@{3}: commit: membuat galeri dinamis
+[33m1527677[m HEAD@{4}: commit: membuat dinamis galeri
+[33maa6e3bd[m HEAD@{5}: commit (merge): Ejournal dan Form Usulan Buku
+[33ma4c341c[m[33m ([m[1;31morigin/user-UsulanBuku[m[33m, [m[1;31morigin/user-Ejournal[m[33m, [m[1;32muser-UsulanBuku[m[33m, [m[1;32muser-Ejournal[m[33m)[m HEAD@{6}: reset: moving to HEAD
+[33ma4c341c[m[33m ([m[1;31morigin/user-UsulanBuku[m[33m, [m[1;31morigin/user-Ejournal[m[33m, [m[1;32muser-UsulanBuku[m[33m, [m[1;32muser-Ejournal[m[33m)[m HEAD@{7}: reset: moving to HEAD
+[33ma4c341c[m[33m ([m[1;31morigin/user-UsulanBuku[m[33m, [m[1;31morigin/user-Ejournal[m[33m, [m[1;32muser-UsulanBuku[m[33m, [m[1;32muser-Ejournal[m[33m)[m HEAD@{8}: reset: moving to a4c341c
+[33m704bcec[m HEAD@{9}: reset: moving to 704bcec
+[33ma4c341c[m[33m ([m[1;31morigin/user-UsulanBuku[m[33m, [m[1;31morigin/user-Ejournal[m[33m, [m[1;32muser-UsulanBuku[m[33m, [m[1;32muser-Ejournal[m[33m)[m HEAD@{10}: reset: moving to a4c341c
+[33m704bcec[m HEAD@{11}: reset: moving to HEAD^
+[33ma4c341c[m[33m ([m[1;31morigin/user-UsulanBuku[m[33m, [m[1;31morigin/user-Ejournal[m[33m, [m[1;32muser-UsulanBuku[m[33m, [m[1;32muser-Ejournal[m[33m)[m HEAD@{12}: checkout: moving from user-UsulanBuku to main
+[33ma4c341c[m[33m ([m[1;31morigin/user-UsulanBuku[m[33m, [m[1;31morigin/user-Ejournal[m[33m, [m[1;32muser-UsulanBuku[m[33m, [m[1;32muser-Ejournal[m[33m)[m HEAD@{13}: checkout: moving from main to user-UsulanBuku
+[33ma4c341c[m[33m ([m[1;31morigin/user-UsulanBuku[m[33m, [m[1;31morigin/user-Ejournal[m[33m, [m[1;32muser-UsulanBuku[m[33m, [m[1;32muser-Ejournal[m[33m)[m HEAD@{14}: checkout: moving from user-UsulanBuku to main
+[33ma4c341c[m[33m ([m[1;31morigin/user-UsulanBuku[m[33m, [m[1;31morigin/user-Ejournal[m[33m, [m[1;32muser-UsulanBuku[m[33m, [m[1;32muser-Ejournal[m[33m)[m HEAD@{15}: checkout: moving from main to user-UsulanBuku
+[33ma4c341c[m[33m ([m[1;31morigin/user-UsulanBuku[m[33m, [m[1;31morigin/user-Ejournal[m[33m, [m[1;32muser-UsulanBuku[m[33m, [m[1;32muser-Ejournal[m[33m)[m HEAD@{16}: commit: Ejournal dan UsulanBuku
+[33m704bcec[m HEAD@{17}: pull origin main: Fast-forward
+[33m6d37a3b[m HEAD@{18}: pull origin main: Fast-forward
+[33m752338f[m HEAD@{19}: reset: moving to 752338f2bc271d81937287c6bb78ec54774eca3f
+[33md35b3a7[m HEAD@{20}: commit (merge): tanya pustakawan
+[33m752338f[m HEAD@{21}: commit (merge): hihi
+[33m119b235[m HEAD@{22}: commit (merge): Selesai merge dari origin/main
+[33m8f5c6ab[m[33m ([m[1;31morigin/TanyaPustakawan[m[33m, [m[1;32mTanyaPustakawan[m[33m)[m HEAD@{23}: commit: Membuat Tanya Pustakawan
+[33m0de68ca[m[33m ([m[1;31morigin/Merge-Main[m[33m, [m[1;32mMerge-Main[m[33m)[m HEAD@{24}: commit: Merge dari Main
+[33m05a1632[m HEAD@{25}: commit (merge): Merge dari Main
+[33madcd3dd[m[33m ([m[1;31morigin/BebasMasalah[m[33m, [m[1;32mBebasMasalah[m[33m)[m HEAD@{26}: commit: Tampilan Galeri dan Tampilan Bebas Masalah
+[33m1d2ac11[m HEAD@{27}: checkout: moving from user-Pelayanan to main
+[33mb199b6e[m[33m ([m[1;31morigin/user-Pelayanan[m[33m, [m[1;32muser-Pelayanan[m[33m)[m HEAD@{28}: checkout: moving from main to user-Pelayanan
+[33m1d2ac11[m HEAD@{29}: commit: yo
+[33m4eae78d[m HEAD@{30}: checkout: moving from user-Pelayanan to main
+[33mb199b6e[m[33m ([m[1;31morigin/user-Pelayanan[m[33m, [m[1;32muser-Pelayanan[m[33m)[m HEAD@{31}: commit (merge): Membuat Semua Halaman Pelayanan
+[33m26e7bb3[m HEAD@{32}: checkout: moving from main to user-Pelayanan
+[33m4eae78d[m HEAD@{33}: commit: Membuat Halaman Pelayanan
+[33m16b08d2[m HEAD@{34}: commit (merge): testin
+[33m301eccb[m HEAD@{35}: commit (merge): .
+[33m26e7bb3[m HEAD@{36}: commit: membuat halaman Pelayanan
+[33m2929e34[m HEAD@{37}: pull origin main: Fast-forward
+[33md0b2e26[m HEAD@{38}: clone: from https://github.com/MaulIshak/proyek3-perpustakaan-polban.git
