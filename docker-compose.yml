@@ -12,7 +12,7 @@ services:
       - .env
     volumes:
       - storage:/usr/share/nginx/html/storage:rw
-      - public:/usr/share/nginx/html/public:rw
+     # - public:/usr/share/nginx/html/public:rw
   # queue-worker:
   #   build:
   #     context: ./backend
