@@ -8,6 +8,19 @@ import { ref } from 'vue';
 
 const breadcrumbs = [{ label: 'Home', link: '/' }];
 
+const props = defineProps({
+    book_covers: {
+        type: Array<{
+            id: Number;
+            title: string;
+            image_path: string;
+            created_at: Date;
+            updated_at: Date;
+        }>,
+        default: [],
+    },
+});
+
 // Data Pengumuman
 const pengumumanList = [
     {
@@ -117,7 +130,8 @@ const activeTab = ref('berita');
                                 <PengumumanCard
                                     v-for="pengumuman in pengumumanList"
                                     :key="pengumuman.id"
-                                    :id="pengumuman.id"  :title="pengumuman.title"
+                                    :id="pengumuman.id"
+                                    :title="pengumuman.title"
                                     :content="pengumuman.content"
                                     :date="pengumuman.date"
                                     class="transform border-slate-200 bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
@@ -127,7 +141,7 @@ const activeTab = ref('berita');
 
                         <!-- CONTENT: BUKU -->
                         <div v-else-if="activeTab === 'buku'" key="buku">
-                            <BookCovers />
+                            <BookCovers :data="book_covers" />
                         </div>
                     </transition>
                 </div>

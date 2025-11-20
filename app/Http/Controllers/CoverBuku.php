@@ -18,6 +18,15 @@ class CoverBuku extends Controller
             'covers' => $covers
         ]);
     }
+    public function show()
+    {
+        // Ambil data terbaru
+        $covers = BookCover::latest()->limit(6)->get();
+
+        return Inertia::render('user/Home', [
+            'covers' => $covers
+        ]);
+    }
 
     public function store(Request $request)
     {

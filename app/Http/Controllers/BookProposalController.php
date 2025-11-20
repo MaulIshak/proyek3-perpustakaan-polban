@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\BookProposal;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Exports\BookProposalsExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class BookProposalController extends Controller
 {
@@ -46,8 +48,8 @@ class BookProposalController extends Controller
 
     public function create()
     {
-        return Inertia::render('user/Koleksi/Usulan_Buku'); 
-        
+        return Inertia::render('user/Koleksi/Usulan_Buku');
+
     }
 
     public function store(Request $request)
@@ -91,7 +93,7 @@ class BookProposalController extends Controller
     public function destroy($id)
     {
         $proposal = BookProposal::findOrFail($id);
-        
+
         // Opsional: Pastikan hanya yang statusnya ditolak yang bisa dihapus backend
         if ($proposal->status !== 'rejected') {
             return back()->withErrors(['error' => 'Hanya usulan yang ditolak yang boleh dihapus.']);
@@ -101,11 +103,18 @@ class BookProposalController extends Controller
 
         return back()->with('success', 'Usulan berhasil dihapus.');
     }
-    
-    // Placeholder untuk export excel
-    public function export()
-    {
-        // Implementasi logic export excel (misal menggunakan Maatwebsite/Excel)
-        return back()->with('success', 'Fitur export akan segera tersedia.');
-    }
+
+public function export(Request $request)
+{
+    // Ambil parameter filter dari request URL
+    $search = $request->input('search');
+    $status = $request->input('status');
+
+    // Generate nama file dengan timestamp
+    $fileName = 'usulan-buku-' . date('Y-m-d_H-i') . '.xlsx';
+
+    return Excel::download(new BookProposalsExport($search, $status), $fileName);
+}
+
+
 }
