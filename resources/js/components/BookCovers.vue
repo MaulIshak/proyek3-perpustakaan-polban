@@ -1,39 +1,15 @@
 <script setup lang="ts">
 import { ArrowRight, BookPlus, CalendarCheck } from 'lucide-vue-next';
 
-// Data Buku Dummy
-const books = [
-    {
-        href: '#',
-        src: 'https://images.unsplash.com/photo-1532012197267-da84d127e765?w=300&q=80',
-        title: 'Principles of Science',
+const props = defineProps({
+    data: {
+        type: Array<{
+            id: Number;
+            image_path: string;
+        }>,
+        default: [],
     },
-    {
-        href: '#',
-        src: 'https://images.unsplash.com/photo-1589998059171-988d887df646?w=300&q=80',
-        title: 'Modern Architecture',
-    },
-    {
-        href: '#',
-        src: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&q=80',
-        title: 'The Art of Design',
-    },
-    {
-        href: '#',
-        src: 'https://images.unsplash.com/photo-1592496431122-2349e0fbc666?w=300&q=80',
-        title: 'Advanced Mathematics',
-    },
-    {
-        href: '#',
-        src: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=300&q=80',
-        title: 'Programming 101',
-    },
-    {
-        href: '#',
-        src: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=300&q=80',
-        title: 'History of World',
-    },
-];
+});
 </script>
 
 <template>
@@ -76,11 +52,13 @@ const books = [
             <!-- 2. Grid Container (PERBAIKAN UTAMA) -->
             <!-- Mengganti horizontal scroll dengan CSS Grid -->
             <!-- Mobile: 2 kolom, Tablet: 3 kolom, Desktop: 6 kolom -->
-            <div class="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-6">
+            <div
+                class="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-6"
+            >
                 <a
-                    v-for="(book, index) in books"
+                    v-for="(book, index) in data"
                     :key="index"
-                    :href="book.href"
+                    :href="`/storage/${book.image_path}`"
                     class="group relative flex w-full cursor-pointer flex-col"
                 >
                     <!-- Book Cover -->
@@ -89,8 +67,8 @@ const books = [
                         class="relative aspect-[2/3] w-full overflow-hidden rounded-xl bg-slate-200 shadow-lg shadow-slate-300/60 transition-all duration-500 group-hover:-translate-y-2 group-hover:shadow-2xl group-hover:shadow-[#99cc33]/30"
                     >
                         <img
-                            :src="book.src"
-                            :alt="book.title"
+                            :src="`/storage/${book.image_path}`"
+                            :alt="'cover buku' + book.id"
                             class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                             loading="lazy"
                         />
