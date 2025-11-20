@@ -42,7 +42,7 @@ services:
     image: bitnami/postgresql
     platform: linux/amd64
     ports:
-      - 7979:5432
+      - 8989:5432
     restart: always
     volumes:
       - db-data:/bitnami/postgresql
