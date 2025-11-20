@@ -22,38 +22,37 @@ class EJournalController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'subject' => 'required|string|max:255',
+            'description' => 'required|string|max:255',
             'url' => 'required|url',
-            'logo' => 'nullable|image|max:2048', // Maks 2MB
+            'type' => 'required|in:journal,ebook', // <--- Validasi baru
+            'logo' => 'nullable|image|max:2048',
         ]);
 
-        $data = $request->only(['name', 'subject', 'url']);
+        $data = $request->only(['name', 'description', 'url', 'type']); // <--- Ambil type
 
-        // Handle Upload Logo
         if ($request->hasFile('logo')) {
             $data['logo_path'] = $request->file('logo')->store('journals', 'public');
         }
 
         EJournal::create($data);
 
-        return redirect()->back()->with('message', 'Jurnal berhasil ditambahkan.');
+        return redirect()->back()->with('message', 'Data berhasil ditambahkan.');
     }
 
     public function update(Request $request, EJournal $ejournal)
     {
-        // Note: Gunakan 'post' method dengan _method: 'put' di frontend untuk handle file
         $request->validate([
             'name' => 'required|string|max:255',
-            'subject' => 'required|string|max:255',
+            'description' => 'required|string|max:255',
             'url' => 'required|url',
+            'type' => 'required|in:journal,ebook', // <--- Validasi baru
             'logo' => 'nullable|image|max:2048',
         ]);
 
-        $data = $request->only(['name', 'subject', 'url']);
+        $data = $request->only(['name', 'description', 'url', 'type']); // <--- Ambil type
 
-        // Handle Ganti Logo
+        // ... logic upload gambar tetap sama ...
         if ($request->hasFile('logo')) {
-            // Hapus logo lama jika ada
             if ($ejournal->logo_path) {
                 Storage::disk('public')->delete($ejournal->logo_path);
             }
@@ -61,8 +60,8 @@ class EJournalController extends Controller
         }
 
         $ejournal->update($data);
-
-        return redirect()->back()->with('message', 'Jurnal berhasil diperbarui.');
+        
+        return redirect()->back()->with('message', 'Data berhasil diperbarui.');
     }
 
     public function destroy(EJournal $ejournal)

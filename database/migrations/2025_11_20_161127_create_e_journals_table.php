@@ -15,9 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('name');             // Untuk 'nama' (misal: Emerald Insight)
             $table->string('url');              // Untuk 'link' tujuan
-            $table->string('subject');          // Untuk 'subjek' (misal: Ekonomi, Bisnis)
+            $table->text('description');          // Untuk 'subjek' (misal: Ekonomi, Bisnis)
             $table->string('logo_path')->nullable(); // Path gambar setelah di-upload. Nullable karena ada jurnal tanpa logo.
             $table->timestamps();
+            $table->enum('type', ['journal', 'ebook'])->default('journal')->after('id');
         });
     }
 

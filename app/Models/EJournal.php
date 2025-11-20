@@ -14,8 +14,9 @@ class EJournal extends Model
     protected $fillable = [
         'name',
         'url',
-        'subject',
+        'description',
         'logo_path',
+        'type',
     ];
 
     // Append atribut custom 'img_url' ke dalam JSON response
