@@ -1,4 +1,6 @@
-<script setup lang="ts">
+<script setup>
+import { ref, nextTick } from 'vue';
+import { useForm } from '@inertiajs/vue3';
 import Layout from '@/layouts/UserAppLayout.vue';
 import {
     AlignLeft,
@@ -26,73 +28,78 @@ const breadcrumb = [
 const showMessage = ref(false);
 const messageRef = ref<HTMLElement | null>(null);
 
-// Simulasi submit
-const submitForm = async (e: Event) => {
-    e.preventDefault();
+// Inertia form with all fields
+const form = useForm({
+    nama_pengusul: '',
+    nim: '',
+    prodi: '',
+    title: '',
+    author: '',
+    isbn: '',
+    publisher: '',
+    year: '',
+    price: '',
+    reason: '',
+    status: 'pending', // Default status for user submissions
+});
 
-    showMessage.value = true;
-    await nextTick();
+const submitForm = () => { // Hapus async dan e.preventDefault karena useForm sudah handle itu
+    form.post('usulan-buku/store', {
+        preserveScroll: true,
+        onSuccess: () => {
+            showMessage.value = true;
+            form.reset(); 
+            
+            // Scroll ke pesan sukses
+            nextTick(() => {
+                messageRef.value?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
 
-    // Scroll halus ke pesan sukses
-    messageRef.value?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-    // Optional: Reset form logic here
+            // Sembunyikan pesan otomatis setelah 5 detik (opsional)
+            setTimeout(() => {
+                showMessage.value = false;
+            }, 5000);
+        },
+        onError: (errors) => {
+            // Jika validasi Laravel gagal, Inertia otomatis mengisi form.errors
+            console.error('Gagal validasi:', errors);
+            
+            // Opsional: Scroll ke atas jika ada error agar user sadar
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    });
 };
 </script>
 
 <template>
     <Layout :page="true" :breadcrumb="breadcrumb" title="Form Usulan Buku">
-        <!-- Background Decoration -->
-        <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-            <div
-                class="absolute top-0 right-0 h-[600px] w-[600px] rounded-full bg-[#99cc33]/5 blur-3xl"
-            ></div>
-            <div
-                class="absolute bottom-0 left-0 h-[500px] w-[500px] rounded-full bg-gray-100 blur-3xl"
-            ></div>
-        </div>
+        <div class="py-12">
+            <div class="mx-auto px-4 sm:px-6 lg:px-8">
 
-        <div class="relative container mx-auto px-4 py-10 sm:px-6 lg:px-8">
-            <!-- Header Section
-            <div class="mb-10 text-center max-w-3xl mx-auto">
-                <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-4">
-                    Usulkan Koleksi Baru
-                </h1>
-                <p class="text-slate-600 text-lg">
-                    Bantu kami melengkapi koleksi perpustakaan dengan mengusulkan buku-buku berkualitas yang Anda butuhkan.
-                </p>
-                <div class="flex justify-center mt-6">
-                    <div class="h-1.5 w-20 bg-[#99cc33] rounded-full shadow-sm shadow-[#99cc33]/50"></div>
-                </div>
-            </div> -->
+                <div class="flex justify-center">
+                    
+                    <div class="bg-white rounded-xl shadow-xl p-10 w-full max-w-7xl border border-[var(--primary-green)]">
+                        <!-- SUCCESS MESSAGE -->
+                        <div
+                            v-if="showMessage"
+                            ref="messageRef"
+                            class="mb-6 p-6 rounded-xl border border-green-400 bg-green-50 shadow-md animate-[fadeInUp_.5s_ease]"
+                        >
+                            <h2 class="text-2xl font-bold text-green-700 mb-2">
+                                Terimakasih sudah mengusul buku 🙌
+                            </h2>
+                            <p class="text-green-800 text-lg">
+                                Usulan Anda telah kami terima dan akan diproses oleh pihak perpustakaan.
+                            </p>
+                        </div>
+                        
+                        <!-- TITLE -->
+                        <h1 class="text-4xl font-bold text-gray-900 mb-4">
+                            Form Usulan Buku Perpustakaan POLBAN
+                        </h1>
 
-            <!-- Success Message (Transition) -->
-            <transition
-                enter-active-class="transition ease-out duration-300"
-                enter-from-class="opacity-0 -translate-y-4"
-                enter-to-class="opacity-100 translate-y-0"
-                leave-active-class="transition ease-in duration-200"
-                leave-from-class="opacity-100 translate-y-0"
-                leave-to-class="opacity-0 -translate-y-4"
-            >
-                <div
-                    v-if="showMessage"
-                    ref="messageRef"
-                    class="mx-auto mb-8 flex max-w-4xl items-start gap-4 rounded-2xl border border-emerald-100 bg-emerald-50 p-6 shadow-lg"
-                >
-                    <div
-                        class="shrink-0 rounded-full bg-emerald-100 p-2 text-emerald-600"
-                    >
-                        <CheckCircle2 class="h-8 w-8" />
-                    </div>
-                    <div>
-                        <h3 class="mb-1 text-xl font-bold text-emerald-800">
-                            Terima Kasih! 🙌
-                        </h3>
-                        <p class="leading-relaxed text-emerald-700">
-                            Usulan buku Anda telah berhasil kami terima. Tim
-                            pengadaan kami akan meninjau usulan tersebut. Cek
-                            status pengadaan secara berkala.
+                        <p class="text-gray-700 leading-relaxed mb-6 text-1xl">
+                            Silahkan usulkan buku-buku yang Anda perlukan dengan mengisi formulir yang telah kami sediakan. 
                         </p>
                     </div>
                 </div>
@@ -107,261 +114,168 @@ const submitForm = async (e: Event) => {
                     class="h-2 w-full bg-gradient-to-r from-[#99cc33] to-[var(--dark-green)]"
                 ></div>
 
-                <div class="p-8 sm:p-10">
-                    <form @submit="submitForm" class="space-y-10">
-                        <!-- Section: Data Diri -->
-                        <div>
-                            <h3
-                                class="mb-6 flex items-center gap-2 border-b border-slate-100 pb-2 text-lg font-bold text-slate-800"
-                            >
-                                <User class="h-5 w-5 text-[#99cc33]" />
-                                Data Pengusul
-                            </h3>
+                            <div>
+                                <label class="block text-gray-800 font-semibold mb-1">
+                                    Nama Pengusul <span class="text-red-600">*</span>
+                                </label>
+                                <input 
+                                    v-model="form.nama_pengusul"
+                                    type="text" 
+                                    class="w-full border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-[var(--primary-green)]" 
+                                    :class="{ 'border-red-500': form.errors.nama_pengusul }"
+                                    required 
+                                />
+                                <p v-if="form.errors.nama_pengusul" class="text-sm text-red-500 mt-1">
+                                    {{ form.errors.nama_pengusul }}
+                                </p>
+                            </div>
 
-                            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                                <!-- Nama -->
-                                <div class="md:col-span-2">
-                                    <label
-                                        class="mb-2 block text-sm font-semibold text-slate-700"
-                                        >Nama Lengkap
-                                        <span class="text-red-500"
-                                            >*</span
-                                        ></label
-                                    >
-                                    <div class="relative">
-                                        <div
-                                            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"
-                                        >
-                                            <User class="h-5 w-5" />
-                                        </div>
-                                        <input
-                                            type="text"
-                                            class="w-full rounded-xl border border-slate-200 py-3 pr-4 pl-10 text-slate-700 transition-all outline-none focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
-                                            placeholder="Masukkan nama lengkap Anda"
-                                            required
-                                        />
-                                    </div>
-                                </div>
+                            <div>
+                                <label class="block text-gray-800 font-semibold mb-1">
+                                    NIM <span class="text-red-600">*</span>
+                                </label>
+                                <input 
+                                    v-model="form.nim"
+                                    type="text" 
+                                    class="w-full border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-[var(--primary-green)]" 
+                                    :class="{ 'border-red-500': form.errors.nim }"
+                                    required 
+                                />
+                                <p v-if="form.errors.nim" class="text-sm text-red-500 mt-1">
+                                    {{ form.errors.nim }}
+                                </p>
+                            </div>
 
-                                <!-- NIM/NIP -->
-                                <div>
-                                    <label
-                                        class="mb-2 block text-sm font-semibold text-slate-700"
-                                        >NIM / NIP
-                                        <span class="text-red-500"
-                                            >*</span
-                                        ></label
-                                    >
-                                    <div class="relative">
-                                        <div
-                                            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"
-                                        >
-                                            <Hash class="h-5 w-5" />
-                                        </div>
-                                        <input
-                                            type="text"
-                                            class="w-full rounded-xl border border-slate-200 py-3 pr-4 pl-10 text-slate-700 transition-all outline-none focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
-                                            placeholder="Nomor Induk"
-                                            required
-                                        />
-                                    </div>
-                                </div>
+                            <div>
+                                <label class="block text-gray-800 font-semibold mb-1">
+                                    Prodi <span class="text-red-600">*</span>
+                                </label>
+                                <input 
+                                    v-model="form.prodi"
+                                    type="text" 
+                                    class="w-full border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-[var(--primary-green)]" 
+                                    :class="{ 'border-red-500': form.errors.prodi }"
+                                    required 
+                                />
+                                <p v-if="form.errors.prodi" class="text-sm text-red-500 mt-1">
+                                    {{ form.errors.prodi }}
+                                </p>
+                            </div>
 
-                                <!-- Prodi/Unit -->
-                                <div>
-                                    <label
-                                        class="mb-2 block text-sm font-semibold text-slate-700"
-                                        >Program Studi / Unit
-                                        <span class="text-red-500"
-                                            >*</span
-                                        ></label
-                                    >
-                                    <div class="relative">
-                                        <div
-                                            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"
-                                        >
-                                            <GraduationCap class="h-5 w-5" />
-                                        </div>
-                                        <input
-                                            type="text"
-                                            class="w-full rounded-xl border border-slate-200 py-3 pr-4 pl-10 text-slate-700 transition-all outline-none focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
-                                            placeholder="Contoh: D3 Teknik Informatika"
-                                            required
-                                        />
-                                    </div>
-                                </div>
+                            <div>
+                                <label class="block text-gray-800 font-semibold mb-1">
+                                    Judul Buku <span class="text-red-600">*</span>
+                                </label>
+                                <input 
+                                    v-model="form.title"
+                                    type="text" 
+                                    class="w-full border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-[var(--primary-green)]" 
+                                    :class="{ 'border-red-500': form.errors.title }"
+                                    required 
+                                />
+                                <p v-if="form.errors.title" class="text-sm text-red-500 mt-1">
+                                    {{ form.errors.title }}
+                                </p>
                             </div>
                         </div>
 
-                        <!-- Section: Data Buku -->
-                        <div>
-                            <h3
-                                class="mb-6 flex items-center gap-2 border-b border-slate-100 pb-2 text-lg font-bold text-slate-800"
-                            >
-                                <BookPlus class="h-5 w-5 text-[#99cc33]" />
-                                Detail Buku
-                            </h3>
+                            <div>
+                                <label class="block text-gray-800 font-semibold mb-1">
+                                    Pengarang <span class="text-red-600">*</span>
+                                </label>
+                                <input 
+                                    v-model="form.author"
+                                    type="text" 
+                                    class="w-full border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-[var(--primary-green)]" 
+                                    :class="{ 'border-red-500': form.errors.author }"
+                                    required 
+                                />
+                                <p v-if="form.errors.author" class="text-sm text-red-500 mt-1">
+                                    {{ form.errors.author }}
+                                </p>
+                            </div>
 
-                            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                                <!-- Judul Buku -->
-                                <div class="md:col-span-2">
-                                    <label
-                                        class="mb-2 block text-sm font-semibold text-slate-700"
-                                        >Judul Buku
-                                        <span class="text-red-500"
-                                            >*</span
-                                        ></label
-                                    >
-                                    <div class="relative">
-                                        <div
-                                            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"
-                                        >
-                                            <BookOpen class="h-5 w-5" />
-                                        </div>
-                                        <input
-                                            type="text"
-                                            class="w-full rounded-xl border border-slate-200 py-3 pr-4 pl-10 text-slate-700 transition-all outline-none focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
-                                            placeholder="Judul lengkap buku"
-                                            required
-                                        />
-                                    </div>
-                                </div>
+                            <div>
+                                <label class="block text-gray-800 font-semibold mb-1">
+                                    ISBN <span class="text-red-600">*</span>
+                                </label>
+                                <input 
+                                    v-model="form.isbn"
+                                    type="text" 
+                                    class="w-full border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-[var(--primary-green)]" 
+                                    :class="{ 'border-red-500': form.errors.isbn }"
+                                    required 
+                                />
+                                <p v-if="form.errors.isbn" class="text-sm text-red-500 mt-1">
+                                    {{ form.errors.isbn }}
+                                </p>
+                            </div>
 
-                                <!-- Pengarang -->
-                                <div>
-                                    <label
-                                        class="mb-2 block text-sm font-semibold text-slate-700"
-                                        >Pengarang
-                                        <span class="text-red-500"
-                                            >*</span
-                                        ></label
-                                    >
-                                    <div class="relative">
-                                        <div
-                                            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"
-                                        >
-                                            <PenTool class="h-5 w-5" />
-                                        </div>
-                                        <input
-                                            type="text"
-                                            class="w-full rounded-xl border border-slate-200 py-3 pr-4 pl-10 text-slate-700 transition-all outline-none focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
-                                            placeholder="Nama penulis/pengarang"
-                                            required
-                                        />
-                                    </div>
-                                </div>
+                            <div>
+                                <label class="block text-gray-800 font-semibold mb-1">
+                                    Penerbit <span class="text-red-600">*</span>
+                                </label>
+                                <input 
+                                    v-model="form.publisher"
+                                    type="text" 
+                                    class="w-full border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-[var(--primary-green)]" 
+                                    :class="{ 'border-red-500': form.errors.publisher }"
+                                    required 
+                                />
+                                <p v-if="form.errors.publisher" class="text-sm text-red-500 mt-1">
+                                    {{ form.errors.publisher }}
+                                </p>
+                            </div>
 
-                                <!-- Penerbit -->
-                                <div>
-                                    <label
-                                        class="mb-2 block text-sm font-semibold text-slate-700"
-                                        >Penerbit
-                                        <span class="text-red-500"
-                                            >*</span
-                                        ></label
-                                    >
-                                    <div class="relative">
-                                        <div
-                                            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"
-                                        >
-                                            <Building2 class="h-5 w-5" />
-                                        </div>
-                                        <input
-                                            type="text"
-                                            class="w-full rounded-xl border border-slate-200 py-3 pr-4 pl-10 text-slate-700 transition-all outline-none focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
-                                            placeholder="Nama penerbit"
-                                            required
-                                        />
-                                    </div>
-                                </div>
+                            <div>
+                                <label class="block text-gray-800 font-semibold mb-1">
+                                    Tahun Terbit <span class="text-red-600">*</span>
+                                </label>
+                                <input 
+                                    v-model="form.year"
+                                    type="number" 
+                                    min="1700"
+                                    :max="new Date().getFullYear()"
+                                    class="w-full border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-[var(--primary-green)]" 
+                                    :class="{ 'border-red-500': form.errors.year }"
+                                    required 
+                                />
+                                <p v-if="form.errors.year" class="text-sm text-red-500 mt-1">
+                                    {{ form.errors.year }}
+                                </p>
+                            </div>
 
-                                <!-- ISBN -->
-                                <div>
-                                    <label
-                                        class="mb-2 block text-sm font-semibold text-slate-700"
-                                        >ISBN
-                                        <span class="text-red-500"
-                                            >*</span
-                                        ></label
-                                    >
-                                    <div class="relative">
-                                        <div
-                                            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"
-                                        >
-                                            <Barcode class="h-5 w-5" />
-                                        </div>
-                                        <input
-                                            type="text"
-                                            class="w-full rounded-xl border border-slate-200 py-3 pr-4 pl-10 text-slate-700 transition-all outline-none focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
-                                            placeholder="Contoh: 978-602-..."
-                                            required
-                                        />
-                                    </div>
-                                </div>
+                            <div>
+                                <label class="block text-gray-800 font-semibold mb-1">
+                                    Harga (Opsional)
+                                </label>
+                                <input 
+                                    v-model="form.price"
+                                    type="number" 
+                                    min="0"
+                                    placeholder="Contoh: 150000"
+                                    class="w-full border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-[var(--primary-green)]" 
+                                    :class="{ 'border-red-500': form.errors.price }"
+                                />
+                                <p v-if="form.errors.price" class="text-sm text-red-500 mt-1">
+                                    {{ form.errors.price }}
+                                </p>
+                            </div>
 
-                                <!-- Tahun -->
-                                <div>
-                                    <label
-                                        class="mb-2 block text-sm font-semibold text-slate-700"
-                                        >Tahun Terbit
-                                        <span class="text-red-500"
-                                            >*</span
-                                        ></label
-                                    >
-                                    <div class="relative">
-                                        <div
-                                            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"
-                                        >
-                                            <Calendar class="h-5 w-5" />
-                                        </div>
-                                        <input
-                                            type="number"
-                                            class="w-full rounded-xl border border-slate-200 py-3 pr-4 pl-10 text-slate-700 transition-all outline-none focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
-                                            placeholder="YYYY"
-                                            required
-                                        />
-                                    </div>
-                                </div>
-
-                                <!-- Harga (Optional) -->
-                                <div class="md:col-span-2">
-                                    <label
-                                        class="mb-2 block text-sm font-semibold text-slate-700"
-                                        >Perkiraan Harga (Opsional)</label
-                                    >
-                                    <div class="relative">
-                                        <div
-                                            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"
-                                        >
-                                            <DollarSign class="h-5 w-5" />
-                                        </div>
-                                        <input
-                                            type="number"
-                                            class="w-full rounded-xl border border-slate-200 py-3 pr-4 pl-10 text-slate-700 transition-all outline-none focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
-                                            placeholder="Rp"
-                                        />
-                                    </div>
-                                </div>
-
-                                <!-- Alasan -->
-                                <div class="md:col-span-2">
-                                    <label
-                                        class="mb-2 block text-sm font-semibold text-slate-700"
-                                        >Alasan Usulan</label
-                                    >
-                                    <div class="relative">
-                                        <div
-                                            class="pointer-events-none absolute top-3 left-3 flex items-start text-slate-400"
-                                        >
-                                            <AlignLeft class="h-5 w-5" />
-                                        </div>
-                                        <textarea
-                                            rows="4"
-                                            class="w-full resize-none rounded-xl border border-slate-200 py-3 pr-4 pl-10 text-slate-700 transition-all outline-none focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
-                                            placeholder="Jelaskan mengapa buku ini penting untuk koleksi perpustakaan..."
-                                        ></textarea>
-                                    </div>
-                                </div>
+                            <div>
+                                <label class="block text-gray-800 font-semibold mb-1">
+                                    Alasan Usulan Buku
+                                </label>
+                                <textarea
+                                    v-model="form.reason"
+                                    rows="4"
+                                    placeholder="Jelaskan mengapa buku ini diperlukan..."
+                                    class="w-full border border-gray-300 rounded-md p-3 focus:ring-2 focus:ring-[var(--primary-green)]" 
+                                    :class="{ 'border-red-500': form.errors.reason }"
+                                />
+                                <p v-if="form.errors.reason" class="text-sm text-red-500 mt-1">
+                                    {{ form.errors.reason }}
+                                </p>
                             </div>
                         </div>
 
@@ -369,10 +283,10 @@ const submitForm = async (e: Event) => {
                         <div class="pt-6">
                             <button
                                 type="submit"
-                                class="flex w-full items-center justify-center gap-2 rounded-xl bg-[#99cc33] py-4 text-lg font-bold text-white shadow-lg shadow-[#99cc33]/30 transition-all duration-300 hover:-translate-y-1 hover:bg-[#88b82d] hover:shadow-[#99cc33]/50 active:translate-y-0"
+                                :disabled="form.processing"
+                                class="w-full py-3 bg-[var(--primary-green)] text-white font-semibold rounded-lg hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                <Send class="h-5 w-5" />
-                                Kirim Usulan Buku
+                                {{ form.processing ? 'Mengirim...' : 'Kirim Usulan' }}
                             </button>
                         </div>
                     </form>
@@ -381,3 +295,10 @@ const submitForm = async (e: Event) => {
         </div>
     </Layout>
 </template>
+
+<style>
+@keyframes fadeInUp {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+</style>

@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\GaleriController;
+use App\Http\Controllers\BookProposalController;
+use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -19,9 +22,7 @@ Route::get('/bebas_masalah', function () {
     return Inertia::render('BebasMasalah/Bebas_Masalah');
 });
 
-Route::get('/gallery', function() {
-    return Inertia::render('Galeri/Galeri');
-});
+Route::get('/gallery', [GaleriController::class, 'index']);
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', function () {
@@ -93,9 +94,8 @@ Route::get('/contact', function () {
     return Inertia::render('user/Kontak/Kontak', $data);
 });
 
-Route::get('/usulan_buku', function () {
-    return Inertia::render('user/Koleksi/Usulan_Buku');
-});
+Route::get('usulan_buku', [BookProposalController::class, 'create'])->name('user.book-proposals.create');
+Route::post('usulan-buku/store', [BookProposalController::class, 'store'])->name('user.book-proposals.store');
 
 Route::get('/E_Journal', function () {
     return Inertia::render('user/Koleksi/EJournal');
@@ -184,6 +184,23 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('pengumuman/edit/{id}', [ArticleController::class, 'editPengumuman'])->middleware('auth:admin');
     Route::post('pengumuman/update/{id}', [ArticleController::class, 'updatePengumuman'])->middleware('auth:admin');
     Route::delete('pengumuman/delete/{id}', [ArticleController::class, 'destroyPengumuman'])->middleware('auth:admin');
+    Route::get('berita/edit/{id}', [ArticleController::class, 'editBerita'])->middleware('auth:admin');
+    Route::post('berita/update/{id}', [ArticleController::class, 'updateBerita'])->middleware('auth:admin');
+    Route::delete('berita/delete/{id}', [ArticleController::class, 'destroyBerita'])->middleware('auth:admin');
+
+    // galeri
+    Route::get('galeri/', [PhotoController::class, 'index'])->middleware('auth:admin')->name('index');
+    Route::post('galeri/store', [PhotoController::class, 'store'])->middleware('auth:admin')->name('store');
+    Route::put('galeri/{foto_id}', [PhotoController::class, 'update'])->middleware('auth:admin')->name('update');
+    Route::delete('galeri/{foto_id}', [PhotoController::class, 'destroy'])->middleware('auth:admin')->name('delete');
+
+    // usulan
+    Route::get('usulan-buku', [BookProposalController::class, 'index'])->middleware('auth:admin')->name('book-proposals.index');
+    Route::patch('usulan-buku/{id}/status', [BookProposalController::class, 'updateStatus'])->middleware('auth:admin')->name('book-proposals.update-status');
+    Route::delete('usulan-buku/{id}', [BookProposalController::class, 'destroy'])->middleware('auth:admin')->name('book-proposals.destroy');
+    Route::get('usulan-buku/export', [BookProposalController::class, 'export'])->middleware('auth:admin')->name('book-proposals.export');
+    
+
 
     // Tim manajemen
     Route::get('tim-manajemen', [TimManajemen::class, 'TmAdminPage'])->middleware('auth:admin')->name('tim.index');

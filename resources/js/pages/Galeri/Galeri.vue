@@ -3,31 +3,9 @@ import Layout from '@/layouts/UserAppLayout.vue';
 import { Image as ImageIcon, X, ZoomIn } from 'lucide-vue-next';
 import { ref } from 'vue';
 
-// Definisi Tipe untuk Item Galeri
-interface GalleryItem {
-    id: number;
-    image: string;
-}
-
-// Data Galeri
-const galeriData: GalleryItem[] = [
-    { id: 1, image: '/hero-bg.jpg' },
-    { id: 2, image: '/hero-bg.jpg' },
-    { id: 3, image: '/hero-bg.jpg' },
-    { id: 4, image: '/hero-bg.jpg' },
-    { id: 5, image: '/hero-bg.jpg' },
-    { id: 6, image: '/hero-bg.jpg' },
-    { id: 7, image: '/hero-bg.jpg' },
-    { id: 8, image: '/hero-bg.jpg' },
-];
-
-// State
-const selectedItem = ref<GalleryItem | null>(null);
-const breadcrumb = [
-    { label: 'Home', link: '/' },
-    { label: 'Profil' },
-    { label: 'Galeri' },
-];
+const props = defineProps({
+    photos: Object,
+});
 
 // Actions
 function openLightbox(item: GalleryItem) {
@@ -43,62 +21,22 @@ function closeLightbox() {
 
 <template>
     <Layout :page="true" :breadcrumb="breadcrumb" title="Galeri Foto">
-        <!-- Background Decoration (Consistent Theme) -->
-        <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-            <div
-                class="absolute top-0 right-0 h-[600px] w-[600px] rounded-full bg-[#99cc33]/5 blur-3xl"
-            ></div>
-            <div
-                class="absolute bottom-0 left-0 h-[500px] w-[500px] rounded-full bg-gray-100 blur-3xl"
-            ></div>
-        </div>
-
-        <div class="relative container mx-auto px-4 py-10 sm:px-6 lg:px-8">
-            <!-- Header Section
-            <div class="mx-auto mb-12 max-w-3xl text-center">
-                <h1
-                    class="mb-4 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl"
-                >
-                    Galeri Kegiatan
-                </h1>
-                <p class="text-lg text-slate-600">
-                    Dokumentasi kegiatan, fasilitas, dan momen berharga di
-                    Perpustakaan POLBAN.
-                </p>
-                <div class="mt-6 flex justify-center">
+        <div class="min-h-screen bg-gray-50 py-12">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <!-- Grid Galeri -->
+                <div v-if="photos.length > 0" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     <div
-                        class="h-1.5 w-20 rounded-full bg-[#99cc33] shadow-sm shadow-[#99cc33]/50"
-                    ></div>
-                </div>
-            </div> -->
-
-            <!-- Grid Galeri -->
-            <!-- Menggunakan columns-xs untuk efek Masonry sederhana atau grid standard yang rapi -->
-            <div
-                class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-            >
-                <div
-                    v-for="item in galeriData"
-                    :key="item.id"
-                    class="group relative aspect-[4/3] cursor-pointer overflow-hidden rounded-2xl bg-slate-200 shadow-md transition-all duration-500 hover:shadow-xl hover:shadow-[#99cc33]/20"
-                    @click="openLightbox(item)"
-                >
-                    <!-- Image -->
-                    <img
-                        :src="item.image"
-                        class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        loading="lazy"
-                    />
-
-                    <!-- Overlay Gradient -->
-                    <div
-                        class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                    ></div>
-
-                    <!-- Content Overlay (Center Icon) -->
-                    <div
-                        class="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity delay-75 duration-300 group-hover:opacity-100"
+                        v-for="item in photos"
+                        :key="item.foto_id"
+                        class="group relative cursor-pointer overflow-hidden rounded-lg"
+                        @click="selectedImage = item.url_foto"
                     >
+                        <img
+                            :src="item.url_foto"
+                            :alt="'Galeri Foto ' + item.foto_id"
+                            loading="lazy"
+                            class="h-64 w-full object-cover transition-transform group-hover:scale-110"
+                        />
                         <div
                             class="rounded-full border border-white/30 bg-white/20 p-3 text-white backdrop-blur-sm"
                         >
@@ -110,6 +48,9 @@ function closeLightbox() {
                     <div
                         class="absolute bottom-0 left-0 w-full translate-y-4 p-4 opacity-0 transition-all delay-100 duration-300 group-hover:translate-y-0 group-hover:opacity-100"
                     ></div>
+                </div>
+                <div v-else class="text-center text-gray-500">
+                    <p>Belum ada foto di galeri.</p>
                 </div>
             </div>
 

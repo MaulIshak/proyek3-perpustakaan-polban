@@ -6,32 +6,36 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('usulan', function (Blueprint $table) {
-            $table->uuid('usulan_id')->primary();
-            $table->string('nama', 100);
-            $table->string('identitas', 30)->comment('NIM atau NIP');
-            $table->string('email', 150);
-            $table->string('no_whatsapp', 20);
-            $table->string('judul_buku', 255);
-            $table->string('penulis_buku', 255);
-            $table->text('alasan_usulan');
-            $table->enum('status', ['disetujui', 'ditolak', 'menunggu'])->default('menunggu');
-            $table->timestamp('created_date')->useCurrent();
-            $table->timestamp('updated_date')->nullable();
-            $table->softDeletes('deleted_date', precision: 0);
+        Schema::create('book_proposals', function (Blueprint $table) {
+            $table->id();
+            
+            // User information
+            $table->string('nama_pengusul');
+            $table->string('nim');
+            $table->string('prodi');
+            
+            // Book information
+            $table->string('title');
+            $table->string('author');
+            $table->string('isbn');
+            $table->string('publisher');
+            $table->year('year');
+            $table->decimal('price', 10, 2)->nullable();
+            $table->text('reason')->nullable();
+            
+            // Admin fields
+            $table->string('cover_image')->nullable();
+            $table->text('description')->nullable(); // Admin can add description later
+            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
+            
+            $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('usulan');
+        Schema::dropIfExists('book_proposals');
     }
 };
