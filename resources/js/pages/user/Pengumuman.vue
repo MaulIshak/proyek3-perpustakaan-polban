@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import PengumumanCard from '@/components/PengumumanCard.vue';
 import PaginationLink from '@/components/PaginationLink.vue';
+import PengumumanCard from '@/components/PengumumanCard.vue';
 import UserAppLayout from '@/layouts/UserAppLayout.vue';
 import { router } from '@inertiajs/vue3';
-import { Search, FileX, Megaphone } from 'lucide-vue-next';
-import { watch, ref, computed } from 'vue';
 import { debounce } from 'lodash';
+import { Megaphone, Search } from 'lucide-vue-next';
+import { computed, ref, watch } from 'vue';
 
 // Tipe data
 interface Article {
@@ -33,7 +33,11 @@ const props = defineProps<{
     searchQuery: string | null;
 }>();
 
-const breadcrumb = [{ label: 'Informasi' }, { label: 'Pengumuman' }];
+const breadcrumb = [
+    { label: 'Home', link: '/' },
+    { label: 'Arsip' },
+    { label: 'Pengumuman' },
+];
 
 // State pencarian
 const search = ref(props.searchQuery || '');
@@ -46,43 +50,55 @@ const searchArticles = debounce(() => {
             preserveState: true,
             replace: true,
             preserveScroll: true,
-        }
+        },
     );
 }, 300);
 
 watch(search, searchArticles);
 
 const paginationLinks = computed(() => {
-    return props.articles.links.filter(link => link.url || link.label.includes('...'));
+    return props.articles.links.filter(
+        (link) => link.url || link.label.includes('...'),
+    );
 });
 </script>
 
 <template>
-    <UserAppLayout :page="true" :breadcrumb="breadcrumb" title="Arsip Pengumuman">
-
+    <UserAppLayout :page="true" :breadcrumb="breadcrumb" title="Pengumuman">
         <!-- Background Decoration -->
-        <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-            <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-[#99cc33]/5 rounded-full blur-3xl"></div>
-            <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gray-100 rounded-full blur-3xl"></div>
+        <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+            <div
+                class="absolute top-0 right-0 h-[600px] w-[600px] rounded-full bg-[#99cc33]/5 blur-3xl"
+            ></div>
+            <div
+                class="absolute bottom-0 left-0 h-[500px] w-[500px] rounded-full bg-gray-100 blur-3xl"
+            ></div>
         </div>
 
-        <div class="container mx-auto px-4 py-10 sm:px-6 lg:px-8 relative min-h-[60vh]">
-
+        <div
+            class="relative container mx-auto min-h-[60vh] px-4 py-10 sm:px-6 lg:px-8"
+        >
             <!-- 1. Search Bar Modern -->
-            <div class="max-w-2xl mx-auto mb-12 -mt-16 relative z-20">
-                <div class="relative group">
+            <div class="relative z-20 mx-auto -mt-16 mb-12 max-w-2xl">
+                <div class="group relative">
                     <!-- Shadow Effect -->
-                    <div class="absolute inset-0 bg-[#99cc33]/20 rounded-full blur-md opacity-0 group-focus-within:opacity-100 transition-opacity duration-300"></div>
+                    <div
+                        class="absolute inset-0 rounded-full bg-[#99cc33]/20 opacity-0 blur-md transition-opacity duration-300 group-focus-within:opacity-100"
+                    ></div>
 
-                    <div class="relative bg-white rounded-full shadow-lg shadow-slate-200/50 flex items-center px-2 py-1.5 border border-slate-100 focus-within:border-[#99cc33] transition-colors">
-                        <div class="pl-4 pr-2 text-slate-400 group-focus-within:text-[#99cc33] transition-colors">
-                            <Search class="w-6 h-6" />
+                    <div
+                        class="relative flex items-center rounded-full border border-slate-100 bg-white px-2 py-1.5 shadow-lg shadow-slate-200/50 transition-colors focus-within:border-[#99cc33]"
+                    >
+                        <div
+                            class="pr-2 pl-4 text-slate-400 transition-colors group-focus-within:text-[#99cc33]"
+                        >
+                            <Search class="h-6 w-6" />
                         </div>
                         <input
                             type="text"
                             placeholder="Cari pengumuman..."
                             v-model="search"
-                            class="w-full bg-transparent border-none outline-none text-slate-700 placeholder:text-slate-400 h-12 text-base focus:ring-0"
+                            class="h-12 w-full border-none bg-transparent text-base text-slate-700 outline-none placeholder:text-slate-400 focus:ring-0"
                         />
                     </div>
                 </div>
@@ -91,7 +107,7 @@ const paginationLinks = computed(() => {
             <!-- 2. Content Area -->
             <div v-if="props.articles.data.length > 0">
                 <!-- List Pengumuman (Vertical Stack) -->
-                <div class="space-y-6 mb-12 max-w-5xl mx-auto">
+                <div class="mx-auto mb-12 max-w-5xl space-y-6">
                     <PengumumanCard
                         v-for="pengumuman in props.articles.data"
                         :key="pengumuman.article_id"
@@ -103,12 +119,30 @@ const paginationLinks = computed(() => {
                 </div>
 
                 <!-- Pagination & Info -->
-                <div class="flex flex-col items-center justify-between gap-6 sm:flex-row border-t border-slate-200 pt-8 max-w-5xl mx-auto">
-                    <div class="text-sm text-slate-500 font-medium bg-white px-4 py-2 rounded-full shadow-sm border border-slate-100">
-                        Menampilkan <span class="text-[#99cc33] font-bold">{{ props.articles.from }}</span> - <span class="text-[#99cc33] font-bold">{{ props.articles.to }}</span> dari <span class="text-slate-800 font-bold">{{ props.articles.total }}</span> pengumuman
+                <div
+                    class="mx-auto flex max-w-5xl flex-col items-center justify-between gap-6 border-t border-slate-200 pt-8 sm:flex-row"
+                >
+                    <div
+                        class="rounded-full border border-slate-100 bg-white px-4 py-2 text-sm font-medium text-slate-500 shadow-sm"
+                    >
+                        Menampilkan
+                        <span class="font-bold text-[#99cc33]">{{
+                            props.articles.from
+                        }}</span>
+                        -
+                        <span class="font-bold text-[#99cc33]">{{
+                            props.articles.to
+                        }}</span>
+                        dari
+                        <span class="font-bold text-slate-800">{{
+                            props.articles.total
+                        }}</span>
+                        pengumuman
                     </div>
 
-                    <nav class="isolate inline-flex -space-x-px rounded-xl shadow-sm bg-white p-1 border border-slate-100">
+                    <nav
+                        class="isolate inline-flex -space-x-px rounded-xl border border-slate-100 bg-white p-1 shadow-sm"
+                    >
                         <PaginationLink
                             v-for="(link, index) in paginationLinks"
                             :key="index"
@@ -119,15 +153,24 @@ const paginationLinks = computed(() => {
             </div>
 
             <!-- 3. Empty State -->
-            <div v-else class="flex flex-col items-center justify-center py-24 text-center">
-                <div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mb-6 animate-pulse">
-                    <Megaphone class="w-10 h-10 text-slate-400" />
+            <div
+                v-else
+                class="flex flex-col items-center justify-center py-24 text-center"
+            >
+                <div
+                    class="mb-6 flex h-24 w-24 animate-pulse items-center justify-center rounded-full bg-slate-100"
+                >
+                    <Megaphone class="h-10 w-10 text-slate-400" />
                 </div>
-                <h3 class="text-2xl font-black text-slate-800 mb-2">
+                <h3 class="mb-2 text-2xl font-black text-slate-800">
                     Pengumuman Tidak Ditemukan
                 </h3>
-                <p class="text-slate-500 max-w-md leading-relaxed">
-                    Maaf, kami tidak dapat menemukan pengumuman dengan kata kunci "<span class="text-[#99cc33] font-semibold">{{ search }}</span>". Silakan coba kata kunci lain.
+                <p class="max-w-md leading-relaxed text-slate-500">
+                    Maaf, kami tidak dapat menemukan pengumuman dengan kata
+                    kunci "<span class="font-semibold text-[#99cc33]">{{
+                        search
+                    }}</span
+                    >". Silakan coba kata kunci lain.
                 </p>
                 <button
                     @click="search = ''"
@@ -136,7 +179,6 @@ const paginationLinks = computed(() => {
                     Reset Pencarian
                 </button>
             </div>
-
         </div>
     </UserAppLayout>
 </template>
