@@ -3,65 +3,101 @@ import Layout from '@/layouts/UserAppLayout.vue';
 import { Image as ImageIcon, X, ZoomIn } from 'lucide-vue-next';
 import { ref } from 'vue';
 
-const props = defineProps({
-    photos: Object,
-});
+// Definisi Tipe Data Foto (Sesuaikan dengan response backend Anda)
+interface PhotoItem {
+    foto_id: string | number;
+    url_foto: string;
+}
+
+const props = defineProps<{
+    photos: PhotoItem[];
+}>();
+
+// State untuk Lightbox
+const selectedImage = ref<string | null>(null);
+const breadcrumb = [{ label: 'Profil' }, { label: 'Galeri' }];
 
 // Actions
-function openLightbox(item: GalleryItem) {
-    selectedItem.value = item;
+function openLightbox(url: string) {
+    selectedImage.value = url;
     document.body.style.overflow = 'hidden'; // Prevent scrolling background
 }
 
 function closeLightbox() {
-    selectedItem.value = null;
+    selectedImage.value = null;
     document.body.style.overflow = ''; // Restore scrolling
 }
 </script>
 
 <template>
     <Layout :page="true" :breadcrumb="breadcrumb" title="Galeri Foto">
-        <div class="min-h-screen bg-gray-50 py-12">
-            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <!-- Grid Galeri -->
-                <div v-if="photos.length > 0" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <!-- Background Decoration -->
+        <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+            <div
+                class="absolute top-0 right-0 h-[600px] w-[600px] rounded-full bg-[#99cc33]/5 blur-3xl"
+            ></div>
+            <div
+                class="absolute bottom-0 left-0 h-[500px] w-[500px] rounded-full bg-gray-100 blur-3xl"
+            ></div>
+        </div>
+
+        <div
+            class="relative container mx-auto min-h-[60vh] px-4 py-10 sm:px-6 lg:px-8"
+        >
+            <!-- Grid Galeri -->
+            <div
+                v-if="photos && photos.length > 0"
+                class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            >
+                <div
+                    v-for="item in photos"
+                    :key="item.foto_id"
+                    class="group relative aspect-[4/3] cursor-pointer overflow-hidden rounded-2xl bg-slate-200 shadow-md transition-all duration-500 hover:shadow-xl hover:shadow-[#99cc33]/20"
+                    @click="openLightbox(item.url_foto)"
+                >
+                    <!-- Image -->
+                    <img
+                        :src="item.url_foto"
+                        :alt="'Galeri Foto ' + item.foto_id"
+                        class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        loading="lazy"
+                    />
+
+                    <!-- Overlay Gradient -->
                     <div
-                        v-for="item in photos"
-                        :key="item.foto_id"
-                        class="group relative cursor-pointer overflow-hidden rounded-lg"
-                        @click="selectedImage = item.url_foto"
+                        class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                    ></div>
+
+                    <!-- Content Overlay (Center Icon) -->
+                    <div
+                        class="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity delay-75 duration-300 group-hover:opacity-100"
                     >
-                        <img
-                            :src="item.url_foto"
-                            :alt="'Galeri Foto ' + item.foto_id"
-                            loading="lazy"
-                            class="h-64 w-full object-cover transition-transform group-hover:scale-110"
-                        />
                         <div
                             class="rounded-full border border-white/30 bg-white/20 p-3 text-white backdrop-blur-sm"
                         >
                             <ZoomIn class="h-6 w-6" />
                         </div>
                     </div>
-
-                    <!-- Content Overlay (Bottom Text) -->
-                    <div
-                        class="absolute bottom-0 left-0 w-full translate-y-4 p-4 opacity-0 transition-all delay-100 duration-300 group-hover:translate-y-0 group-hover:opacity-100"
-                    ></div>
-                </div>
-                <div v-else class="text-center text-gray-500">
-                    <p>Belum ada foto di galeri.</p>
                 </div>
             </div>
 
             <!-- Empty State -->
-            <div v-if="galeriData.length === 0" class="py-20 text-center">
+            <div
+                v-else
+                class="flex flex-col items-center justify-center py-24 text-center"
+            >
                 <div
-                    class="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 text-slate-400"
+                    class="mb-4 inline-flex h-20 w-20 items-center justify-center rounded-full bg-slate-100 text-slate-400"
                 >
-                    <ImageIcon class="h-8 w-8" />
+                    <ImageIcon class="h-10 w-10" />
                 </div>
-                <p class="text-slate-500">Belum ada foto di galeri.</p>
+                <h3 class="mb-2 text-xl font-bold text-slate-700">
+                    Belum Ada Foto
+                </h3>
+                <p class="max-w-md text-slate-500">
+                    Saat ini belum ada foto yang diunggah ke dalam galeri.
+                    Silakan kembali lagi nanti.
+                </p>
             </div>
 
             <!-- Modern Lightbox -->
@@ -74,7 +110,7 @@ function closeLightbox() {
                 leave-to-class="opacity-0"
             >
                 <div
-                    v-if="selectedItem"
+                    v-if="selectedImage"
                     class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/95 p-4 backdrop-blur-sm sm:p-8"
                     @click="closeLightbox"
                 >
@@ -88,16 +124,14 @@ function closeLightbox() {
 
                     <!-- Image Container -->
                     <div
-                        class="relative flex max-h-full w-full max-w-5xl flex-col items-center"
+                        class="relative flex max-h-full w-full max-w-5xl flex-col items-center justify-center"
                         @click.stop
                     >
                         <img
-                            :src="selectedItem.image"
-                            class="max-h-[80vh] w-auto rounded-lg object-contain shadow-2xl"
+                            :src="selectedImage"
+                            alt="Preview Galeri"
+                            class="max-h-[85vh] w-auto rounded-lg object-contain shadow-2xl"
                         />
-
-                        <!-- Caption Bar -->
-                        <div class="mt-4 text-center"></div>
                     </div>
                 </div>
             </transition>
