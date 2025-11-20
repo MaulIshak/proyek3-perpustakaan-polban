@@ -34,15 +34,15 @@ const PelayananData: Record<string, any> = {
             {
                 subtitle: 'Ketentuan Peminjaman',
                 items: [
-                    'Mahasiswa dapat meminjam maksimal 5 (lima) buku',
-                    'Dosen dan staf dapat meminjam maksimal 10 (sepuluh) buku',
-                    'Masa peminjaman mahasiswa: 14 hari',
-                    'Masa peminjaman dosen/staf: 30 hari',
-                    'Perpanjangan dapat dilakukan maksimal 2 kali',
+                    'Mahasiswa dapat meminjam maksimal 2 (dua) buku',
+                    'Dosen dan staf dapat meminjam maksimal 2 (dua) buku',
+                    'Masa peminjaman mahasiswa: 7 hari',
+                    'Masa peminjaman dosen/staf: 7 hari',
+                    'Perpanjangan dapat dilakukan maksimal 1 kali',
                 ],
             },
             {
-                subtitle: 'Alur Peminjaman',
+                subtitle: 'Alur peminjaman Melalui selfloan',
                 items: [
                     'Cari buku yang diinginkan melalui katalog online (e-Lib)',
                     'Catat nomor panggil buku dan cari di rak koleksi',
@@ -72,7 +72,7 @@ const PelayananData: Record<string, any> = {
             {
                 subtitle: 'Ketentuan Denda',
                 items: [
-                    'Denda keterlambatan: Rp 1.000 per hari per buku',
+                    'denda keterlambatan sesuai dengan sk Direktur',
                     'Kehilangan buku: Ganti buku yang sama atau 2x harga buku',
                     'Kerusakan ringan: Rp 25.000 - Rp 50.000',
                     'Kerusakan berat: Sesuai harga buku',
@@ -120,16 +120,14 @@ const PelayananData: Record<string, any> = {
                 items: [
                     'Konsultasi pencarian referensi untuk tugas akhir',
                     'Bantuan penelusuran database jurnal internasional',
-                    'Pelatihan penggunaan tools manajemen referensi (Mendeley, Zotero)',
-                    'Layanan fotokopi artikel jurnal dan buku referensi',
                     'Bantuan sitasi dan penulisan daftar pustaka',
                 ],
             },
             {
                 subtitle: 'Cara Mengakses',
                 items: [
-                    'Datang langsung ke meja layanan referensi',
-                    "Email ke perpustakaan@polban.ac.id dengan subjek 'Layanan Referensi'",
+                    'Datang langsung ke ruang referensi',
+                    "Email ke lib@polban.ac.id dengan subjek 'Layanan Referensi'",
                     'Jadwal konsultasi: Senin-Jumat, 09.00-15.00 WIB',
                     'Gratis untuk seluruh civitas akademika POLBAN',
                     'Dapat dijadwalkan untuk konsultasi kelompok',
@@ -146,10 +144,10 @@ const PelayananData: Record<string, any> = {
             {
                 subtitle: 'Fasilitas',
                 items: [
-                    '40 unit komputer dengan spesifikasi memadai',
+                    '24 unit komputer dengan spesifikasi memadai',
                     'Koneksi internet berkecepatan tinggi',
-                    'Microsoft Office dan software akademik',
-                    'Printer dan scanner (berbayar)',
+                    'Microsoft Office',
+                    'Printer',
                     'AC dan pencahayaan yang baik',
                 ],
             },
@@ -157,7 +155,6 @@ const PelayananData: Record<string, any> = {
                 subtitle: 'Tata Tertib Penggunaan',
                 items: [
                     'Wajib menunjukkan kartu anggota perpustakaan',
-                    'Maksimal penggunaan 2 jam per sesi',
                     'Hanya untuk keperluan akademik',
                     'Dilarang mengunduh file ilegal atau bermain game',
                     'Jaga kebersihan dan ketenangan ruangan',

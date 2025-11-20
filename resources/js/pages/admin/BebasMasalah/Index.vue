@@ -147,7 +147,8 @@ const deleteItem = (type, id) => {
                             <textarea 
                                 v-model="formSettings.alur_description" 
                                 rows="4" 
-                                class="w-full rounded-lg border-gray-300 focus:border-[#99cc33] focus:ring-[#99cc33] transition-colors bg-[#f3fff3]/30"
+                                class="w-full rounded-lg border border-[#99cc33] focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/50 focus:outline-none transition-all duration-200 bg-[#f3fff3]/30 text-gray-700 placeholder-gray-400"
+                                placeholder="Masukkan deskripsi alur..."
                             ></textarea>
                         </div>
                         
@@ -241,17 +242,17 @@ const deleteItem = (type, id) => {
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-semibold text-[#00637b] mb-1">Judul {{ activeTab === 'template' ? 'Dokumen' : 'Watermark' }}</label>
-                            <input type="text" v-model="formSettings[activeTab + '_title']" class="w-full rounded-lg border-gray-300 focus:border-[#99cc33] focus:ring-[#99cc33]" />
+                            <input type="text" v-model="formSettings[activeTab + '_title']" class="w-full h-8 rounded-lg border border-[#99cc33] focus:ring-2 focus:outline-none focus:ring-[#99cc33]" />
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-[#00637b] mb-1">Info File</label>
-                            <input type="text" v-model="formSettings[activeTab + '_info']" class="w-full rounded-lg border-gray-300 focus:border-[#99cc33] focus:ring-[#99cc33]" />
+                            <input type="text" v-model="formSettings[activeTab + '_info']" class="w-full h-8 rounded-lg border border-[#99cc33] focus:ring-2 focus:outline-none focus:ring-[#99cc33]" />
                         </div>
                     </div>
                     
                     <div>
                         <label class="block text-sm font-semibold text-[#00637b] mb-1">Instruksi</label>
-                        <textarea v-model="formSettings[activeTab + '_instruction']" rows="2" class="w-full rounded-lg border-gray-300 focus:border-[#99cc33] focus:ring-[#99cc33]"></textarea>
+                        <textarea v-model="formSettings[activeTab + '_instruction']" rows="3" class="w-full rounded-lg border border-[#99cc33] focus:ring-2 focus:outline-none focus:ring-[#99cc33]"></textarea>
                     </div>
 
                     <div class="flex flex-col md:flex-row gap-6 items-start mt-2 bg-white p-4 rounded-lg border border-[#99cc33]/30 shadow-sm">
