@@ -170,6 +170,7 @@ const PelayananData: Record<string, any> = {
 // Computed property untuk mengambil data berdasarkan props
 const activeData = computed(() => PelayananData[props.pelayanan]);
 const breadcrumb = computed(() => [
+    { label: 'Home', link: '/' },
     { label: 'Pelayanan' },
     { label: activeData.value ? activeData.value.title : 'Detail' },
 ]);

@@ -1,22 +1,22 @@
 <script setup lang="ts">
-import { ref, nextTick } from 'vue';
 import Layout from '@/layouts/UserAppLayout.vue';
 import {
-    User,
+    BookOpen,
+    CalendarCheck,
+    CheckCircle2,
     Hash,
     Mail,
     MessageCircle,
-    BookOpen,
     PenTool,
-    CheckCircle2,
-    CalendarCheck
+    User,
 } from 'lucide-vue-next';
+import { nextTick, ref } from 'vue';
 
 defineProps<{
     title: string;
 }>();
 
-const breadcrumb = [{ label: 'Booking Buku' }];
+const breadcrumb = [{ label: 'Home', link: '/' }, { label: 'Booking Buku' }];
 
 const form = ref({
     namaLengkap: '',
@@ -44,15 +44,17 @@ const submitForm = async () => {
 
 <template>
     <Layout :page="true" :breadcrumb="breadcrumb" :title="title">
-
         <!-- Background Decoration (Consistent) -->
-        <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-            <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-[#99cc33]/5 rounded-full blur-3xl"></div>
-            <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gray-100 rounded-full blur-3xl"></div>
+        <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+            <div
+                class="absolute top-0 right-0 h-[600px] w-[600px] rounded-full bg-[#99cc33]/5 blur-3xl"
+            ></div>
+            <div
+                class="absolute bottom-0 left-0 h-[500px] w-[500px] rounded-full bg-gray-100 blur-3xl"
+            ></div>
         </div>
 
-        <div class="container mx-auto px-4 py-10 sm:px-6 lg:px-8 relative">
-
+        <div class="relative container mx-auto px-4 py-10 sm:px-6 lg:px-8">
             <!-- Header Section
             <div class="mb-10 text-center max-w-3xl mx-auto">
                 <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-4">
@@ -78,47 +80,66 @@ const submitForm = async () => {
                 <div
                     v-if="showMessage"
                     ref="messageRef"
-                    class="max-w-4xl mx-auto mb-8 p-6 rounded-2xl bg-emerald-50 border border-emerald-100 shadow-lg flex items-start gap-4"
+                    class="mx-auto mb-8 flex max-w-4xl items-start gap-4 rounded-2xl border border-emerald-100 bg-emerald-50 p-6 shadow-lg"
                 >
-                    <div class="p-2 bg-emerald-100 rounded-full text-emerald-600 shrink-0">
-                        <CheckCircle2 class="w-8 h-8" />
+                    <div
+                        class="shrink-0 rounded-full bg-emerald-100 p-2 text-emerald-600"
+                    >
+                        <CheckCircle2 class="h-8 w-8" />
                     </div>
                     <div>
-                        <h3 class="text-xl font-bold text-emerald-800 mb-1">Booking Berhasil! 📚</h3>
-                        <p class="text-emerald-700 leading-relaxed">
-                            Permintaan booking Anda telah dicatat. Kami akan menghubungi Anda melalui WhatsApp/Email segera setelah buku tersedia.
+                        <h3 class="mb-1 text-xl font-bold text-emerald-800">
+                            Booking Berhasil! 📚
+                        </h3>
+                        <p class="leading-relaxed text-emerald-700">
+                            Permintaan booking Anda telah dicatat. Kami akan
+                            menghubungi Anda melalui WhatsApp/Email segera
+                            setelah buku tersedia.
                         </p>
                     </div>
                 </div>
             </transition>
 
             <!-- Form Card -->
-            <div class="max-w-4xl mx-auto bg-white rounded-3xl shadow-xl shadow-slate-200/60 border border-slate-100 overflow-hidden">
+            <div
+                class="mx-auto max-w-4xl overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-xl shadow-slate-200/60"
+            >
                 <!-- Decorative Top Bar -->
-                <div class="h-2 w-full bg-gradient-to-r from-[#99cc33] to-[#7aace5]"></div>
+                <div
+                    class="h-2 w-full bg-gradient-to-r from-[#99cc33] to-[var(--dark-green)]"
+                ></div>
 
                 <div class="p-8 sm:p-10">
                     <form @submit.prevent="submitForm" class="space-y-10">
-
                         <!-- Group 1: Data Peminjam -->
                         <div>
-                            <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2 pb-2 border-b border-slate-100">
-                                <User class="w-5 h-5 text-[#99cc33]" />
+                            <h3
+                                class="mb-6 flex items-center gap-2 border-b border-slate-100 pb-2 text-lg font-bold text-slate-800"
+                            >
+                                <User class="h-5 w-5 text-[#99cc33]" />
                                 Data Peminjam
                             </h3>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                                 <!-- Nama -->
                                 <div class="md:col-span-2">
-                                    <label class="block text-sm font-semibold text-slate-700 mb-2">Nama Lengkap <span class="text-red-500">*</span></label>
+                                    <label
+                                        class="mb-2 block text-sm font-semibold text-slate-700"
+                                        >Nama Lengkap
+                                        <span class="text-red-500"
+                                            >*</span
+                                        ></label
+                                    >
                                     <div class="relative">
-                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                                            <User class="w-5 h-5" />
+                                        <div
+                                            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"
+                                        >
+                                            <User class="h-5 w-5" />
                                         </div>
                                         <input
                                             v-model="form.namaLengkap"
                                             type="text"
-                                            class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20 transition-all outline-none text-slate-700"
+                                            class="w-full rounded-xl border border-slate-200 py-3 pr-4 pl-10 text-slate-700 transition-all outline-none focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
                                             placeholder="Masukkan nama lengkap sesuai KTM"
                                             required
                                         />
@@ -127,15 +148,23 @@ const submitForm = async () => {
 
                                 <!-- NIM/NIP -->
                                 <div>
-                                    <label class="block text-sm font-semibold text-slate-700 mb-2">NIM / NIP <span class="text-red-500">*</span></label>
+                                    <label
+                                        class="mb-2 block text-sm font-semibold text-slate-700"
+                                        >NIM / NIP
+                                        <span class="text-red-500"
+                                            >*</span
+                                        ></label
+                                    >
                                     <div class="relative">
-                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                                            <Hash class="w-5 h-5" />
+                                        <div
+                                            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"
+                                        >
+                                            <Hash class="h-5 w-5" />
                                         </div>
                                         <input
                                             v-model="form.nimNip"
                                             type="text"
-                                            class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20 transition-all outline-none text-slate-700"
+                                            class="w-full rounded-xl border border-slate-200 py-3 pr-4 pl-10 text-slate-700 transition-all outline-none focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
                                             placeholder="Nomor Induk Mahasiswa/Pegawai"
                                             required
                                         />
@@ -144,15 +173,23 @@ const submitForm = async () => {
 
                                 <!-- WhatsApp -->
                                 <div>
-                                    <label class="block text-sm font-semibold text-slate-700 mb-2">WhatsApp (Aktif) <span class="text-red-500">*</span></label>
+                                    <label
+                                        class="mb-2 block text-sm font-semibold text-slate-700"
+                                        >WhatsApp (Aktif)
+                                        <span class="text-red-500"
+                                            >*</span
+                                        ></label
+                                    >
                                     <div class="relative">
-                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                                            <MessageCircle class="w-5 h-5" />
+                                        <div
+                                            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"
+                                        >
+                                            <MessageCircle class="h-5 w-5" />
                                         </div>
                                         <input
                                             v-model="form.whatsapp"
                                             type="tel"
-                                            class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20 transition-all outline-none text-slate-700"
+                                            class="w-full rounded-xl border border-slate-200 py-3 pr-4 pl-10 text-slate-700 transition-all outline-none focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
                                             placeholder="08xxxxxxxxxx"
                                             required
                                         />
@@ -161,15 +198,23 @@ const submitForm = async () => {
 
                                 <!-- Email -->
                                 <div class="md:col-span-2">
-                                    <label class="block text-sm font-semibold text-slate-700 mb-2">Email <span class="text-red-500">*</span></label>
+                                    <label
+                                        class="mb-2 block text-sm font-semibold text-slate-700"
+                                        >Email
+                                        <span class="text-red-500"
+                                            >*</span
+                                        ></label
+                                    >
                                     <div class="relative">
-                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                                            <Mail class="w-5 h-5" />
+                                        <div
+                                            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"
+                                        >
+                                            <Mail class="h-5 w-5" />
                                         </div>
                                         <input
                                             v-model="form.email"
                                             type="email"
-                                            class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20 transition-all outline-none text-slate-700"
+                                            class="w-full rounded-xl border border-slate-200 py-3 pr-4 pl-10 text-slate-700 transition-all outline-none focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
                                             placeholder="email@polban.ac.id"
                                             required
                                         />
@@ -180,23 +225,33 @@ const submitForm = async () => {
 
                         <!-- Group 2: Data Buku -->
                         <div>
-                            <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2 pb-2 border-b border-slate-100">
-                                <BookOpen class="w-5 h-5 text-[#99cc33]" />
+                            <h3
+                                class="mb-6 flex items-center gap-2 border-b border-slate-100 pb-2 text-lg font-bold text-slate-800"
+                            >
+                                <BookOpen class="h-5 w-5 text-[#99cc33]" />
                                 Buku yang Dipesan
                             </h3>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                                 <!-- Judul Buku -->
                                 <div class="md:col-span-2">
-                                    <label class="block text-sm font-semibold text-slate-700 mb-2">Judul Buku <span class="text-red-500">*</span></label>
+                                    <label
+                                        class="mb-2 block text-sm font-semibold text-slate-700"
+                                        >Judul Buku
+                                        <span class="text-red-500"
+                                            >*</span
+                                        ></label
+                                    >
                                     <div class="relative">
-                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                                            <BookOpen class="w-5 h-5" />
+                                        <div
+                                            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"
+                                        >
+                                            <BookOpen class="h-5 w-5" />
                                         </div>
                                         <input
                                             v-model="form.judulBuku"
                                             type="text"
-                                            class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20 transition-all outline-none text-slate-700"
+                                            class="w-full rounded-xl border border-slate-200 py-3 pr-4 pl-10 text-slate-700 transition-all outline-none focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
                                             placeholder="Masukkan judul buku lengkap"
                                             required
                                         />
@@ -205,15 +260,23 @@ const submitForm = async () => {
 
                                 <!-- Pengarang -->
                                 <div class="md:col-span-2">
-                                    <label class="block text-sm font-semibold text-slate-700 mb-2">Pengarang <span class="text-red-500">*</span></label>
+                                    <label
+                                        class="mb-2 block text-sm font-semibold text-slate-700"
+                                        >Pengarang
+                                        <span class="text-red-500"
+                                            >*</span
+                                        ></label
+                                    >
                                     <div class="relative">
-                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                                            <PenTool class="w-5 h-5" />
+                                        <div
+                                            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"
+                                        >
+                                            <PenTool class="h-5 w-5" />
                                         </div>
                                         <input
                                             v-model="form.pengarang"
                                             type="text"
-                                            class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20 transition-all outline-none text-slate-700"
+                                            class="w-full rounded-xl border border-slate-200 py-3 pr-4 pl-10 text-slate-700 transition-all outline-none focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
                                             placeholder="Nama pengarang"
                                             required
                                         />
@@ -226,20 +289,19 @@ const submitForm = async () => {
                         <div class="pt-4">
                             <button
                                 type="submit"
-                                class="w-full flex items-center justify-center gap-2 py-4 bg-[#99cc33] hover:bg-[#88b82d] text-white font-bold text-lg rounded-xl shadow-lg shadow-[#99cc33]/30 transition-all duration-300 hover:shadow-[#99cc33]/50 hover:-translate-y-1 active:translate-y-0"
+                                class="flex w-full items-center justify-center gap-2 rounded-xl bg-[#99cc33] py-4 text-lg font-bold text-white shadow-lg shadow-[#99cc33]/30 transition-all duration-300 hover:-translate-y-1 hover:bg-[#88b82d] hover:shadow-[#99cc33]/50 active:translate-y-0"
                             >
-                                <CalendarCheck class="w-5 h-5" />
+                                <CalendarCheck class="h-5 w-5" />
                                 Kirim Permintaan Booking
                             </button>
-                            <p class="text-center text-slate-400 text-sm mt-4">
-                                Pastikan data yang Anda masukkan valid agar kami dapat menghubungi Anda.
+                            <p class="mt-4 text-center text-sm text-slate-400">
+                                Pastikan data yang Anda masukkan valid agar kami
+                                dapat menghubungi Anda.
                             </p>
                         </div>
-
                     </form>
                 </div>
             </div>
-
         </div>
     </Layout>
 </template>

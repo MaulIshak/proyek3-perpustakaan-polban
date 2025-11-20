@@ -13,16 +13,15 @@ defineProps<{
     }[];
 }>();
 
-const breadcrumb = [{ label: 'Profile' }, { label: 'Fasilitas' }];
+const breadcrumb = [
+    { label: 'Home', link: '/' },
+    { label: 'Profile' },
+    { label: 'Fasilitas' },
+];
 </script>
 
 <template>
-    <Layout
-        :page="true"
-        :breadcrumb="breadcrumb"
-        :title="title"
-        :subtitle="subtitle"
-    >
+    <Layout :page="true" :breadcrumb="breadcrumb" :title="title">
         <!-- Background decoration (Consistent with LibraryAbout) -->
         <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
             <div

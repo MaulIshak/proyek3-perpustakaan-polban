@@ -91,7 +91,11 @@ const peraturanItems = [
     },
 ];
 
-const breadcrumb = [{ label: 'Profil' }, { label: 'Peraturan Perpustakaan' }];
+const breadcrumb = [
+    { label: 'Home', link: '/' },
+    { label: 'Profil' },
+    { label: 'Peraturan Perpustakaan' },
+];
 </script>
 
 <template>

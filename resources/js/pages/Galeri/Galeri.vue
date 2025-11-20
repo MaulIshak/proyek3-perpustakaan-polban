@@ -23,7 +23,11 @@ const galeriData: GalleryItem[] = [
 
 // State
 const selectedItem = ref<GalleryItem | null>(null);
-const breadcrumb = [{ label: 'Profil' }, { label: 'Galeri' }];
+const breadcrumb = [
+    { label: 'Home', link: '/' },
+    { label: 'Profil' },
+    { label: 'Galeri' },
+];
 
 // Actions
 function openLightbox(item: GalleryItem) {

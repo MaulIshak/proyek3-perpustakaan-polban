@@ -7,7 +7,11 @@ defineProps<{
     pdf_url?: string;
 }>();
 
-const breadcrumb = [{ label: 'Profil' }, { label: 'Rencana Strategis' }];
+const breadcrumb = [
+    { label: 'Home', link: '/' },
+    { label: 'Profil' },
+    { label: 'Rencana Strategis' },
+];
 </script>
 
 <template>

@@ -9,7 +9,11 @@ defineProps({
     },
 });
 
-const breadcrumb = [{ label: 'Profil' }, { label: 'Jam Layanan' }];
+const breadcrumb = [
+    { label: 'Home', link: '/' },
+    { label: 'Profil' },
+    { label: 'Jam Layanan' },
+];
 </script>
 
 <template>

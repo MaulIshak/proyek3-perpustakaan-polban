@@ -15,7 +15,11 @@ defineProps({
     misi: Array as () => string[],
 });
 
-const breadcrumb = [{ label: 'Profil' }, { label: 'Tentang Perpustakaan' }];
+const breadcrumb = [
+    { label: 'Home', link: '/' },
+    { label: 'Profil' },
+    { label: 'Tentang Perpustakaan' },
+];
 </script>
 
 <template>
@@ -40,7 +44,7 @@ const breadcrumb = [{ label: 'Profil' }, { label: 'Tentang Perpustakaan' }];
                     >
                         <!-- Decorative top border -->
                         <div
-                            class="absolute top-0 left-0 h-1.5 w-full bg-gradient-to-r from-[#99cc33] to-[#7aace5]"
+                            class="absolute top-0 left-0 h-1.5 w-full bg-gradient-to-r from-[#99cc33] to-[var(--dark-green)]"
                         ></div>
 
                         <div class="p-6 sm:p-10">
