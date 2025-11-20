@@ -170,7 +170,7 @@ const emit = defineEmits(['toggle-sidebar']);
                 <SidebarLink
                     icon="LibraryBig"
                     label="E-Journal"
-                    to="/admin/e-journal"
+                    to="/admin/e-journals"
                     :sidebar-open="sidebarOpen"
                 />
             </div>

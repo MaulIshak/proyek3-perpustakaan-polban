@@ -4,6 +4,7 @@ use App\Http\Controllers\GaleriController;
 use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\BookProposalController;
 use App\Http\Controllers\BebasMasalahController;
+use App\Http\Controllers\EJournalController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -96,9 +97,7 @@ Route::get('/contact', function () {
 Route::get('usulan_buku', [BookProposalController::class, 'create'])->name('user.book-proposals.create');
 Route::post('usulan-buku/store', [BookProposalController::class, 'store'])->name('user.book-proposals.store');
 
-Route::get('/E_Journal', function () {
-    return Inertia::render('user/Koleksi/EJournal');
-});
+Route::get('/e-journal', [EJournalController::class, 'ShowUser'])->name('ejournal.ShowUser');
 
 Route::get('/berita', [ArticleController::class, 'beritaUser'])->name('beritaUser');
 Route::get('/berita/{id}', [ArticleController::class, 'showBeritaUser'])->name('showBeritaUser');
@@ -220,17 +219,37 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::delete('cover-buku/delete/{id}', [CoverBuku::class, 'destroy'])->name('cover.destroy');
 
     // BebasMasalah
-    Route::get('/bebas-masalah', [BebasMasalahController::class, 'index'])->name('admin.bebas-masalah.index');
+    Route::get('/bebas-masalah', [BebasMasalahController::class, 'index'])->middleware('auth:admin')->name('admin.bebas-masalah.index');
     // (Alur, Template, Watermark)
-    Route::post('/bebas-masalah/settings', [BebasMasalahController::class, 'updateSettings'])->name('admin.bebas-masalah.settings.update');
+    Route::post('/bebas-masalah/settings', [BebasMasalahController::class, 'updateSettings'])->middleware('auth:admin')->name('admin.bebas-masalah.settings.update');
     // Persyaratan
-    Route::post('/bebas-masalah/requirements', [BebasMasalahController::class, 'storeRequirement'])->name('admin.bebas-masalah.requirements.store');
-    Route::put('/bebas-masalah/requirements/{id}', [BebasMasalahController::class, 'updateRequirement'])->name('admin.bebas-masalah.requirements.update');
-    Route::delete('/bebas-masalah/requirements/{id}', [BebasMasalahController::class, 'destroyRequirement'])->name('admin.bebas-masalah.requirements.destroy');
+    Route::post('/bebas-masalah/requirements', [BebasMasalahController::class, 'storeRequirement'])->middleware('auth:admin')->name('admin.bebas-masalah.requirements.store');
+    Route::put('/bebas-masalah/requirements/{id}', [BebasMasalahController::class, 'updateRequirement'])->middleware('auth:admin')->name('admin.bebas-masalah.requirements.update');
+    Route::delete('/bebas-masalah/requirements/{id}', [BebasMasalahController::class, 'destroyRequirement'])->middleware('auth:admin')->name('admin.bebas-masalah.requirements.destroy');
     // Panduan
-    Route::post('/bebas-masalah/guides', [BebasMasalahController::class, 'storeGuide'])->name('admin.bebas-masalah.guides.store');
-    Route::put('/bebas-masalah/guides/{id}', [BebasMasalahController::class, 'updateGuide'])->name('admin.bebas-masalah.guides.update');
-    Route::delete('/bebas-masalah/guides/{id}', [BebasMasalahController::class, 'destroyGuide'])->name('admin.bebas-masalah.guides.destroy');
+    Route::post('/bebas-masalah/guides', [BebasMasalahController::class, 'storeGuide'])->middleware('auth:admin')->name('admin.bebas-masalah.guides.store');
+    Route::put('/bebas-masalah/guides/{id}', [BebasMasalahController::class, 'updateGuide'])->middleware('auth:admin')->name('admin.bebas-masalah.guides.update');
+    Route::delete('/bebas-masalah/guides/{id}', [BebasMasalahController::class, 'destroyGuide'])->middleware('auth:admin')->name('admin.bebas-masalah.guides.destroy');
+
+    // Ejournal
+    // 1. GET: Menampilkan halaman (Index)
+    Route::get('/e-journals', [EJournalController::class, 'index'])
+        ->name('e-journals.index');
+
+    // 2. POST: Menyimpan data baru (Store)
+    Route::post('/e-journals', [EJournalController::class, 'store'])
+        ->name('e-journals.store');
+
+    // 3. PUT: Mengupdate data (Update)
+    // Menggunakan {ejournal} agar otomatis mencari data berdasarkan ID
+    Route::put('/e-journals/{ejournal}', [EJournalController::class, 'update'])
+        ->name('e-journals.update');
+
+    // 4. DELETE: Menghapus data (Destroy)
+    Route::delete('/e-journals/{ejournal}', [EJournalController::class, 'destroy'])
+        ->name('e-journals.destroy');
+
+
 });
 
 require __DIR__.'/settings.php';

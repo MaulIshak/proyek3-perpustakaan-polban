@@ -35,7 +35,7 @@ const navItems = [
         items: [
             { name: 'Katalog Digital', href: 'https://elib.polban.ac.id/' },
             { name: 'Digilib', href: 'https://digilib.polban.ac.id/' },
-            { name: 'E-Journal', href: '/E_Journal' },
+            { name: 'E-Journal', href: '/e-journal' },
             { name: 'Form Usulan Buku', href: '/usulan_buku' },
         ],
     },
