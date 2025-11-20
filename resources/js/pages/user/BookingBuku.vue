@@ -1,23 +1,23 @@
 <script setup lang="ts">
 import Layout from '@/layouts/UserAppLayout.vue';
-import { ref } from 'vue';
+import {
+    BookOpen,
+    CalendarCheck,
+    CheckCircle2,
+    Hash,
+    Mail,
+    MessageCircle,
+    PenTool,
+    User,
+} from 'lucide-vue-next';
+import { nextTick, ref } from 'vue';
 
-// Definisikan props dari parent component
-defineProps({
-    title: {
-        type: String,
-        required: true,
-    },
-    // ... props lainnya yang tidak digunakan di sini tapi ada di script asli
-    subjudul_1: String,
-    subjudul_2: String,
-    subjudul_3: String,
-    description: String,
-    visi: String,
-    misi: Array as () => string[],
-});
+defineProps<{
+    title: string;
+}>();
 
-// State untuk form input
+const breadcrumb = [{ label: 'Home', link: '/' }, { label: 'Booking Buku' }];
+
 const form = ref({
     namaLengkap: '',
     nimNip: '',
@@ -27,130 +27,280 @@ const form = ref({
     pengarang: '',
 });
 
-// Breadcrumb
-const breadcrumb = [{ label: 'Booking Buku' }];
+const showMessage = ref(false);
+const messageRef = ref<HTMLElement | null>(null);
 
-// Fungsi yang akan dipanggil saat form disubmit
-const submitForm = () => {
+const submitForm = async () => {
+    // Simulasi submit (di sini nanti Anda bisa ganti dengan Inertia form.post)
     console.log('Permintaan Booking Dikirim:', form.value);
-    // Tambahkan logika pengiriman data ke backend di sini
-    alert('Permintaan Booking berhasil dikirim!');
+
+    showMessage.value = true;
+    await nextTick();
+
+    // Scroll ke pesan sukses agar user sadar
+    messageRef.value?.scrollIntoView({ behavior: 'smooth', block: 'center' });
 };
 </script>
 
 <template>
     <Layout :page="true" :breadcrumb="breadcrumb" :title="title">
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-10">
-                <div class="text-center mb-10">
-                    <p class="text-gray-500 mt-1">
-                        Pesan buku yang sedang dipinjam dan kami akan memberitahu Anda saat tersedia
-                    </p>
+        <!-- Background Decoration (Consistent) -->
+        <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+            <div
+                class="absolute top-0 right-0 h-[600px] w-[600px] rounded-full bg-[#99cc33]/5 blur-3xl"
+            ></div>
+            <div
+                class="absolute bottom-0 left-0 h-[500px] w-[500px] rounded-full bg-gray-100 blur-3xl"
+            ></div>
+        </div>
+
+        <div class="relative container mx-auto px-4 py-10 sm:px-6 lg:px-8">
+            <!-- Header Section
+            <div class="mb-10 text-center max-w-3xl mx-auto">
+                <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-4">
+                    {{ title }}
+                </h1>
+                <p class="text-slate-600 text-lg">
+                    Pesan buku yang sedang dipinjam agar Anda menjadi prioritas peminjam berikutnya saat buku tersedia.
+                </p>
+                <div class="flex justify-center mt-6">
+                    <div class="h-1.5 w-20 bg-[#99cc33] rounded-full shadow-sm shadow-[#99cc33]/50"></div>
                 </div>
+            </div> -->
 
-                <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg p-6 md:p-8 border border-gray-100">
-                    <form @submit.prevent="submitForm">
-                        
-                        <div class="mb-5">
-                            <label for="namaLengkap" class="block text-sm font-medium text-red-500">
-                                Nama Lengkap *
-                            </label>
-                            <input 
-                                type="text" 
-                                id="namaLengkap" 
-                                v-model="form.namaLengkap" 
-                                placeholder="Masukkan nama lengkap" 
-                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring-green-500 text-sm p-2"
-                                required
-                            />
+            <!-- Success Message -->
+            <transition
+                enter-active-class="transition ease-out duration-300"
+                enter-from-class="opacity-0 -translate-y-4"
+                enter-to-class="opacity-100 translate-y-0"
+                leave-active-class="transition ease-in duration-200"
+                leave-from-class="opacity-100 translate-y-0"
+                leave-to-class="opacity-0 -translate-y-4"
+            >
+                <div
+                    v-if="showMessage"
+                    ref="messageRef"
+                    class="mx-auto mb-8 flex max-w-4xl items-start gap-4 rounded-2xl border border-emerald-100 bg-emerald-50 p-6 shadow-lg"
+                >
+                    <div
+                        class="shrink-0 rounded-full bg-emerald-100 p-2 text-emerald-600"
+                    >
+                        <CheckCircle2 class="h-8 w-8" />
+                    </div>
+                    <div>
+                        <h3 class="mb-1 text-xl font-bold text-emerald-800">
+                            Booking Berhasil! 📚
+                        </h3>
+                        <p class="leading-relaxed text-emerald-700">
+                            Permintaan booking Anda telah dicatat. Kami akan
+                            menghubungi Anda melalui WhatsApp/Email segera
+                            setelah buku tersedia.
+                        </p>
+                    </div>
+                </div>
+            </transition>
+
+            <!-- Form Card -->
+            <div
+                class="mx-auto max-w-4xl overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-xl shadow-slate-200/60"
+            >
+                <!-- Decorative Top Bar -->
+                <div
+                    class="h-2 w-full bg-gradient-to-r from-[#99cc33] to-[var(--dark-green)]"
+                ></div>
+
+                <div class="p-8 sm:p-10">
+                    <form @submit.prevent="submitForm" class="space-y-10">
+                        <!-- Group 1: Data Peminjam -->
+                        <div>
+                            <h3
+                                class="mb-6 flex items-center gap-2 border-b border-slate-100 pb-2 text-lg font-bold text-slate-800"
+                            >
+                                <User class="h-5 w-5 text-[#99cc33]" />
+                                Data Peminjam
+                            </h3>
+
+                            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                <!-- Nama -->
+                                <div class="md:col-span-2">
+                                    <label
+                                        class="mb-2 block text-sm font-semibold text-slate-700"
+                                        >Nama Lengkap
+                                        <span class="text-red-500"
+                                            >*</span
+                                        ></label
+                                    >
+                                    <div class="relative">
+                                        <div
+                                            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"
+                                        >
+                                            <User class="h-5 w-5" />
+                                        </div>
+                                        <input
+                                            v-model="form.namaLengkap"
+                                            type="text"
+                                            class="w-full rounded-xl border border-slate-200 py-3 pr-4 pl-10 text-slate-700 transition-all outline-none focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
+                                            placeholder="Masukkan nama lengkap sesuai KTM"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                <!-- NIM/NIP -->
+                                <div>
+                                    <label
+                                        class="mb-2 block text-sm font-semibold text-slate-700"
+                                        >NIM / NIP
+                                        <span class="text-red-500"
+                                            >*</span
+                                        ></label
+                                    >
+                                    <div class="relative">
+                                        <div
+                                            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"
+                                        >
+                                            <Hash class="h-5 w-5" />
+                                        </div>
+                                        <input
+                                            v-model="form.nimNip"
+                                            type="text"
+                                            class="w-full rounded-xl border border-slate-200 py-3 pr-4 pl-10 text-slate-700 transition-all outline-none focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
+                                            placeholder="Nomor Induk Mahasiswa/Pegawai"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                <!-- WhatsApp -->
+                                <div>
+                                    <label
+                                        class="mb-2 block text-sm font-semibold text-slate-700"
+                                        >WhatsApp (Aktif)
+                                        <span class="text-red-500"
+                                            >*</span
+                                        ></label
+                                    >
+                                    <div class="relative">
+                                        <div
+                                            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"
+                                        >
+                                            <MessageCircle class="h-5 w-5" />
+                                        </div>
+                                        <input
+                                            v-model="form.whatsapp"
+                                            type="tel"
+                                            class="w-full rounded-xl border border-slate-200 py-3 pr-4 pl-10 text-slate-700 transition-all outline-none focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
+                                            placeholder="08xxxxxxxxxx"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                <!-- Email -->
+                                <div class="md:col-span-2">
+                                    <label
+                                        class="mb-2 block text-sm font-semibold text-slate-700"
+                                        >Email
+                                        <span class="text-red-500"
+                                            >*</span
+                                        ></label
+                                    >
+                                    <div class="relative">
+                                        <div
+                                            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"
+                                        >
+                                            <Mail class="h-5 w-5" />
+                                        </div>
+                                        <input
+                                            v-model="form.email"
+                                            type="email"
+                                            class="w-full rounded-xl border border-slate-200 py-3 pr-4 pl-10 text-slate-700 transition-all outline-none focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
+                                            placeholder="email@polban.ac.id"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="mb-5">
-                            <label for="nimNip" class="block text-sm font-medium text-red-500">
-                                NIM/NIP *
-                            </label>
-                            <input 
-                                type="text" 
-                                id="nimNip" 
-                                v-model="form.nimNip" 
-                                placeholder="Masukkan NIM atau NIP" 
-                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring-green-500 text-sm p-2"
-                                required
-                            />
-                        </div>
-                        
-                        <div class="mb-5">
-                            <label for="email" class="block text-sm font-medium text-red-500">
-                                Email *
-                            </label>
-                            <input 
-                                type="email" 
-                                id="email" 
-                                v-model="form.email" 
-                                placeholder="email@example.com" 
-                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring-green-500 text-sm p-2"
-                                required
-                            />
+                        <!-- Group 2: Data Buku -->
+                        <div>
+                            <h3
+                                class="mb-6 flex items-center gap-2 border-b border-slate-100 pb-2 text-lg font-bold text-slate-800"
+                            >
+                                <BookOpen class="h-5 w-5 text-[#99cc33]" />
+                                Buku yang Dipesan
+                            </h3>
+
+                            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                <!-- Judul Buku -->
+                                <div class="md:col-span-2">
+                                    <label
+                                        class="mb-2 block text-sm font-semibold text-slate-700"
+                                        >Judul Buku
+                                        <span class="text-red-500"
+                                            >*</span
+                                        ></label
+                                    >
+                                    <div class="relative">
+                                        <div
+                                            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"
+                                        >
+                                            <BookOpen class="h-5 w-5" />
+                                        </div>
+                                        <input
+                                            v-model="form.judulBuku"
+                                            type="text"
+                                            class="w-full rounded-xl border border-slate-200 py-3 pr-4 pl-10 text-slate-700 transition-all outline-none focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
+                                            placeholder="Masukkan judul buku lengkap"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                <!-- Pengarang -->
+                                <div class="md:col-span-2">
+                                    <label
+                                        class="mb-2 block text-sm font-semibold text-slate-700"
+                                        >Pengarang
+                                        <span class="text-red-500"
+                                            >*</span
+                                        ></label
+                                    >
+                                    <div class="relative">
+                                        <div
+                                            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"
+                                        >
+                                            <PenTool class="h-5 w-5" />
+                                        </div>
+                                        <input
+                                            v-model="form.pengarang"
+                                            type="text"
+                                            class="w-full rounded-xl border border-slate-200 py-3 pr-4 pl-10 text-slate-700 transition-all outline-none focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
+                                            placeholder="Nama pengarang"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="mb-5">
-                            <label for="whatsapp" class="block text-sm font-medium text-red-500">
-                                Nomor WhatsApp (Aktif) *
-                            </label>
-                            <input 
-                                type="tel" 
-                                id="whatsapp" 
-                                v-model="form.whatsapp" 
-                                placeholder="08xxxxxxxxxxxx" 
-                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring-green-500 text-sm p-2"
-                                required
-                            />
+                        <!-- Submit Button -->
+                        <div class="pt-4">
+                            <button
+                                type="submit"
+                                class="flex w-full items-center justify-center gap-2 rounded-xl bg-[#99cc33] py-4 text-lg font-bold text-white shadow-lg shadow-[#99cc33]/30 transition-all duration-300 hover:-translate-y-1 hover:bg-[#88b82d] hover:shadow-[#99cc33]/50 active:translate-y-0"
+                            >
+                                <CalendarCheck class="h-5 w-5" />
+                                Kirim Permintaan Booking
+                            </button>
+                            <p class="mt-4 text-center text-sm text-slate-400">
+                                Pastikan data yang Anda masukkan valid agar kami
+                                dapat menghubungi Anda.
+                            </p>
                         </div>
-
-                        <div class="mb-5">
-                            <label for="judulBuku" class="block text-sm font-medium text-gray-700">
-                                Judul Buku *
-                            </label>
-                            <input 
-                                type="text" 
-                                id="judulBuku" 
-                                v-model="form.judulBuku" 
-                                placeholder="Masukkan judul buku yang ingin dibooking" 
-                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring-green-500 text-sm p-2"
-                                required
-                            />
-                        </div>
-
-                        <div class="mb-8">
-                            <label for="pengarang" class="block text-sm font-medium text-gray-700">
-                                Pengarang *
-                            </label>
-                            <input 
-                                type="text" 
-                                id="pengarang" 
-                                v-model="form.pengarang" 
-                                placeholder="Masukkan nama pengarang" 
-                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring-green-500 text-sm p-2"
-                                required
-                            />
-                        </div>
-
-                        <button 
-                            type="submit" 
-                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                        >
-                            Kirim Permintaan Booking
-                        </button>
-                        
                     </form>
                 </div>
-                
-                <div class="text-center mt-6">
-                    <a href="/" class="text-sm text-gray-500 hover:text-green-600">
-                        Kembali ke Beranda
-                    </a>
-                </div>
-
             </div>
         </div>
     </Layout>

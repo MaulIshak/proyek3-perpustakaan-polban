@@ -1,18 +1,35 @@
-<script setup>
+<script setup lang="ts">
 import Layout from '@/layouts/UserAppLayout.vue';
-import { BookOpen, Clock, FileText, Laptop, Users } from 'lucide-vue-next';
+import {
+    ArrowRight,
+    BookOpen,
+    CheckCircle2,
+    Clock,
+    FileText,
+    Laptop,
+    Users,
+} from 'lucide-vue-next';
 import { computed } from 'vue';
 
-const props = defineProps({
-    pelayanan: String,
-});
+const props = defineProps<{
+    pelayanan: string;
+}>();
 
-const PelayananData = {
+// Mapping String ke Komponen Icon Lucide
+const iconMap: Record<string, any> = {
+    BookOpen,
+    Clock,
+    Users,
+    FileText,
+    Laptop,
+};
+
+const PelayananData: Record<string, any> = {
     peminjaman: {
         title: 'Peminjaman Buku',
         icon: 'BookOpen',
         description:
-            'Layanan peminjaman buku untuk mendukung kegiatan belajar dan penelitian',
+            'Layanan sirkulasi buku cetak untuk mendukung kegiatan belajar mengajar dan penelitian civitas akademika.',
         content: [
             {
                 subtitle: 'Ketentuan Peminjaman',
@@ -39,7 +56,8 @@ const PelayananData = {
     pengembalian: {
         title: 'Pengembalian Buku',
         icon: 'Clock',
-        description: 'Prosedur pengembalian buku yang mudah dan praktis',
+        description:
+            'Prosedur pengembalian koleksi pustaka yang mudah, transparan, dan praktis.',
         content: [
             {
                 subtitle: 'Cara Pengembalian',
@@ -67,7 +85,7 @@ const PelayananData = {
         title: 'Keanggotaan',
         icon: 'Users',
         description:
-            'Informasi pendaftaran dan layanan keanggotaan perpustakaan',
+            'Akses penuh ke seluruh fasilitas perpustakaan melalui keanggotaan resmi civitas akademika.',
         content: [
             {
                 subtitle: 'Syarat Keanggotaan',
@@ -94,7 +112,8 @@ const PelayananData = {
     referensi: {
         title: 'Pelayanan Referensi',
         icon: 'FileText',
-        description: 'Bantuan pencarian informasi dan referensi akademik',
+        description:
+            'Bantuan profesional dalam penelusuran informasi ilmiah dan referensi akademik.',
         content: [
             {
                 subtitle: 'Layanan yang Tersedia',
@@ -122,7 +141,7 @@ const PelayananData = {
         title: 'Ruang Komputer',
         icon: 'Laptop',
         description:
-            'Fasilitas komputer dengan akses internet untuk kegiatan akademik',
+            'Fasilitas komputasi modern dengan akses internet berkecepatan tinggi untuk menunjang akademik.',
         content: [
             {
                 subtitle: 'Fasilitas',
@@ -148,46 +167,91 @@ const PelayananData = {
     },
 };
 
-const icons = {
-    BookOpen,
-    Clock,
-    Users,
-    FileText,
-    Laptop,
-};
-
-const Pelayanan_Data = computed(() => PelayananData[props.pelayanan]);
-const breadcrumb = [{ label: 'Pelayanan' }, { label: Pelayanan_Data.value.title }];
+// Computed property untuk mengambil data berdasarkan props
+const activeData = computed(() => PelayananData[props.pelayanan]);
+const breadcrumb = computed(() => [
+    { label: 'Home', link: '/' },
+    { label: 'Pelayanan' },
+    { label: activeData.value ? activeData.value.title : 'Detail' },
+]);
 </script>
 
 <template>
-    <Layout :page="true" :breadcrumb="breadcrumb" :title="Pelayanan_Data.title">
-        <div class="py-12" v-if="Pelayanan_Data">
-            <div class="mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex flex-col items-center gap-6">
+    <Layout
+        :page="true"
+        :breadcrumb="breadcrumb"
+        :title="activeData?.title || 'Layanan'"
+    >
+        <!-- Background decoration (Consistent Theme) -->
+        <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+            <div
+                class="absolute top-0 right-0 h-[600px] w-[600px] rounded-full bg-[#99cc33]/5 blur-3xl"
+            ></div>
+            <div
+                class="absolute bottom-0 left-0 h-[500px] w-[500px] rounded-full bg-gray-100 blur-3xl"
+            ></div>
+        </div>
+
+        <div
+            class="relative container mx-auto px-4 py-10 sm:px-6 lg:px-8"
+            v-if="activeData"
+        >
+            <!-- Content Grid -->
+            <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
+                <div
+                    v-for="(section, index) in activeData.content"
+                    :key="index"
+                    class="group flex flex-col rounded-2xl border border-slate-100 bg-white p-8 shadow-lg shadow-slate-200/50 transition-all duration-300 hover:-translate-y-1 hover:border-[#99cc33]/30"
+                >
                     <div
-                        v-for="(section, index) in Pelayanan_Data.content"
-                        :key="index"
-                        class="rounded-lg border border-transparent bg-white p-6 shadow-md duration-300 hover:scale-102 hover:border-[var(--primary-green)] hover:shadow-xl w-full max-w-7xl"
+                        class="mb-6 flex items-center gap-3 border-b border-slate-100 pb-4"
                     >
-                        <h2 class="mb-4 text-3xl font-bold text-gray-800">
+                        <div class="rounded-lg bg-[#99cc33]/10 p-2">
+                            <ArrowRight class="h-5 w-5 text-[#99cc33]" />
+                        </div>
+                        <h2
+                            class="text-xl font-bold text-slate-800 transition-colors group-hover:text-[#99cc33]"
+                        >
                             {{ section.subtitle }}
                         </h2>
-                        <ul class="space-y-3">
-                            <li
-                                v-for="(item, itemIndex) in section.items"
-                                :key="itemIndex"
-                                class="flex items-start gap-3 text-gray-800"
-                            >
-                                <span
-                                    class="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-[var(--primary-green)]"
-                                ></span>
-                                <span class="text-lg">{{ item }}</span>
-                            </li>
-                        </ul>
                     </div>
+
+                    <ul class="flex-grow space-y-4">
+                        <li
+                            v-for="(item, itemIndex) in section.items"
+                            :key="itemIndex"
+                            class="group/item flex items-start gap-3"
+                        >
+                            <!-- Custom Bullet Point -->
+                            <div class="mt-1 shrink-0">
+                                <CheckCircle2
+                                    class="h-5 w-5 text-[#99cc33]/60 transition-colors group-hover/item:text-[#99cc33]"
+                                />
+                            </div>
+                            <span
+                                class="text-[0.95rem] leading-relaxed text-slate-600 transition-colors group-hover/item:text-slate-800"
+                            >
+                                {{ item }}
+                            </span>
+                        </li>
+                    </ul>
                 </div>
             </div>
+        </div>
+
+        <!-- Empty State / Error Handling -->
+        <div v-else class="container mx-auto px-4 py-20 text-center">
+            <div
+                class="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-slate-100"
+            >
+                <FileText class="h-8 w-8 text-slate-400" />
+            </div>
+            <h2 class="text-xl font-bold text-slate-700">
+                Layanan Tidak Ditemukan
+            </h2>
+            <p class="text-slate-500">
+                Mohon maaf, informasi layanan yang Anda cari tidak tersedia.
+            </p>
         </div>
     </Layout>
 </template>

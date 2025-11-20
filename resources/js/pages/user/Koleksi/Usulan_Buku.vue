@@ -2,14 +2,31 @@
 import { ref, nextTick } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 import Layout from '@/layouts/UserAppLayout.vue';
+import {
+    AlignLeft,
+    Barcode,
+    BookOpen,
+    BookPlus,
+    Building2,
+    Calendar,
+    CheckCircle2,
+    DollarSign,
+    GraduationCap,
+    Hash,
+    PenTool,
+    Send,
+    User,
+} from 'lucide-vue-next';
+import { nextTick, ref } from 'vue';
 
 const breadcrumb = [
+    { label: 'Home', link: '/' },
     { label: 'Pelayanan' },
     { label: 'Form Usulan Buku' },
 ];
 
 const showMessage = ref(false);
-const messageRef = ref(null);
+const messageRef = ref<HTMLElement | null>(null);
 
 // Inertia form with all fields
 const form = useForm({
@@ -84,9 +101,18 @@ const submitForm = () => { // Hapus async dan e.preventDefault karena useForm su
                         <p class="text-gray-700 leading-relaxed mb-6 text-1xl">
                             Silahkan usulkan buku-buku yang Anda perlukan dengan mengisi formulir yang telah kami sediakan. 
                         </p>
+                    </div>
+                </div>
+            </transition>
 
-                        <!-- FORM -->
-                        <form class="space-y-5" @submit="submitForm">
+            <!-- Form Card -->
+            <div
+                class="mx-auto max-w-4xl overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-xl shadow-slate-200/60"
+            >
+                <!-- Decorative Top Bar -->
+                <div
+                    class="h-2 w-full bg-gradient-to-r from-[#99cc33] to-[var(--dark-green)]"
+                ></div>
 
                             <div>
                                 <label class="block text-gray-800 font-semibold mb-1">
@@ -151,6 +177,7 @@ const submitForm = () => { // Hapus async dan e.preventDefault karena useForm su
                                     {{ form.errors.title }}
                                 </p>
                             </div>
+                        </div>
 
                             <div>
                                 <label class="block text-gray-800 font-semibold mb-1">
@@ -250,8 +277,10 @@ const submitForm = () => { // Hapus async dan e.preventDefault karena useForm su
                                     {{ form.errors.reason }}
                                 </p>
                             </div>
+                        </div>
 
-                            <!-- BUTTON -->
+                        <!-- Submit Button -->
+                        <div class="pt-6">
                             <button
                                 type="submit"
                                 :disabled="form.processing"
@@ -259,11 +288,9 @@ const submitForm = () => { // Hapus async dan e.preventDefault karena useForm su
                             >
                                 {{ form.processing ? 'Mengirim...' : 'Kirim Usulan' }}
                             </button>
-
-                        </form>
-                    </div>
+                        </div>
+                    </form>
                 </div>
-
             </div>
         </div>
     </Layout>

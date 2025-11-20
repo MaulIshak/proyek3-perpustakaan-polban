@@ -1,15 +1,22 @@
-<script setup>
+<script setup lang="ts">
 import Layout from '@/layouts/UserAppLayout.vue';
-import { X } from 'lucide-vue-next';
+import { Image as ImageIcon, X, ZoomIn } from 'lucide-vue-next';
 import { ref } from 'vue';
 
 const props = defineProps({
     photos: Object,
 });
 
-// Gambar yang sedang dipilih
-const selectedImage = ref(null);
-const breadcrumb = [{ label: 'Profil' }, { label: 'Tentang Perpustakaan' }];
+// Actions
+function openLightbox(item: GalleryItem) {
+    selectedItem.value = item;
+    document.body.style.overflow = 'hidden'; // Prevent scrolling background
+}
+
+function closeLightbox() {
+    selectedItem.value = null;
+    document.body.style.overflow = ''; // Restore scrolling
+}
 </script>
 
 <template>
@@ -31,40 +38,69 @@ const breadcrumb = [{ label: 'Profil' }, { label: 'Tentang Perpustakaan' }];
                             class="h-64 w-full object-cover transition-transform group-hover:scale-110"
                         />
                         <div
-                            class="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/40"
+                            class="rounded-full border border-white/30 bg-white/20 p-3 text-white backdrop-blur-sm"
                         >
-                            <span
-                                class="font-medium text-white opacity-0 transition-opacity group-hover:opacity-100"
-                            >
-                                Klik untuk memperbesar
-                            </span>
+                            <ZoomIn class="h-6 w-6" />
                         </div>
                     </div>
+
+                    <!-- Content Overlay (Bottom Text) -->
+                    <div
+                        class="absolute bottom-0 left-0 w-full translate-y-4 p-4 opacity-0 transition-all delay-100 duration-300 group-hover:translate-y-0 group-hover:opacity-100"
+                    ></div>
                 </div>
                 <div v-else class="text-center text-gray-500">
                     <p>Belum ada foto di galeri.</p>
                 </div>
             </div>
 
-            <!-- Lightbox -->
-            <div
-                v-if="selectedImage"
-                class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
-                @click="selectedImage = null"
-            >
-                <button
-                    class="absolute top-4 right-4 text-white hover:text-gray-300"
-                    @click.stop="selectedImage = null"
+            <!-- Empty State -->
+            <div v-if="galeriData.length === 0" class="py-20 text-center">
+                <div
+                    class="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 text-slate-400"
                 >
-                    <X class="h-8 w-8" />
-                </button>
-                <img
-                    :src="selectedImage"
-                    alt="Preview"
-                    class="max-h-full max-w-full object-contain"
-                    @click.stop
-                />
+                    <ImageIcon class="h-8 w-8" />
+                </div>
+                <p class="text-slate-500">Belum ada foto di galeri.</p>
             </div>
+
+            <!-- Modern Lightbox -->
+            <transition
+                enter-active-class="transition ease-out duration-300"
+                enter-from-class="opacity-0"
+                enter-to-class="opacity-100"
+                leave-active-class="transition ease-in duration-200"
+                leave-from-class="opacity-100"
+                leave-to-class="opacity-0"
+            >
+                <div
+                    v-if="selectedItem"
+                    class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/95 p-4 backdrop-blur-sm sm:p-8"
+                    @click="closeLightbox"
+                >
+                    <!-- Close Button -->
+                    <button
+                        class="absolute top-6 right-6 z-10 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20 focus:outline-none"
+                        @click.stop="closeLightbox"
+                    >
+                        <X class="h-8 w-8" />
+                    </button>
+
+                    <!-- Image Container -->
+                    <div
+                        class="relative flex max-h-full w-full max-w-5xl flex-col items-center"
+                        @click.stop
+                    >
+                        <img
+                            :src="selectedItem.image"
+                            class="max-h-[80vh] w-auto rounded-lg object-contain shadow-2xl"
+                        />
+
+                        <!-- Caption Bar -->
+                        <div class="mt-4 text-center"></div>
+                    </div>
+                </div>
+            </transition>
         </div>
     </Layout>
 </template>

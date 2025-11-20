@@ -1,5 +1,7 @@
-<script setup>
+<script setup lang="ts">
 import BeritaCard from '@/components/BeritaCard.vue';
+import { ArrowRight, Newspaper } from 'lucide-vue-next';
+
 const beritaList = [
     {
         id: 1,
@@ -29,41 +31,43 @@ const beritaList = [
 </script>
 
 <template>
-    <section class="bg-gradient-to-br py-12">
-        <div class="mx-auto">
-            <div class="mb-8 flex items-center justify-between">
-                <div class="inline-block">
-                    <h2
-                        class="relative text-3xl font-bold text-[var(--dark-green)]"
-                    >
-                        Berita Terbaru
-                    </h2>
-                    <span
-                        class="mt-1 block h-1 w-16 rounded-full bg-[var(--primary-green)]"
-                    ></span>
+    <section class="w-full py-4">
+        <div class="mx-auto max-w-7xl">
+            <!-- Header Section (Consistent with Home) -->
+            <div
+                class="mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-end"
+            >
+                <div>
+                    <div class="mb-2 flex items-center gap-3">
+                        <div
+                            class="rounded-lg bg-[#99cc33]/10 p-2 text-[#99cc33]"
+                        >
+                            <Newspaper class="h-6 w-6" />
+                        </div>
+                        <h2
+                            class="text-3xl font-black tracking-tight text-slate-900"
+                        >
+                            Berita Terbaru
+                        </h2>
+                    </div>
+                    <div
+                        class="ml-1 h-1.5 w-24 rounded-full bg-[#99cc33] shadow-sm shadow-[#99cc33]/50"
+                    ></div>
                 </div>
+
                 <a
-                    class="flex w-35 items-center justify-evenly gap-1 rounded-3xl border border-transparent bg-[var(--primary-green)] p-2 text-center text-sm font-medium text-white transition-all duration-300 hover:border-[var(--primary-green)] hover:bg-white hover:text-[var(--primary-green)]"
                     href="/berita"
-                    data-discover="true"
-                    >Lihat Semua<svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        class="lucide lucide-arrow-right h-5 w-5"
-                        aria-hidden="true"
-                    >
-                        <path d="M5 12h14"></path>
-                        <path d="m12 5 7 7-7 7"></path></svg
-                ></a>
+                    class="group flex items-center gap-2 rounded-full border border-slate-200 bg-white px-6 py-2.5 text-sm font-semibold text-slate-600 shadow-sm transition-all hover:border-[#99cc33] hover:text-[#99cc33] hover:shadow-md"
+                >
+                    Lihat Semua
+                    <ArrowRight
+                        class="h-4 w-4 transition-transform group-hover:translate-x-1"
+                    />
+                </a>
             </div>
-            <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+
+            <!-- Grid Content -->
+            <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                 <BeritaCard
                     v-for="berita in beritaList"
                     :key="berita.id"
@@ -72,6 +76,7 @@ const beritaList = [
                     :content="berita.content"
                     :thumbnail="berita.thumbnail"
                     :date="berita.date"
+                    class="h-full transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
                 />
             </div>
         </div>

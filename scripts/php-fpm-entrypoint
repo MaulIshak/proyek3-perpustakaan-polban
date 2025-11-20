@@ -12,7 +12,7 @@ main() {
         optimize_app
         run_server "$@"
     fi
-}
+}   
 
 prepare_file_permissions() {
     chmod a+x ./artisan

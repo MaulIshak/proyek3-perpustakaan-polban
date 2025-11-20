@@ -17,7 +17,7 @@ const navItems = [
             { name: 'Tim Manajemen', href: '/tim-manajemen' },
             { name: 'Peraturan Perpustakaan', href: '/peraturan' },
             { name: 'Jam Layanan', href: '/jam-layanan' },
-            { name: 'Rencana Strategi', href: '/renstra'}
+            { name: 'Rencana Strategi', href: '/renstra' },
         ],
     },
     {
@@ -104,40 +104,57 @@ onMounted(() => {
 onUnmounted(() => {
     document.removeEventListener('click', onDocumentClick, true);
     document.removeEventListener('keydown', onEsc);
-    // Reset body overflow saat component unmount
     document.body.style.overflow = '';
 });
 </script>
 
 <template>
     <nav
-        class="bg-grey border-b border-gray-200 bg-white/90 py-3 text-black backdrop-blur-md"
+        class="sticky top-0 z-50 w-full border-b border-slate-200 bg-white shadow-sm transition-all duration-300"
     >
-        <div class="container mx-auto px-4">
-            <div class="flex h-16 items-center justify-between">
-                <!-- Logo -->
-                <div class="flex items-center gap-3">
-                    <Link href="/" class="flex items-center gap-6">
-                        <img
-                            src="/logo-polban.png"
-                            alt="Logo Politeknik Negeri Bandung"
-                            class="h-12 w-auto object-contain md:h-16"
-                        />
-                        <div class="leading-tight sm:block">
-                            <h1 class="text-sm font-bold md:text-lg">
+        <!-- Top Decorative Line -->
+        <div
+            class="absolute top-0 left-0 h-0.5 w-full bg-gradient-to-r from-[#99cc33] to-[#7aace5]"
+        ></div>
+
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex h-20 items-center justify-between">
+                <!-- Logo Section -->
+                <!-- Adjusted gap for mobile -->
+                <div class="flex items-center gap-2 sm:gap-4">
+                    <Link href="/" class="group flex items-center gap-2 sm:gap-4">
+                        <div class="relative shrink-0">
+                            <div
+                                class="absolute inset-0 rounded-full bg-[#99cc33]/20 opacity-0 blur-lg transition-opacity duration-500 group-hover:opacity-100"
+                            ></div>
+                            <img
+                                src="/logo-polban.png"
+                                alt="Logo Politeknik Negeri Bandung"
+                                class="relative h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105 md:h-14"
+                            />
+                        </div>
+                        <!-- PERBAIKAN DI SINI: -->
+                        <!-- 1. Menghapus 'hidden' agar muncul di mobile -->
+                        <!-- 2. Menggunakan text-[10px] untuk mobile agar muat -->
+                        <!-- 3. Menggunakan flex-col agar teks NPP berada di bawah judul -->
+                        <div class="flex flex-col justify-center">
+                            <h1
+                                class="text-[10px] leading-tight font-extrabold tracking-tight text-slate-800 transition-colors duration-300 group-hover:text-[#99cc33] sm:text-sm md:text-base lg:text-lg"
+                            >
                                 PERPUSTAKAAN POLITEKNIK NEGERI BANDUNG
+                                <span
+                                    class="block font-semibold text-slate-500 text-[9px] sm:text-xs md:text-sm lg:text-base"
+                                    >NPP: 321702200000001</span
+                                >
                             </h1>
-                            <p class="text-md text-gray-600 md:text-lg">
-                                NPP: 321702200000001
-                            </p>
                         </div>
                     </Link>
                 </div>
 
-                <!-- Tombol Mobile -->
+                <!-- Mobile Menu Button -->
                 <button
                     @click="mobileOpen = !mobileOpen"
-                    class="flex items-center justify-center rounded-md p-2 text-gray-700 hover:bg-gray-100 focus:outline-none xl:hidden"
+                    class="flex shrink-0 items-center justify-center rounded-xl p-2.5 text-slate-600 transition-colors hover:bg-[#99cc33]/10 hover:text-[#99cc33] focus:outline-none xl:hidden"
                     aria-label="Toggle menu"
                 >
                     <Menu v-if="!mobileOpen" class="h-6 w-6" />
@@ -145,43 +162,164 @@ onUnmounted(() => {
                 </button>
 
                 <!-- Desktop Nav -->
-                <div class="hidden items-center gap-5 xl:flex">
+                <div class="hidden items-center gap-2 xl:flex">
                     <template v-for="(item, i) in navItems" :key="item.name">
-                        <!-- plain link -->
+                        <!-- Single Link -->
                         <Link
                             v-if="!item.items"
                             :href="item.href"
-                            class="text-md rounded-full p-2 font-medium hover:text-[var(--dark-green)]"
+                            class="rounded-full px-4 py-2 text-sm font-semibold transition-all duration-200"
                             :class="[
                                 item.href === currentUrl
-                                    ? 'bg-[var(--background-green)] text-[var(--dark-green)]'
-                                    : 'text-gray-700',
+                                    ? 'bg-[#99cc33]/10 text-[#99cc33]'
+                                    : 'text-slate-600 hover:bg-slate-50 hover:text-[#99cc33]',
                             ]"
                         >
                             {{ item.name }}
                         </Link>
 
-                        <!-- dropdown -->
+                        <!-- Dropdown Menu -->
+                        <div v-else class="navbar-dropdown group relative">
+                            <button
+                                @click="toggleMenu(i)"
+                                class="flex items-center gap-1 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-200 group-hover:text-[#99cc33]"
+                                :class="
+                                    openIndex === i
+                                        ? 'bg-[#99cc33]/5 text-[#99cc33]'
+                                        : 'text-slate-600 hover:bg-slate-50'
+                                "
+                            >
+                                <span>{{ item.name }}</span>
+                                <ChevronDown
+                                    class="h-4 w-4 transition-transform duration-300"
+                                    :class="{ 'rotate-180': openIndex === i }"
+                                />
+                            </button>
+
+                            <!-- Dropdown Content -->
+                            <transition
+                                enter-active-class="transition ease-out duration-200"
+                                enter-from-class="opacity-0 translate-y-2"
+                                enter-to-class="opacity-100 translate-y-0"
+                                leave-active-class="transition ease-in duration-150"
+                                leave-from-class="opacity-100 translate-y-0"
+                                leave-to-class="opacity-0 translate-y-2"
+                            >
+                                <ul
+                                    v-show="openIndex === i"
+                                    class="absolute left-0 z-50 mt-2 w-56 origin-top-left rounded-2xl bg-white py-2 shadow-xl ring-1 shadow-slate-200/50 ring-slate-100 focus:outline-none"
+                                >
+                                    <li
+                                        v-for="subItem in item.items"
+                                        :key="subItem.name"
+                                    >
+                                        <a
+                                            v-if="
+                                                subItem.href &&
+                                                subItem.href.startsWith('http')
+                                            "
+                                            :href="subItem.href"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="block px-4 py-2.5 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-[#99cc33]/5 hover:pl-6 hover:text-[#99cc33]"
+                                            @click="closeAll"
+                                        >
+                                            {{ subItem.name }}
+                                        </a>
+
+                                        <Link
+                                            v-else
+                                            :href="subItem.href"
+                                            class="block px-4 py-2.5 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-[#99cc33]/5 hover:pl-6 hover:text-[#99cc33]"
+                                            :class="{
+                                                'bg-[#99cc33]/5 text-[#99cc33]':
+                                                    subItem.href === currentUrl,
+                                            }"
+                                            @click="closeAll"
+                                        >
+                                            {{ subItem.name }}
+                                        </Link>
+                                    </li>
+                                </ul>
+                            </transition>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Mobile Menu Overlay -->
+            <transition
+                enter-active-class="transition-opacity duration-300"
+                enter-from-class="opacity-0"
+                enter-to-class="opacity-100"
+                leave-active-class="transition-opacity duration-300"
+                leave-from-class="opacity-100"
+                leave-to-class="opacity-0"
+            >
+                <div
+                    v-if="mobileOpen"
+                    class="fixed inset-0 z-40 bg-slate-900/20 backdrop-blur-sm xl:hidden"
+                    @click="closeMobileMenu"
+                ></div>
+            </transition>
+
+            <!-- Mobile Menu Content -->
+            <transition
+                enter-active-class="transition-all duration-300 ease-out"
+                enter-from-class="-translate-y-4 opacity-0"
+                enter-to-class="translate-y-0 opacity-100"
+                leave-active-class="transition-all duration-200 ease-in"
+                leave-from-class="translate-y-0 opacity-100"
+                leave-to-class="-translate-y-4 opacity-0"
+            >
+                <div
+                    v-show="mobileOpen"
+                    class="absolute top-full right-0 left-0 z-50 mx-4 mt-2 flex max-h-[80vh] flex-col gap-2 overflow-y-auto rounded-2xl bg-white p-4 shadow-2xl ring-1 ring-slate-100 xl:hidden"
+                >
+                    <template v-for="(item, i) in navItems" :key="item.name">
+                        <!-- Single Link Mobile -->
+                        <Link
+                            v-if="!item.items"
+                            :href="item.href"
+                            class="block rounded-xl px-4 py-3 text-base font-medium transition-colors"
+                            :class="[
+                                item.href === currentUrl
+                                    ? 'bg-[#99cc33]/10 text-[#99cc33]'
+                                    : 'text-slate-600 hover:bg-slate-50 hover:text-[#99cc33]',
+                            ]"
+                            @click="closeMobileMenu"
+                        >
+                            {{ item.name }}
+                        </Link>
+
+                        <!-- Dropdown Mobile -->
                         <div
                             v-else
-                            class="navbar-dropdown relative"
+                            class="rounded-xl transition-colors duration-200"
+                            :class="{ 'bg-slate-50': openIndex === i }"
                         >
                             <button
                                 @click="toggleMenu(i)"
-                                class="text-md flex items-center gap-1 rounded-full p-2 font-medium text-gray-700 transition-colors hover:text-[var(--font-green)]"
+                                class="flex w-full items-center justify-between px-4 py-3 text-base font-medium text-slate-600 transition-colors hover:text-[#99cc33]"
+                                :class="{
+                                    'text-[#99cc33]': openIndex === i,
+                                }"
                             >
                                 <span>{{ item.name }}</span>
-                                <ChevronDown class="h-4 w-4" />
+                                <ChevronDown
+                                    class="h-5 w-5 transition-transform duration-300"
+                                    :class="{ 'rotate-180': openIndex === i }"
+                                />
                             </button>
 
-                            <ul
+                            <!-- Konten Dropdown -->
+                            <div
                                 v-show="openIndex === i"
-                                class="absolute z-50 mt-2 w-48 rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 focus:outline-none"
+                                class="flex flex-col gap-1 p-2 pt-0"
                             >
-                                <li
+                                <template
                                     v-for="subItem in item.items"
                                     :key="subItem.name"
-                                    class="p-3 hover:bg-[var(--background-green)]"
                                 >
                                     <a
                                         v-if="
@@ -190,80 +328,24 @@ onUnmounted(() => {
                                         "
                                         :href="subItem.href"
                                         target="_blank"
-                                        rel="noopener noreferrer"
-                                        class="block text-sm text-gray-700"
-                                        @click="closeAll"
+                                        class="block rounded-lg px-4 py-2.5 text-sm font-medium text-slate-600 transition-all hover:bg-white hover:text-[#99cc33] hover:shadow-sm"
+                                        @click="closeMobileMenu"
                                     >
                                         {{ subItem.name }}
                                     </a>
-
                                     <Link
                                         v-else
                                         :href="subItem.href"
-                                        class="block text-sm text-gray-700"
-                                        @click="closeAll"
+                                        class="block rounded-lg px-4 py-2.5 text-sm font-medium text-slate-600 transition-all hover:bg-white hover:text-[#99cc33] hover:shadow-sm"
+                                        :class="{
+                                            'bg-white text-[#99cc33] shadow-sm':
+                                                subItem.href === currentUrl,
+                                        }"
+                                        @click="closeMobileMenu"
                                     >
                                         {{ subItem.name }}
                                     </Link>
-                                </li>
-                            </ul>
-                        </div>
-                    </template>
-                </div>
-            </div>
-
-            <!-- Mobile Menu -->
-            <transition name="fade">
-                <div
-                    v-show="mobileOpen"
-                    class="mt-3 flex max-h-[70vh] flex-col gap-2 overflow-y-auto border-t border-gray-200 pt-3 xl:hidden"
-                >
-                    <template v-for="(item, i) in navItems" :key="item.name">
-                        <!-- single link -->
-                        <Link
-                            v-if="!item.items"
-                            :href="item.href"
-                            class="block rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100"
-                            :class="[
-                                item.href === currentUrl
-                                    ? 'bg-[var(--background-green)] text-[var(--dark-green)]'
-                                    : '',
-                            ]"
-                            @click="closeMobileMenu"
-                        >
-                            {{ item.name }}
-                        </Link>
-
-                        <!-- dropdown in mobile -->
-                        <div v-else class="navbar-dropdown">
-                            <button
-                                @click="toggleMenu(i)"
-                                class="flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100"
-                            >
-                                <span>{{ item.name }}</span>
-                                <ChevronDown
-                                    :class="[ 'h-4 w-4 transition-transform', openIndex === i ? 'rotate-180' : '' ]"
-                                />
-                            </button>
-
-                            <div
-                                v-show="openIndex === i"
-                                class="flex flex-col gap-1 py-1 pl-5"
-                            >
-                                <Link
-                                    v-for="subItem in item.items"
-                                    :key="subItem.name"
-                                    :href="subItem.href"
-                                    class="block rounded-md px-3 py-1 text-sm text-gray-600 hover:bg-gray-100"
-                                    :class="[
-                                        subItem.href === currentUrl
-                                            ? 'bg-[var(--background-green)] text-[var(--dark-green)]'
-                                            : '',
-                                    ]"
-                                    @click="closeMobileMenu"
-                                >
-                                    {{ subItem.name }}
-                                </Link>
+                                </template>
                             </div>
                         </div>
                     </template>
@@ -272,14 +354,3 @@ onUnmounted(() => {
         </div>
     </nav>
 </template>
-
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.2s ease;
-}
-.fade-enter-from,
-.fade-leave-to {
-    opacity: 0;
-}
-</style>

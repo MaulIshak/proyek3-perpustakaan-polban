@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ArrowRight } from 'lucide-vue-next';
+import { ArrowRight, CalendarDays } from 'lucide-vue-next';
 import { defineProps } from 'vue';
 
 const props = defineProps<{
-    // Mengubah tipe id menjadi string karena menggunakan UUID
-    id: string;
+    // Mengubah tipe id menjadi string/number agar fleksibel
+    id: string | number;
     title: string;
     content: string;
     thumbnail: string;
@@ -12,15 +12,16 @@ const props = defineProps<{
 }>();
 
 function formatDate(dateString: string) {
-    if (!dateString) return '-'; // fallback kalau null
+    if (!dateString) return '-';
     const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
+    return new Intl.DateTimeFormat('id-ID', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+    }).format(date);
 }
 
-function truncateText(text: string, maxLength: number = 120): string {
+function truncateText(text: string, maxLength: number = 100): string {
     if (text.length <= maxLength) return text;
     return text.slice(0, maxLength) + '...';
 }
@@ -35,31 +36,45 @@ function stripHtml(html: string) {
 
 <template>
     <div
-        class="group overflow-hidden rounded-xl border bg-card text-card-foreground shadow transition-shadow hover:shadow-xl"
+        class="group flex flex-col h-full bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-lg shadow-slate-200/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-[#99cc33]/30"
     >
-        <img
-            alt="Workshop Literasi Digital untuk Mahasiswa Baru 2025"
-            class="h-48 w-full object-cover transition-all duration-700 ease-out group-hover:scale-110 group-hover:brightness-120"
-            :src="thumbnail"
-        />
-        <div class="p-5">
-            <div class="mb-3 flex items-center gap-2">
-                <span class="text-sm text-gray-500">{{
-                    formatDate(date)
-                }}</span>
+        <!-- Image Container -->
+        <div class="relative h-52 overflow-hidden shrink-0">
+            <img
+                :src="thumbnail"
+                :alt="title"
+                class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+            />
+            <!-- Gradient Overlay -->
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60"></div>
+
+            <!-- Date Badge (Floating) -->
+            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold text-slate-600 shadow-sm">
+                <CalendarDays class="w-3.5 h-3.5 text-[#99cc33]" />
+                {{ formatDate(date) }}
             </div>
-            <h3 class="mb-2 line-clamp-2 text-lg font-bold text-gray-800">
+        </div>
+
+        <!-- Content Container -->
+        <div class="p-6 flex flex-col flex-grow">
+            <h3 class="mb-3 text-xl font-extrabold text-slate-800 leading-tight line-clamp-2 group-hover:text-[#99cc33] transition-colors">
                 {{ title }}
             </h3>
-            <p class="mb-4 line-clamp-2 text-sm text-gray-600">
+
+            <p class="mb-6 text-sm text-slate-500 leading-relaxed line-clamp-3 flex-grow">
                 {{ truncateText(stripHtml(content)) }}
             </p>
-            <a
-                class="flex w-45 items-center justify-evenly gap-1 rounded-3xl border border-transparent bg-[var(--primary-green)] p-2 text-center text-sm font-medium text-white transition-all duration-300 hover:border-[var(--primary-green)] hover:bg-white hover:text-[var(--primary-green)]"
-                :href="`/berita/${id}`"
-                data-discover="true"
-                >Baca Selengkapnya <ArrowRight class="w-5" />
-            </a>
+
+            <!-- Action Button -->
+            <div class="mt-auto pt-4 border-t border-slate-100">
+                <a
+                    :href="`/berita/${id}`"
+                    class="flex items-center justify-center w-full gap-2 rounded-xl bg-[#99cc33] px-4 py-3 text-sm font-bold text-white shadow-lg shadow-[#99cc33]/20 transition-all duration-300 hover:bg-[#88b82d] hover:shadow-[#99cc33]/40 group/btn"
+                >
+                    Baca Selengkapnya
+                    <ArrowRight class="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
+                </a>
+            </div>
         </div>
     </div>
 </template>

@@ -1,109 +1,281 @@
-<script setup>
-import { ref } from 'vue'
-import { MessageCircle, X, Send } from 'lucide-vue-next'
+<script setup lang="ts">
+import {
+    CheckCircle2,
+    Mail,
+    MessageCircle,
+    MessageSquare,
+    Send,
+    User,
+    X,
+} from 'lucide-vue-next';
+import { ref } from 'vue';
 
-const isOpen = ref(false)
+const isOpen = ref(false);
+const isSent = ref(false);
+
 const formData = ref({
     nama: '',
     email: '',
-    pertanyaan: ''
-})
+    pertanyaan: '',
+});
 
-const handleSubmit = (e) => {
-    e.preventDefault()
-    alert('Pertanyaan Anda telah berhasil dikirim! Tim pustakawan kami akan segera merespons.')
-    formData.value = { nama: '', email: '', pertanyaan: '' }
-    isOpen.value = false
-}
+const handleSubmit = async (e: Event) => {
+    e.preventDefault();
+
+    // Simulasi pengiriman
+    isSent.value = true;
+
+    // Reset otomatis setelah 3 detik (opsional)
+    setTimeout(() => {
+        if (isOpen.value) {
+            // Logic jika ingin auto-reset
+        }
+    }, 3000);
+};
+
+const resetChat = () => {
+    isOpen.value = false;
+    // Tunggu animasi selesai baru reset data form
+    setTimeout(() => {
+        isSent.value = false;
+        formData.value = { nama: '', email: '', pertanyaan: '' };
+    }, 300);
+};
 </script>
 
 <template>
     <div>
-        <!-- Tombol Chat -->
-        <button v-if="!isOpen" @click="isOpen = true" class="fixed bottom-15 right-15 z-50 w-20 h-20 bg-gradient-to-br from-[var(--primary-green)] to-[var(--primary-green)] 
-             hover:from-[var(--primary-green)] hover:to-emerald-700 text-white rounded-full shadow-lg 
-             flex items-center justify-center transition-all hover:scale-110" aria-label="Tanya Pustakawan">
-            <MessageCircle class="w-6 h-6" />
-            <!-- Tambahkan teks melengkung -->
-            <svg viewBox="0 0 100 60"
-                class="absolute -top-6 left-1/2 -translate-x-1/2 w-50 pointer-events-none select-none">
-                <path id="curve" d="M10,50 A40,40 0 0,1 90,50" fill="transparent" />
-                <text font-size="8" fill="var(--primary-green)" font-weight="bold" text-anchor="middle">
-                    <textPath href="#curve" startOffset="50%">
-                        Tanya Pustakawan
-                    </textPath>
-                </text>
-            </svg>
-        </button>
-
-        <!-- Widget Chat -->
+        <!-- Overlay Backdrop (Mobile Only) -->
         <transition name="fade">
-            <div v-if="isOpen" class="fixed bottom-15 right-15 z-50 w-90 max-w-[calc(100vw-2rem)] bg-white rounded-2xl 
-               shadow-2xl border border-gray-200 overflow-hidden">
+            <div
+                v-if="isOpen"
+                class="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm sm:hidden"
+                @click="isOpen = false"
+            ></div>
+        </transition>
+
+        <!-- Tombol Floating Action Button (FAB) -->
+        <transition name="scale">
+            <div
+                v-if="!isOpen"
+                class="fixed right-6 bottom-6 z-50 flex items-center gap-3"
+            >
+                <!-- Label Statis "Tanya Pustakawan" (Selalu Muncul di Desktop) -->
+                <span
+                    class="hidden rounded-lg border border-slate-100 bg-white px-3 py-1.5 text-xs font-bold whitespace-nowrap text-slate-700 shadow-md transition-all duration-300 sm:block"
+                >
+                    Tanya Pustakawan
+                </span>
+
+                <button
+                    @click="isOpen = true"
+                    class="group flex h-16 w-16 items-center justify-center rounded-full bg-[#99cc33] text-white shadow-lg shadow-[#99cc33]/40 transition-all duration-300 hover:scale-110 hover:bg-[#88b82d] focus:ring-4 focus:ring-[#99cc33]/30 focus:outline-none"
+                    aria-label="Buka Chat Pustakawan"
+                >
+                    <!-- Icon Chat -->
+                    <MessageCircle
+                        class="h-8 w-8 transition-transform group-hover:-rotate-12"
+                    />
+                </button>
+            </div>
+        </transition>
+
+        <!-- Widget Window -->
+        <transition name="slide-up">
+            <div
+                v-if="isOpen"
+                class="fixed right-6 bottom-6 z-50 flex max-h-[80vh] w-full max-w-[calc(100vw-3rem)] flex-col overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-2xl shadow-slate-300/50 sm:w-[400px]"
+            >
                 <!-- Header -->
                 <div
-                    class="bg-gradient-to-br from-[var(--primary-green)] to-[var(--primary-green)] text-white p-4 flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                            <MessageCircle class="w-5 h-5" />
+                    class="flex shrink-0 items-center justify-between bg-[#99cc33] p-5"
+                >
+                    <div class="flex items-center gap-4">
+                        <div
+                            class="flex h-12 w-12 items-center justify-center rounded-full border border-white/30 bg-white/20 backdrop-blur-md"
+                        >
+                            <MessageCircle class="h-6 w-6 text-white" />
                         </div>
                         <div>
-                            <h3 class="font-bold text-lg">Tanya Pustakawan</h3>
-                            <p class="text-emerald-100 text-xs">Kami siap membantu Anda</p>
+                            <h3
+                                class="text-lg leading-tight font-bold text-white"
+                            >
+                                Pustakawan
+                            </h3>
+                            <!-- Status Online Dihilangkan, diganti teks statis -->
+                            <p class="mt-0.5 text-xs font-medium text-white/90">
+                                Kami siap membantu
+                            </p>
                         </div>
                     </div>
-                    <button @click="isOpen = false"
-                        class="text-white hover:bg-white/20 rounded-full p-1.5 transition-colors">
-                        <X class="w-5 h-5" />
+                    <button
+                        @click="resetChat"
+                        class="rounded-full p-2 text-white/80 transition-all hover:bg-white/20 hover:text-white"
+                    >
+                        <X class="h-6 w-6" />
                     </button>
                 </div>
 
-                <!-- Form -->
-                <form @submit="handleSubmit" class="p-4 space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Nama Lengkap
-                            <input type="text" v-model="formData.nama" placeholder="Masukkan nama Anda" required
-                            class="w-full rounded-md border border-gray-300 focus:border-[var(--primary-green)] focus:ring focus:ring-emerald-200 transition" />
-                        </label>
-                    </div>
+                <!-- Content Area -->
+                <div class="flex-1 overflow-y-auto bg-slate-50 p-6">
+                    <!-- State: Form -->
+                    <form
+                        v-if="!isSent"
+                        @submit="handleSubmit"
+                        class="space-y-5"
+                    >
+                        <p
+                            class="mb-6 rounded-xl rounded-tl-none border border-slate-100 bg-white p-4 text-sm leading-relaxed text-slate-600 shadow-sm"
+                        >
+                            Halo! 👋 Ada yang bisa kami bantu mengenai layanan
+                            perpustakaan? Silakan isi form di bawah ini.
+                        </p>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Email
-                            <input type="email" v-model="formData.email" placeholder="email@example.com" required
-                            class="w-full rounded-md border border-gray-300 focus:border-[var(--primary-green)] focus:ring focus:ring-emerald-200 transition" />
-                        </label>
-                    </div>
+                        <div class="space-y-4">
+                            <!-- Nama -->
+                            <div class="relative">
+                                <div
+                                    class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400"
+                                >
+                                    <User class="h-4 w-4" />
+                                </div>
+                                <input
+                                    type="text"
+                                    v-model="formData.nama"
+                                    placeholder="Nama Lengkap"
+                                    required
+                                    class="w-full rounded-xl border border-slate-200 bg-white py-3 pr-4 pl-10 text-sm text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
+                                />
+                            </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Pertanyaan Anda
-                            <textarea v-model="formData.pertanyaan" placeholder="Tuliskan pertanyaan Anda di sini..."
-                            required rows="4"
-                            class="w-full rounded-md border border-gray-300 focus:border-[var(--primary--green)] focus:ring focus:ring-emerald-200 resize-none transition"></textarea>
-                        </label>
-                    </div>
+                            <!-- Email -->
+                            <div class="relative">
+                                <div
+                                    class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400"
+                                >
+                                    <Mail class="h-4 w-4" />
+                                </div>
+                                <input
+                                    type="email"
+                                    v-model="formData.email"
+                                    placeholder="Email (@polban.ac.id)"
+                                    required
+                                    class="w-full rounded-xl border border-slate-200 bg-white py-3 pr-4 pl-10 text-sm text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
+                                />
+                            </div>
 
-                    <button type="submit" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[var(--primary-green)] to-[var(--primary-green)] 
-                   hover:from-[var(--primary-green)] hover:to-emerald-700 text-white py-2.5 rounded-lg font-medium 
-                   shadow-md transition-all hover:scale-[1.02]">
-                        <Send class="w-4 h-4" />
-                        Kirim Pertanyaan
-                    </button>
-                </form>
+                            <!-- Pesan -->
+                            <div class="relative">
+                                <div
+                                    class="pointer-events-none absolute top-3.5 left-3.5 flex items-start text-slate-400"
+                                >
+                                    <MessageSquare class="h-4 w-4" />
+                                </div>
+                                <textarea
+                                    v-model="formData.pertanyaan"
+                                    placeholder="Tulis pertanyaan Anda..."
+                                    required
+                                    rows="3"
+                                    class="w-full resize-none rounded-xl border border-slate-200 bg-white py-3 pr-4 pl-10 text-sm text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
+                                ></textarea>
+                            </div>
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="flex w-full items-center justify-center gap-2 rounded-xl bg-[#99cc33] py-3.5 text-sm font-bold text-white shadow-lg shadow-[#99cc33]/30 transition-all hover:bg-[#88b82d] active:scale-95"
+                        >
+                            <Send class="h-4 w-4" />
+                            Kirim Pertanyaan
+                        </button>
+                    </form>
+
+                    <!-- State: Success -->
+                    <div
+                        v-else
+                        class="animate-fade-in flex h-full flex-col items-center justify-center py-8 text-center"
+                    >
+                        <div
+                            class="animate-bounce-subtle mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100"
+                        >
+                            <CheckCircle2 class="h-10 w-10 text-emerald-600" />
+                        </div>
+                        <h4 class="mb-2 text-xl font-bold text-slate-800">
+                            Pesan Terkirim!
+                        </h4>
+                        <p
+                            class="mb-6 max-w-[250px] text-sm leading-relaxed text-slate-500"
+                        >
+                            Terima kasih, <strong>{{ formData.nama }}</strong
+                            >. Tim kami akan segera membalas ke email
+                            <strong>{{ formData.email }}</strong
+                            >.
+                        </p>
+                        <button
+                            @click="
+                                isSent = false;
+                                formData = {
+                                    nama: '',
+                                    email: '',
+                                    pertanyaan: '',
+                                };
+                            "
+                            class="text-sm font-bold text-[#99cc33] hover:underline"
+                        >
+                            Kirim pertanyaan lain
+                        </button>
+                    </div>
+                </div>
             </div>
         </transition>
     </div>
 </template>
 
 <style scoped>
-/* Animasi fade in/out untuk widget */
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.3s ease, transform 0.3s ease;
+/* Animasi Masuk/Keluar Widget */
+.slide-up-enter-active,
+.slide-up-leave-active {
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.slide-up-enter-from,
+.slide-up-leave-to {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+}
+
+/* Animasi Scale Button */
+.scale-enter-active,
+.scale-leave-active {
+    transition: all 0.3s ease;
+}
+
+.scale-enter-from,
+.scale-leave-to {
+    opacity: 0;
+    transform: scale(0);
+}
+
+/* Animasi Fade Overlay */
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
+}
 .fade-enter-from,
 .fade-leave-to {
     opacity: 0;
-    transform: translateY(10px);
+}
+
+@keyframes bounce-subtle {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+.animate-bounce-subtle {
+    animation: bounce-subtle 2s infinite;
 }
 </style>
