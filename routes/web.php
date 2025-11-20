@@ -1,8 +1,9 @@
 <?php
 
 use App\Http\Controllers\GaleriController;
-use App\Http\Controllers\BookProposalController;
 use App\Http\Controllers\PhotoController;
+use App\Http\Controllers\BookProposalController;
+use App\Http\Controllers\BebasMasalahController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -18,9 +19,7 @@ Route::get('/pelayanan/{slug}', function (string $slug) {
     ]);
 });
 
-Route::get('/bebas_masalah', function () {
-    return Inertia::render('BebasMasalah/Bebas_Masalah');
-});
+Route::get('/bebas_masalah', [BebasMasalahController::class, 'ViewUser']);
 
 Route::get('/gallery', [GaleriController::class, 'index']);
 
@@ -201,7 +200,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('usulan-buku/export', [BookProposalController::class, 'export'])->middleware('auth:admin')->name('book-proposals.export');
     
 
-
     // Tim manajemen
     Route::get('tim-manajemen', [TimManajemen::class, 'TmAdminPage'])->middleware('auth:admin')->name('tim.index');
     Route::post('tim-manajemen/store', [TimManajemen::class, 'store'])->middleware('auth:admin')->name('tim.store');
@@ -220,6 +218,19 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Kita pakai POST untuk update file (dengan _method: PUT di frontend)
     Route::post('cover-buku/update/{id}', [CoverBuku::class, 'update'])->name('cover.update');
     Route::delete('cover-buku/delete/{id}', [CoverBuku::class, 'destroy'])->name('cover.destroy');
+
+    // BebasMasalah
+    Route::get('/bebas-masalah', [BebasMasalahController::class, 'index'])->name('admin.bebas-masalah.index');
+    // (Alur, Template, Watermark)
+    Route::post('/bebas-masalah/settings', [BebasMasalahController::class, 'updateSettings'])->name('admin.bebas-masalah.settings.update');
+    // Persyaratan
+    Route::post('/bebas-masalah/requirements', [BebasMasalahController::class, 'storeRequirement'])->name('admin.bebas-masalah.requirements.store');
+    Route::put('/bebas-masalah/requirements/{id}', [BebasMasalahController::class, 'updateRequirement'])->name('admin.bebas-masalah.requirements.update');
+    Route::delete('/bebas-masalah/requirements/{id}', [BebasMasalahController::class, 'destroyRequirement'])->name('admin.bebas-masalah.requirements.destroy');
+    // Panduan
+    Route::post('/bebas-masalah/guides', [BebasMasalahController::class, 'storeGuide'])->name('admin.bebas-masalah.guides.store');
+    Route::put('/bebas-masalah/guides/{id}', [BebasMasalahController::class, 'updateGuide'])->name('admin.bebas-masalah.guides.update');
+    Route::delete('/bebas-masalah/guides/{id}', [BebasMasalahController::class, 'destroyGuide'])->name('admin.bebas-masalah.guides.destroy');
 });
 
 require __DIR__.'/settings.php';

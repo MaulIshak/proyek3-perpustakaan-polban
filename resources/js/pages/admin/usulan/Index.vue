@@ -2,14 +2,18 @@
 import { ref, watch } from 'vue';
 import { Head, router, Link } from '@inertiajs/vue3';
 import AdminLayout from '@/layouts/AdminLayout.vue';
+import { 
+    Search, Download, BookOpen, Clock, CheckCircle, XCircle, 
+    Eye, Trash2, ChevronLeft, ChevronRight, AlertTriangle, Filter
+} from 'lucide-vue-next';
 
 defineOptions({
     layout: (h, page) =>
         h(
             AdminLayout,
             {
-                title: 'Judul Halaman',
-                subTitle: 'Subjudul Halaman',
+                title: 'Manajemen Usulan Buku',
+                subTitle: 'Kelola daftar permintaan buku baru dari pemustaka',
             },
             { default: () => page },
         ),
@@ -40,10 +44,11 @@ const formatRupiah = (number) => {
     }).format(number);
 };
 
+// Logic Status Color (Tetap Semantic tapi disesuaikan stylenya nanti)
 const getStatusColor = (status) => {
     switch (status) {
         case 'pending': return 'bg-blue-50 text-blue-700 border-blue-200';
-        case 'approved': return 'bg-green-50 text-green-700 border-green-200';
+        case 'approved': return 'bg-[#f3fff3] text-[#0f3800] border-[#99cc33]'; // Custom Green Theme
         case 'rejected': return 'bg-red-50 text-red-700 border-red-200';
         default: return 'bg-gray-50 text-gray-700';
     }
@@ -123,166 +128,190 @@ watch([search, statusFilter], ([newSearch, newStatus]) => {
 <template>
     <Head title="Manajemen Usulan Buku" />
 
-    <div class="min-h-screen bg-gray-50 p-8 font-sans text-gray-800">
+    <div class="min-h-screen bg-[#f3fff3] p-6 lg:p-8 font-sans text-gray-800">
         
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
              <div>
-                <h1 class="text-2xl font-bold text-gray-900">Manajemen Usulan Buku</h1>
-                <p class="text-gray-500 mt-1">Kelola usulan pembelian buku dari pengguna</p>
+                <h1 class="text-2xl font-bold text-[#0f3800]">Manajemen Usulan Buku</h1>
+                <p class="text-gray-500 mt-1 text-sm">Kelola dan validasi usulan pembelian buku dari pengguna.</p>
             </div>
-             <a href="/admin/usulan-buku/export" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition shadow-sm text-sm font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                </svg>
+             <a href="/admin/usulan-buku/export" class="bg-[#00637b] hover:bg-[#0f3800] text-white px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-md hover:shadow-lg text-sm font-semibold transform hover:-translate-y-0.5">
+                <Download class="w-4 h-4" />
                 Export Excel
             </a>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-             <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                <div class="text-sm text-gray-500 mb-1 font-medium">Total Usulan</div>
-                <div class="text-3xl font-bold text-gray-900">{{ stats.total }}</div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+            <div class="bg-white p-5 rounded-xl border border-[#99cc33]/30 shadow-sm flex items-center justify-between relative overflow-hidden group hover:shadow-md transition">
+                <div class="relative z-10">
+                    <div class="text-xs text-gray-500 mb-1 font-bold uppercase tracking-wider">Total Usulan</div>
+                    <div class="text-3xl font-bold text-[#0f3800]">{{ stats.total }}</div>
+                </div>
+                <div class="p-3 bg-[#f3fff3] rounded-lg text-[#00637b]">
+                    <BookOpen class="w-6 h-6" />
+                </div>
             </div>
-            <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                <div class="text-sm text-gray-500 mb-1 font-medium">Diproses</div>
-                <div class="text-3xl font-bold text-blue-600">{{ stats.pending }}</div>
+
+            <div class="bg-white p-5 rounded-xl border border-blue-100 shadow-sm flex items-center justify-between hover:shadow-md transition">
+                <div>
+                    <div class="text-xs text-gray-500 mb-1 font-bold uppercase tracking-wider">Diproses</div>
+                    <div class="text-3xl font-bold text-blue-600">{{ stats.pending }}</div>
+                </div>
+                <div class="p-3 bg-blue-50 rounded-lg text-blue-600">
+                    <Clock class="w-6 h-6" />
+                </div>
             </div>
-            <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                <div class="text-sm text-gray-500 mb-1 font-medium">Disetujui</div>
-                <div class="text-3xl font-bold text-emerald-600">{{ stats.approved }}</div>
+
+            <div class="bg-white p-5 rounded-xl border border-[#99cc33]/50 shadow-sm flex items-center justify-between hover:shadow-md transition">
+                <div>
+                    <div class="text-xs text-gray-500 mb-1 font-bold uppercase tracking-wider">Disetujui</div>
+                    <div class="text-3xl font-bold text-[#00637b]">{{ stats.approved }}</div>
+                </div>
+                <div class="p-3 bg-[#f3fff3] rounded-lg text-[#99cc33]">
+                    <CheckCircle class="w-6 h-6" />
+                </div>
             </div>
-            <div class="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                <div class="text-sm text-gray-500 mb-1 font-medium">Ditolak</div>
-                <div class="text-3xl font-bold text-red-500">{{ stats.rejected }}</div>
+
+            <div class="bg-white p-5 rounded-xl border border-red-100 shadow-sm flex items-center justify-between hover:shadow-md transition">
+                <div>
+                    <div class="text-xs text-gray-500 mb-1 font-bold uppercase tracking-wider">Ditolak</div>
+                    <div class="text-3xl font-bold text-red-500">{{ stats.rejected }}</div>
+                </div>
+                <div class="p-3 bg-red-50 rounded-lg text-red-500">
+                    <XCircle class="w-6 h-6" />
+                </div>
             </div>
         </div>
 
-        <div class="flex flex-col md:flex-row gap-4 mb-6 justify-between">
+        <div class="bg-white rounded-xl p-4 mb-6 border border-[#99cc33]/20 shadow-sm flex flex-col md:flex-row gap-4 justify-between items-center">
             <div class="relative w-full md:w-96">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-gray-400">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                    </svg>
+                    <Search class="w-4 h-4 text-gray-400" />
                 </div>
-                <input v-model="search" type="text" placeholder="Cari nama pengusul, judul buku..." class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm transition">
+                <input 
+                    v-model="search" 
+                    type="text" 
+                    placeholder="Cari nama pengusul, judul buku..." 
+                    class="w-full pl-10 pr-4 py-2.5 bg-[#f3fff3]/30 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#99cc33] focus:border-[#99cc33] outline-none text-sm transition hover:bg-white"
+                >
             </div>
-            <div class="flex items-center gap-2">
-                <select v-model="statusFilter" class="pl-4 pr-10 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-white cursor-pointer">
-                    <option value="all">Semua Status</option>
-                    <option value="pending">Diproses</option>
-                    <option value="approved">Disetujui</option>
-                    <option value="rejected">Ditolak</option>
-                </select>
+            <div class="flex items-center gap-2 w-full md:w-auto">
+                <div class="relative w-full md:w-auto">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Filter class="w-4 h-4 text-[#00637b]" />
+                    </div>
+                    <select v-model="statusFilter" class="w-full md:w-auto pl-10 pr-10 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#00637b] focus:border-[#00637b] outline-none text-sm bg-white cursor-pointer font-medium text-gray-700 hover:bg-gray-50">
+                        <option value="all">Semua Status</option>
+                        <option value="pending">Diproses</option>
+                        <option value="approved">Disetujui</option>
+                        <option value="rejected">Ditolak</option>
+                    </select>
+                </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div class="bg-white rounded-xl border border-[#99cc33]/30 shadow-md overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm">
-                    <thead class="bg-gray-50 border-b border-gray-200">
+                    <thead class="bg-[#00637b]">
                         <tr>
-                            <th class="px-6 py-4 font-medium text-gray-500 uppercase tracking-wider text-xs text-left">Nama Pengusul</th>
-                            <th class="px-6 py-4 font-medium text-gray-500 uppercase tracking-wider text-xs text-left">Judul Buku</th>
-                            <th class="px-6 py-4 font-medium text-gray-500 uppercase tracking-wider text-xs text-left">Pengarang</th>
-                            <th class="px-6 py-4 font-medium text-gray-500 uppercase tracking-wider text-xs text-left">ISBN</th>
-                            <th class="px-6 py-4 font-medium text-gray-500 uppercase tracking-wider text-xs text-left">Tahun</th>
-                            <th class="px-6 py-4 font-medium text-gray-500 uppercase tracking-wider text-xs text-left">Alasan</th>
-                            <th class="px-6 py-4 font-medium text-gray-500 uppercase tracking-wider text-xs text-center">Aksi</th>
+                            <th class="px-6 py-4 font-bold text-white uppercase tracking-wider text-xs text-left">Nama Pengusul</th>
+                            <th class="px-6 py-4 font-bold text-white uppercase tracking-wider text-xs text-left">Judul Buku</th>
+                            <th class="px-6 py-4 font-bold text-white uppercase tracking-wider text-xs text-left">Pengarang</th>
+                            <th class="px-6 py-4 font-bold text-white uppercase tracking-wider text-xs text-left">ISBN/Tahun</th>
+                            <th class="px-6 py-4 font-bold text-white uppercase tracking-wider text-xs text-left">Status</th>
+                            <th class="px-6 py-4 font-bold text-white uppercase tracking-wider text-xs text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
-                        <tr v-for="proposal in proposals.data" :key="proposal.id" class="hover:bg-gray-50 transition group">
+                        <tr v-for="proposal in proposals.data" :key="proposal.id" class="hover:bg-[#f3fff3] transition-colors duration-150 group">
                             
                             <td class="px-6 py-4 max-w-[180px]">
-                                <div class="font-semibold text-gray-900 truncate" :title="proposal.nama_pengusul">
+                                <div class="font-bold text-[#0f3800] truncate" :title="proposal.nama_pengusul">
                                     {{ proposal.nama_pengusul }}
                                 </div>
-                                <div class="text-xs text-gray-400 mt-1 truncate">
-                                    {{ proposal.nim }} - {{ proposal.prodi }}
+                                <div class="text-xs text-gray-500 mt-1 truncate flex items-center gap-1">
+                                    <span class="bg-gray-100 px-1.5 py-0.5 rounded">{{ proposal.nim }}</span>
+                                    <span>{{ proposal.prodi }}</span>
                                 </div>
                             </td>
 
                             <td class="px-6 py-4 max-w-[220px]">
-                                <div class="text-gray-900 font-medium truncate" :title="proposal.title">
+                                <div class="text-[#00637b] font-bold truncate" :title="proposal.title">
                                     {{ proposal.title }}
                                 </div>
-                                <div class="text-xs text-gray-400 mt-1 font-normal truncate" :title="proposal.publisher">
+                                <div class="text-xs text-gray-500 mt-1 font-normal truncate" :title="proposal.publisher">
                                     {{ proposal.publisher }}
                                 </div>
                             </td>
 
                             <td class="px-6 py-4 max-w-[150px]">
-                                <div class="text-gray-900 truncate" :title="proposal.author">
+                                <div class="text-gray-700 truncate" :title="proposal.author">
                                     {{ proposal.author }}
                                 </div>
                             </td>
 
-                            <td class="px-6 py-4 text-gray-900 whitespace-nowrap">
-                                {{ proposal.isbn }}
+                            <td class="px-6 py-4 text-gray-700 whitespace-nowrap">
+                                <div class="text-xs font-mono">{{ proposal.isbn }}</div>
+                                <div class="text-xs text-gray-500">{{ proposal.year }}</div>
                             </td>
-                            <td class="px-6 py-4 text-gray-900 whitespace-nowrap">
-                                {{ proposal.year }}
-                            </td>
-                            
-                            <td class="px-6 py-4 max-w-[150px]">
-                                <div class="text-gray-900 truncate" :title="proposal.reason">
-                                    {{ proposal.reason || '-' }}
+
+                            <td class="px-6 py-4">
+                                <div class="relative w-32">
+                                    <select 
+                                        :value="proposal.status"
+                                        @change="updateStatus(proposal.id, $event.target.value)"
+                                        :class="[
+                                            'w-full appearance-none pl-3 pr-8 py-1.5 rounded-md text-xs font-bold border cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-1 transition shadow-sm',
+                                            getStatusColor(proposal.status)
+                                        ]"
+                                    >
+                                        <option value="pending">Diproses</option>
+                                        <option value="approved">Disetujui</option>
+                                        <option value="rejected">Ditolak</option>
+                                    </select>
+                                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 opacity-60">
+                                        <ChevronRight class="w-3 h-3 rotate-90" />
+                                    </div>
                                 </div>
                             </td>
 
                             <td class="px-6 py-4">
-                                <div class="flex flex-col gap-3 items-center">
-                                    
-                                    <div class="relative w-full">
-                                        <select 
-                                            :value="proposal.status"
-                                            @change="updateStatus(proposal.id, $event.target.value)"
-                                            :class="[
-                                                'w-full appearance-none pl-3 pr-8 py-1.5 rounded-md text-xs font-bold border cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-1 transition shadow-sm',
-                                                getStatusColor(proposal.status)
-                                            ]"
-                                        >
-                                            <option value="pending">Diproses</option>
-                                            <option value="approved">Disetujui</option>
-                                            <option value="rejected">Ditolak</option>
-                                        </select>
-                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 opacity-60" :class="proposal.status === 'pending' ? 'text-blue-700' : (proposal.status === 'approved' ? 'text-green-700' : 'text-red-700')">
-                                            <svg class="h-3 w-3 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                                        </div>
-                                    </div>
+                                <div class="flex gap-2 justify-center">
+                                    <button 
+                                        @click="openDetailModal(proposal)"
+                                        class="p-2 text-[#00637b] bg-[#f3fff3] rounded-full hover:bg-[#00637b] hover:text-white transition shadow-sm border border-[#00637b]/20"
+                                        title="Lihat Detail"
+                                    >
+                                        <Eye class="w-4 h-4" />
+                                    </button>
 
-                                    <div class="flex gap-2 w-full justify-center">
-                                        <button 
-                                            @click="openDetailModal(proposal)"
-                                            class="flex-1 px-2 py-1.5 text-xs font-medium text-blue-600 border border-blue-200 rounded-md hover:bg-blue-50 hover:border-blue-300 transition text-center"
-                                        >
-                                            Detail
-                                        </button>
-
-                                        <button 
-                                            v-if="proposal.status === 'rejected' || proposal.status === 'approved'"
-                                            @click="confirmDelete(proposal.id)"
-                                            class="flex-1 px-2 py-1.5 text-xs font-medium text-red-600 border border-red-200 rounded-md hover:bg-red-50 hover:border-red-300 transition text-center"
-                                        >
-                                            Hapus
-                                        </button>
-                                    </div>
-
+                                    <button 
+                                        v-if="proposal.status === 'rejected' || proposal.status === 'approved'"
+                                        @click="confirmDelete(proposal.id)"
+                                        class="p-2 text-red-600 bg-red-50 rounded-full hover:bg-red-600 hover:text-white transition shadow-sm border border-red-200"
+                                        title="Hapus"
+                                    >
+                                        <Trash2 class="w-4 h-4" />
+                                    </button>
                                 </div>
                             </td>
                         </tr>
                         <tr v-if="proposals.data.length === 0">
-                            <td colspan="7" class="px-6 py-10 text-center text-gray-500">
-                                Tidak ada data usulan buku.
+                            <td colspan="6" class="px-6 py-12 text-center text-gray-500 bg-[#f3fff3]/30">
+                                <div class="flex flex-col items-center justify-center">
+                                    <BookOpen class="w-10 h-10 text-gray-300 mb-2" />
+                                    <p>Tidak ada data usulan buku yang ditemukan.</p>
+                                </div>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
             
-            <div v-if="proposals.links.length > 3" class="px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div v-if="proposals.links.length > 3" class="px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center gap-4 bg-white">
                 <div class="text-gray-500 text-sm">
-                    Menampilkan <span class="font-medium">{{ proposals.from }}</span> sampai <span class="font-medium">{{ proposals.to }}</span> dari <span class="font-medium">{{ proposals.total }}</span> data
+                    Menampilkan <span class="font-bold text-[#0f3800]">{{ proposals.from }}</span> - <span class="font-bold text-[#0f3800]">{{ proposals.to }}</span> dari <span class="font-bold text-[#0f3800]">{{ proposals.total }}</span> data
                 </div>
                 <div class="flex gap-1">
                     <Component 
@@ -291,11 +320,11 @@ watch([search, statusFilter], ([newSearch, newStatus]) => {
                         :key="key"
                         :href="link.url"
                         v-html="link.label"
-                        class="px-3 py-1 text-sm rounded-md border transition"
+                        class="px-3 py-1.5 text-sm rounded-md border transition-all duration-200 font-medium"
                         :class="[
                             link.active 
-                                ? 'bg-blue-600 text-white border-blue-600 shadow-sm' 
-                                : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50',
+                                ? 'bg-[#00637b] text-white border-[#00637b] shadow-md' 
+                                : 'bg-white text-gray-600 border-gray-200 hover:bg-[#f3fff3] hover:text-[#00637b] hover:border-[#99cc33]',
                             !link.url ? 'opacity-50 cursor-not-allowed bg-gray-50' : ''
                         ]"
                     />
@@ -304,46 +333,53 @@ watch([search, statusFilter], ([newSearch, newStatus]) => {
         </div>
 
         <Teleport to="body">
-            
             <div v-if="isDetailModalOpen" class="relative z-[9999]" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-                
-                <div 
-                    @click="closeDetailModal" 
-                    class="fixed inset-0 bg-black/50 transition-opacity" 
-                ></div>
-
+                <div @click="closeDetailModal" class="fixed inset-0 bg-[#0f3800]/50 backdrop-blur-sm transition-opacity"></div>
                 <div class="fixed inset-0 z-10 overflow-y-auto">
                     <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-                        
-                        <div class="relative transform overflow-hidden rounded-xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl">
+                        <div class="relative transform overflow-hidden rounded-xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-2xl border-t-4 border-[#99cc33]">
                             
-                            <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                                <h3 class="text-lg font-bold text-gray-900">Detail Usulan Buku</h3>
-                                <button @click="closeDetailModal" class="text-gray-400 hover:text-gray-500 focus:outline-none">
-                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
+                            <div class="bg-[#f3fff3] px-6 py-4 border-b border-[#99cc33]/20 flex justify-between items-center">
+                                <h3 class="text-lg font-bold text-[#0f3800] flex items-center gap-2">
+                                    <BookOpen class="w-5 h-5 text-[#00637b]" />
+                                    Detail Usulan Buku
+                                </h3>
+                                <button @click="closeDetailModal" class="text-gray-400 hover:text-[#00637b] transition">
+                                    <XCircle class="w-6 h-6" />
                                 </button>
                             </div>
 
                             <div class="px-6 py-6" v-if="selectedProposal">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div class="col-span-full"><h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3 border-b pb-1">Informasi Pengusul</h4></div>
-                                    <div><label class="block text-xs text-gray-500 mb-1">Nama</label><p class="text-sm font-medium text-gray-900 whitespace-normal break-words">{{ selectedProposal.nama_pengusul }}</p></div>
-                                    <div><label class="block text-xs text-gray-500 mb-1">NIM/NIP</label><p class="text-sm font-medium text-gray-900 whitespace-normal break-words">{{ selectedProposal.nim }}</p></div>
-                                    <div class="col-span-full"><label class="block text-xs text-gray-500 mb-1">Prodi</label><p class="text-sm font-medium text-gray-900 whitespace-normal break-words">{{ selectedProposal.prodi }}</p></div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
+                                    
+                                    <div class="col-span-full">
+                                        <h4 class="text-xs font-bold text-[#00637b] uppercase tracking-wider mb-3 border-b border-[#99cc33]/20 pb-1">Informasi Pengusul</h4>
+                                    </div>
+                                    <div><label class="block text-xs text-gray-500 mb-1">Nama</label><p class="text-sm font-semibold text-[#0f3800]">{{ selectedProposal.nama_pengusul }}</p></div>
+                                    <div><label class="block text-xs text-gray-500 mb-1">NIM/NIP</label><p class="text-sm font-semibold text-[#0f3800]">{{ selectedProposal.nim }}</p></div>
+                                    <div class="col-span-full"><label class="block text-xs text-gray-500 mb-1">Prodi</label><p class="text-sm font-semibold text-[#0f3800]">{{ selectedProposal.prodi }}</p></div>
 
-                                    <div class="col-span-full mt-2"><h4 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3 border-b pb-1">Informasi Buku</h4></div>
-                                    <div class="col-span-full"><label class="block text-xs text-gray-500 mb-1">Judul</label><p class="text-base font-bold text-gray-900 whitespace-normal break-words">{{ selectedProposal.title }}</p></div>
-                                    <div><label class="block text-xs text-gray-500 mb-1">Pengarang</label><p class="text-sm font-medium text-gray-900 whitespace-normal break-words">{{ selectedProposal.author }}</p></div>
-                                    <div><label class="block text-xs text-gray-500 mb-1">Penerbit</label><p class="text-sm font-medium text-gray-900 whitespace-normal break-words">{{ selectedProposal.publisher }}</p></div>
-                                    <div><label class="block text-xs text-gray-500 mb-1">Harga</label><p class="text-sm font-medium text-gray-900">{{ formatRupiah(selectedProposal.price) }}</p></div>
-                                    <div class="col-span-full"><label class="block text-xs text-gray-500 mb-1">Alasan</label><div class="bg-gray-50 p-3 rounded-lg text-sm text-gray-700 border border-gray-100 whitespace-normal break-words text-justify">{{ selectedProposal.reason || '-' }}</div></div>
+                                    <div class="col-span-full mt-2">
+                                        <h4 class="text-xs font-bold text-[#00637b] uppercase tracking-wider mb-3 border-b border-[#99cc33]/20 pb-1">Informasi Buku</h4>
+                                    </div>
+                                    <div class="col-span-full">
+                                        <label class="block text-xs text-gray-500 mb-1">Judul</label>
+                                        <p class="text-base font-bold text-[#0f3800] bg-[#f3fff3] p-2 rounded border border-[#99cc33]/20">{{ selectedProposal.title }}</p>
+                                    </div>
+                                    <div><label class="block text-xs text-gray-500 mb-1">Pengarang</label><p class="text-sm font-medium text-gray-800">{{ selectedProposal.author }}</p></div>
+                                    <div><label class="block text-xs text-gray-500 mb-1">Penerbit</label><p class="text-sm font-medium text-gray-800">{{ selectedProposal.publisher }}</p></div>
+                                    <div><label class="block text-xs text-gray-500 mb-1">Harga Estimasi</label><p class="text-sm font-bold text-[#00637b]">{{ formatRupiah(selectedProposal.price) }}</p></div>
+                                    <div class="col-span-full">
+                                        <label class="block text-xs text-gray-500 mb-1">Alasan Pembelian</label>
+                                        <div class="bg-gray-50 p-3 rounded-lg text-sm text-gray-600 border border-gray-200 italic text-justify leading-relaxed">
+                                            "{{ selectedProposal.reason || '-' }}"
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             
-                            <div class="bg-gray-50 px-6 py-4 sm:flex sm:flex-row-reverse border-t border-gray-200">
-                                <button type="button" @click="closeDetailModal" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:ml-3 sm:w-auto sm:text-sm">
+                            <div class="bg-gray-50 px-6 py-4 flex justify-end border-t border-gray-200">
+                                <button type="button" @click="closeDetailModal" class="px-5 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-[#00637b] transition">
                                     Tutup
                                 </button>
                             </div>
@@ -351,31 +387,25 @@ watch([search, statusFilter], ([newSearch, newStatus]) => {
                     </div>
                 </div>
             </div>
+        </Teleport>
 
+        <Teleport to="body">
             <div v-if="isDeleteModalOpen" class="relative z-[9999]" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-                
-                <div 
-                    @click="closeDeleteModal" 
-                    class="fixed inset-0 bg-black/50 transition-opacity"
-                ></div>
-
+                <div @click="closeDeleteModal" class="fixed inset-0 bg-[#0f3800]/50 backdrop-blur-sm transition-opacity"></div>
                 <div class="fixed inset-0 z-10 overflow-y-auto">
                     <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-                        
-                        <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                        <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-md border-t-4 border-red-500">
                             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                                 <div class="sm:flex sm:items-start">
                                     <div class="mx-auto shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                                        <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-                                        </svg>
+                                        <AlertTriangle class="h-6 w-6 text-red-600" />
                                     </div>
                                     <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                                        <h3 class="text-lg font-medium leading-6 text-gray-900">Hapus Usulan Buku</h3>
+                                        <h3 class="text-lg font-bold leading-6 text-gray-900">Hapus Usulan Buku</h3>
                                         <div class="mt-2">
                                             <p class="text-sm text-gray-500">
-                                                Apakah Anda yakin ingin menghapus data ini? <br>
-                                                <span class="font-bold text-red-500">Data yang dihapus tidak dapat dikembalikan.</span>
+                                                Apakah Anda yakin ingin menghapus data ini?
+                                                <span class="block mt-2 text-red-600 font-semibold bg-red-50 p-2 rounded border border-red-100">Tindakan ini tidak dapat dibatalkan.</span>
                                             </p>
                                         </div>
                                     </div>
@@ -385,7 +415,7 @@ watch([search, statusFilter], ([newSearch, newStatus]) => {
                                 <button type="button" @click="deleteProposal" :disabled="isDeleting" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:w-auto sm:text-sm disabled:opacity-50 transition">
                                     {{ isDeleting ? 'Menghapus...' : 'Ya, Hapus' }}
                                 </button>
-                                <button type="button" @click="closeDeleteModal" :disabled="isDeleting" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm transition">
+                                <button type="button" @click="closeDeleteModal" :disabled="isDeleting" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#00637b] focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm transition">
                                     Batal
                                 </button>
                             </div>
@@ -393,7 +423,6 @@ watch([search, statusFilter], ([newSearch, newStatus]) => {
                     </div>
                 </div>
             </div>
-
         </Teleport>
 
     </div>

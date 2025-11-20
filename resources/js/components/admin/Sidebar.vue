@@ -92,6 +92,12 @@ const emit = defineEmits(['toggle-sidebar']);
                     :sidebar-open="sidebarOpen"
                 />
                 <SidebarLink
+                    icon="Handshake"
+                    label="BebasMasalah"
+                    to="/admin/bebas-masalah"
+                    :sidebar-open="sidebarOpen"
+                />
+                <SidebarLink
                     icon="Image"
                     label="Galeri"
                     to="/admin/galeri"
