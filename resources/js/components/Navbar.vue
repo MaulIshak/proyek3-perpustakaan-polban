@@ -35,7 +35,7 @@ const navItems = [
         items: [
             { name: 'Katalog Digital', href: 'https://elib.polban.ac.id/' },
             { name: 'Digilib', href: 'https://digilib.polban.ac.id/' },
-            { name: 'repositori', href: '/repositori' },
+            { name: 'Repositori', href: '#' },
             { name: 'E-Journal & E-Book', href: '/e-journal' },
             { name: 'E-Collection', href: '/e-collection' },
         ],
@@ -123,7 +123,10 @@ onUnmounted(() => {
                 <!-- Logo Section -->
                 <!-- Adjusted gap for mobile -->
                 <div class="flex items-center gap-2 sm:gap-4">
-                    <Link href="/" class="group flex items-center gap-2 sm:gap-4">
+                    <Link
+                        href="/"
+                        class="group flex items-center gap-2 sm:gap-4"
+                    >
                         <div class="relative shrink-0">
                             <div
                                 class="absolute inset-0 rounded-full bg-[#99cc33]/20 opacity-0 blur-lg transition-opacity duration-500 group-hover:opacity-100"
@@ -134,18 +137,14 @@ onUnmounted(() => {
                                 class="relative h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105 md:h-14"
                             />
                         </div>
-                        <!-- PERBAIKAN DI SINI: -->
-                        <!-- 1. Menghapus 'hidden' agar muncul di mobile -->
-                        <!-- 2. Menggunakan text-[10px] untuk mobile agar muat -->
-                        <!-- 3. Menggunakan flex-col agar teks NPP berada di bawah judul -->
                         <div class="flex flex-col justify-center">
                             <h1
                                 class="text-[10px] leading-tight font-extrabold tracking-tight text-slate-800 transition-colors duration-300 group-hover:text-[#99cc33] sm:text-sm md:text-base lg:text-lg"
                             >
                                 PERPUSTAKAAN POLITEKNIK NEGERI BANDUNG
                                 <span
-                                    class="block font-semibold text-slate-500 text-[9px] sm:text-xs md:text-sm lg:text-base"
-                                    >NPP: 321702200000001</span
+                                    class="block text-[9px] font-semibold text-slate-500 sm:text-xs md:text-sm lg:text-base"
+                                    >NPP 321702200000001</span
                                 >
                             </h1>
                         </div>

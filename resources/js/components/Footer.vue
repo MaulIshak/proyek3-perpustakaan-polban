@@ -3,39 +3,27 @@ import { Link } from '@inertiajs/vue3';
 import { Facebook, Instagram, Youtube } from 'lucide-vue-next';
 
 const quickLinks = [
-    { name: 'Tentang', href: '/about' },
-    { name: 'Fasilitas', href: '/facilities' },
-    { name: 'e-Lib', href: '/e-lib' },
-    { name: 'Repository', href: '/repository' },
-    { name: 'Kontak', href: '/contact' },
+    { name: 'Politeknik Negeri Bandung', href: 'https://www.polban.ac.id/' },
+    { name: 'Digilib', href: 'https://digilib.polban.ac.id/' },
+    { name: 'Elib', href: 'https://elib.polban.ac.id/' },
+    { name: 'Repositori', href: '#' },
+    { name: 'Bebas Masalah', href: '/bebas_masalah' },
+    { name: 'Usulan Buku', href: '/usulan_buku' },
 ];
 
 const socialMedia = [
     { icon: Instagram, url: 'https://instagram.com/perpustakaanpolban' },
     { icon: Facebook, url: 'https://facebook.com/perpustakaanpolban' },
-    { icon: Youtube, url: 'https://youtube.com/perpustakaanpolban' },
+    { icon: Youtube, url: 'https://youtube.com/@perpustakaanpolban' },
 ];
 </script>
 
 <template>
     <footer
-        class="bg-[var(--background-green)] pt-16 pb-10 font-sans text-sm text-slate-600"
+        class="text-md bg-[var(--background-green)] pt-16 pb-10 font-sans text-slate-600"
     >
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div
-                class="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-12 lg:gap-8"
-            >
-                <!-- COL 1: LOGO & BRAND (Lebar: 3/12) -->
-                <div class="flex flex-col items-start lg:col-span-3">
-                    <div class="mb-6">
-                        <img
-                            src="/logo-polban.png"
-                            alt="Logo Politeknik Negeri Bandung"
-                            class="h-auto w-32 object-contain sm:w-48 md:w-64"
-                        />
-                    </div>
-                </div>
-
+            <div class="flex flex-wrap justify-between gap-5">
                 <!-- COL 2: JADWAL PELAYANAN (Lebar: 4/12) -->
                 <div class="lg:col-span-4">
                     <h3
@@ -52,7 +40,7 @@ const socialMedia = [
                             </h4>
                             <div class="space-y-1 text-slate-600">
                                 <p>Senin - Jumat : 08.00 - 16.00 WIB</p>
-                                <p class="text-xs text-slate-500">
+                                <p class="text-slate-500">
                                     (Istirahat Jumat: 11.00 - 13.00 WIB)
                                 </p>
                             </div>
@@ -69,7 +57,7 @@ const socialMedia = [
                         <!-- Tutup -->
                         <div>
                             <h4 class="mb-1 font-bold text-slate-800">Tutup</h4>
-                            <p class="text-xs leading-relaxed text-slate-500">
+                            <p class="leading-relaxed text-slate-500">
                                 Sabtu, Minggu, Libur Nasional, dan Cuti Bersama.
                                 <br />
                                 <span class="text-[#99cc33] italic"
@@ -88,7 +76,7 @@ const socialMedia = [
                         <h3
                             class="mb-6 text-lg font-extrabold tracking-tight text-slate-900"
                         >
-                            Link
+                            Tautan Singkat
                         </h3>
                         <ul class="space-y-3">
                             <li v-for="link in quickLinks" :key="link.name">
@@ -105,7 +93,7 @@ const socialMedia = [
                         </ul>
                     </div>
 
-                    <!-- Socials -->
+                    <!-- Socials
                     <div>
                         <h3 class="mb-4 text-sm font-bold text-slate-900">
                             Ikuti Kami
@@ -121,7 +109,7 @@ const socialMedia = [
                                 <component :is="social.icon" class="h-5 w-5" />
                             </a>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
 
                 <!-- COL 4: CONTACT (Lebar: 3/12) -->
@@ -138,11 +126,9 @@ const socialMedia = [
                                 Perpustakaan Politeknik Negeri Bandung
                             </h4>
                             <span class="text-slate-500"
-                                >NPP: 321702200000001</span
+                                >NPP 321702200000001</span
                             >
-                            <p
-                                class="mt-2 text-xs leading-relaxed text-slate-500"
-                            >
+                            <p class="mt-2 leading-relaxed text-slate-500">
                                 Gedung H, Lantai 1<br />
                                 Jl. Gegerkalong Hilir, Ds. Ciwaruga<br />
                                 Bandung Barat, Jawa Barat 40559
@@ -182,14 +168,38 @@ const socialMedia = [
                                     >
                                 </div>
                             </div>
+                            <!-- Socials -->
+                            <div>
+                                <h3
+                                    class="mb-4 text-sm font-bold text-slate-900"
+                                >
+                                    Ikuti Kami
+                                </h3>
+                                <div class="flex items-center gap-3">
+                                    <a
+                                        v-for="(social, idx) in socialMedia"
+                                        :key="idx"
+                                        :href="social.url"
+                                        target="_blank"
+                                        class="flex h-12 w-12 items-center justify-center rounded-full bg-white text-slate-600 shadow-sm ring-1 ring-slate-100 transition-all hover:-translate-y-1 hover:bg-[#99cc33] hover:text-white hover:shadow-md"
+                                    >
+                                        <component
+                                            :is="social.icon"
+                                            class="h-5 w-5"
+                                        />
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Copyright Footer -->
-            <div class="mt-16 border-t border-slate-200/60 pt-8 text-center">
-                <p class="text-xs font-medium text-slate-500">
+            <div
+                class="mt-16 border-t border-slate-200/60 pt-8 text-center text-sm"
+            >
+                <p class="font-medium text-slate-500">
                     &copy; {{ new Date().getFullYear() }} Perpustakaan
                     Politeknik Negeri Bandung.
                     <span class="hidden sm:inline"
