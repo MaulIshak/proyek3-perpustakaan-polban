@@ -37,7 +37,7 @@ const navItems = [
             { name: 'Digilib', href: 'https://digilib.polban.ac.id/' },
             { name: 'repositori', href: '/repositori' },
             { name: 'E-Journal & E-Book', href: '/e-journal' },
-            { name: 'E-Collection', href: '/E-Collection' },
+            { name: 'E-Collection', href: '/e-collection' },
         ],
     },
     {

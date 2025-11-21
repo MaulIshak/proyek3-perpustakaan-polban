@@ -4,6 +4,7 @@ use App\Http\Controllers\GaleriController;
 use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\BookProposalController;
 use App\Http\Controllers\BebasMasalahController;
+use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\EJournalController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
@@ -123,6 +124,8 @@ Route::get('/jam-layanan', function (){
     return Inertia::render('user/Profile/JamLayanan', $data);
 });
 
+Route::get('/e-collection', [CollectionController::class, 'ShowUser']);
+
 // Booking Buku
 Route::get('/book-reservation', function(){
     $data = [
@@ -230,6 +233,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('/bebas-masalah/guides', [BebasMasalahController::class, 'storeGuide'])->middleware('auth:admin')->name('admin.bebas-masalah.guides.store');
     Route::put('/bebas-masalah/guides/{id}', [BebasMasalahController::class, 'updateGuide'])->middleware('auth:admin')->name('admin.bebas-masalah.guides.update');
     Route::delete('/bebas-masalah/guides/{id}', [BebasMasalahController::class, 'destroyGuide'])->middleware('auth:admin')->name('admin.bebas-masalah.guides.destroy');
+
+    // ecollection
+    Route::get('/e-collections', [CollectionController::class, 'index']); 
+    Route::post('/e-collections', [CollectionController::class, 'store']);
+    // Edit pakai POST karena method spoofing
+    Route::post('/e-collections/{id}', [CollectionController::class, 'update']); 
+    Route::delete('/e-collections/{id}', [CollectionController::class, 'destroy']);
 
     // Ejournal
     // 1. GET: Menampilkan halaman (Index)
