@@ -13,12 +13,14 @@ const emit = defineEmits(['toggle-sidebar']);
 <template>
     <aside
         :class="[
-            'flex flex-col rounded-r-2xl bg-[var(--background-green)]/80 shadow-sm backdrop-blur-xl transition-all duration-300',
+            'flex h-[85dvh] flex-col rounded-r-2xl bg-[var(--background-green)]/80 shadow-sm backdrop-blur-xl transition-all duration-300',
             sidebarOpen ? 'w-64' : 'w-20',
         ]"
     >
-        <!-- HEADER -->
-        <div class="flex items-center gap-3 border-b border-white/10 px-4 py-4">
+        <!-- HEADER (FIXED TOP) -->
+        <div
+            class="flex shrink-0 items-center gap-3 border-b border-white/10 px-4 py-4"
+        >
             <!-- Logo -->
             <img
                 src="/logo-polban.png"
@@ -42,9 +44,10 @@ const emit = defineEmits(['toggle-sidebar']);
             </div>
         </div>
 
-        <!-- Navigation -->
+        <!-- NAVIGATION LINKS (SCROLLABLE MIDDLE) -->
+        <!-- Perubahan: scrollbar-hide dihapus, diganti custom-scrollbar -->
         <nav
-            class="flex-1 space-y-4 overflow-hidden overflow-y-auto p-3 text-sm font-medium"
+            class="custom-scrollbar flex-1 space-y-4 overflow-hidden overflow-y-auto p-3 text-sm font-medium"
         >
             <!-- Group 1 -->
             <div>
@@ -146,7 +149,7 @@ const emit = defineEmits(['toggle-sidebar']);
                 />
                 <SidebarLink
                     icon="BookMarked"
-                    label="e-collections"
+                    label="E-collections"
                     to="/admin/e-collections"
                     :sidebar-open="sidebarOpen"
                 />
@@ -180,20 +183,52 @@ const emit = defineEmits(['toggle-sidebar']);
                     :sidebar-open="sidebarOpen"
                 />
             </div>
+        </nav>
 
+        <!-- LOGOUT SECTION (FIXED BOTTOM) -->
+        <div class="shrink-0 p-3">
             <!-- Divider sebelum logout -->
-            <hr class="my-2 border-[var(--secondary-green)] opacity-40" />
+            <hr class="mb-2 border-[var(--secondary-green)] opacity-40" />
 
             <!-- Logout -->
             <Link
                 href="/admin/logout"
                 method="post"
                 as="button"
-                class="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-red-500 transition hover:bg-red-500 hover:text-black"
+                class="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-red-500 transition hover:bg-red-500 hover:text-black"
             >
                 <LogOut class="w-5" />
                 <span v-if="sidebarOpen">Keluar</span>
             </Link>
-        </nav>
+        </div>
     </aside>
 </template>
+
+<style scoped>
+/* Webkit browsers (Chrome, Safari, Edge) */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px; /* Sangat tipis dan elegan */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent; /* Track transparan agar menyatu */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(
+        --secondary-green
+    ); /* Menggunakan variabel warna yang sudah ada */
+    border-radius: 20px;
+    opacity: 0.5; /* Sedikit transparansi agar tidak mencolok */
+}
+
+.custom-scrollbar:hover::-webkit-scrollbar-thumb {
+    background-color: var(--dark-green); /* Lebih gelap saat di-hover */
+}
+
+/* Firefox */
+.custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--secondary-green) transparent;
+}
+</style>
