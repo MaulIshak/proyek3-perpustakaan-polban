@@ -1,25 +1,31 @@
-<script setup>
+<script setup lang="ts">
 import AdminLayout from '@/layouts/AdminLayout.vue';
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
+import debounce from 'lodash/debounce';
 import {
-    AlertTriangle,
     BookOpen,
     CheckCircle,
-    ChevronRight,
+    ChevronDown,
     Clock,
     Download,
     Eye,
+    FileText,
     Filter,
+    MoreHorizontal,
     Search,
     Trash2,
+    X,
     XCircle,
 } from 'lucide-vue-next';
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
-import { computed } from 'vue';
+// Import ConfirmModal
+import ConfirmModal from '@/components/admin/ConfirmModal.vue';
+import PaginationLink from '@/components/admin/PaginationLink.vue';
+import { useConfirmModal } from '@/composables/userConfirmModal';
 
 defineOptions({
-    layout: (h, page) =>
+    layout: (h: any, page: any) =>
         h(
             AdminLayout,
             {
@@ -30,23 +36,43 @@ defineOptions({
         ),
 });
 
-const props = defineProps({
-    proposals: Object,
-    filters: Object,
-    stats: Object,
-});
+const props = defineProps<{
+    proposals: {
+        data: any[];
+        links: any[];
+        from: number;
+        to: number;
+        total: number;
+    };
+    filters: {
+        search?: string;
+        status?: string;
+    };
+    stats: {
+        total: number;
+        pending: number;
+        approved: number;
+        rejected: number;
+    };
+}>();
 
 const search = ref(props.filters.search || '');
 const statusFilter = ref(props.filters.status || 'all');
 
 // --- FORMATTER ---
-const formatDate = (dateString) => {
+const formatDate = (dateString: string) => {
     if (!dateString) return '-';
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const options: Intl.DateTimeFormatOptions = {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    };
     return new Date(dateString).toLocaleDateString('id-ID', options);
 };
 
-const formatRupiah = (number) => {
+const formatRupiah = (number: number) => {
     if (!number) return '-';
     return new Intl.NumberFormat('id-ID', {
         style: 'currency',
@@ -55,110 +81,99 @@ const formatRupiah = (number) => {
     }).format(number);
 };
 
-// Logic Status Color (Tetap Semantic tapi disesuaikan stylenya nanti)
-const getStatusColor = (status) => {
+// Helper Status Color
+const getStatusBadge = (status: string) => {
     switch (status) {
         case 'pending':
-            return 'bg-blue-50 text-blue-700 border-blue-200';
+            return {
+                bg: 'bg-blue-50',
+                text: 'text-blue-600',
+                border: 'border-blue-200',
+                icon: Clock,
+            };
         case 'approved':
-            return 'bg-[#f3fff3] text-[#0f3800] border-[#99cc33]'; // Custom Green Theme
+            return {
+                bg: 'bg-emerald-50',
+                text: 'text-emerald-600',
+                border: 'border-emerald-200',
+                icon: CheckCircle,
+            };
         case 'rejected':
-            return 'bg-red-50 text-red-700 border-red-200';
+            return {
+                bg: 'bg-red-50',
+                text: 'text-red-600',
+                border: 'border-red-200',
+                icon: XCircle,
+            };
         default:
-            return 'bg-gray-50 text-gray-700';
+            return {
+                bg: 'bg-slate-50',
+                text: 'text-slate-600',
+                border: 'border-slate-200',
+                icon: MoreHorizontal,
+            };
     }
 };
 
-const updateStatus = (id, newStatus) => {
+// --- ACTIONS ---
+const { open } = useConfirmModal();
+
+const updateStatus = (id: number, newStatus: string) => {
     router.patch(
         `/admin/usulan-buku/${id}/status`,
-        {
-            status: newStatus,
-        },
-        {
-            preserveScroll: true,
-        },
+        { status: newStatus },
+        { preserveScroll: true },
     );
 };
 
-// --- LOGIKA MODAL DELETE ---
-const isDeleteModalOpen = ref(false);
-const proposalToDelete = ref(null);
-const isDeleting = ref(false);
-
-const confirmDelete = (id) => {
-    proposalToDelete.value = id;
-    isDeleteModalOpen.value = true;
-};
-
-const closeDeleteModal = () => {
-    isDeleteModalOpen.value = false;
-    proposalToDelete.value = null;
-};
-
-const deleteProposal = () => {
-    if (!proposalToDelete.value) return;
-    isDeleting.value = true;
-
-    router.delete(`/admin/usulan-buku/${proposalToDelete.value}`, {
-        preserveScroll: true,
-        onSuccess: () => {
-            closeDeleteModal();
-            isDeleting.value = false;
-        },
-        onError: () => {
-            isDeleting.value = false;
-            closeDeleteModal();
-            console.error('Gagal menghapus data');
+const confirmDelete = (proposal: any) => {
+    open({
+        title: 'Hapus Usulan Buku?',
+        message: `Apakah Anda yakin ingin menghapus usulan buku "${proposal.title}" oleh ${proposal.nama_pengusul}?`,
+        actionLabel: 'Hapus',
+        confirmClass: 'bg-rose-600 hover:bg-rose-700 text-white',
+        onConfirm: () => {
+            router.delete(`/admin/usulan-buku/${proposal.id}`, {
+                preserveScroll: true,
+            });
         },
     });
 };
 
-// --- LOGIKA MODAL DETAIL ---
+// --- MODAL DETAIL ---
 const isDetailModalOpen = ref(false);
-const selectedProposal = ref(null);
+const selectedProposal = ref<any>(null);
 
-const openDetailModal = (proposal) => {
+const openDetailModal = (proposal: any) => {
     selectedProposal.value = proposal;
     isDetailModalOpen.value = true;
 };
 
 const closeDetailModal = () => {
     isDetailModalOpen.value = false;
-    selectedProposal.value = null;
+    setTimeout(() => (selectedProposal.value = null), 300);
 };
 
 // --- WATCHER FILTER ---
-let timeout = null;
-watch([search, statusFilter], ([newSearch, newStatus]) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => {
+watch(
+    [search, statusFilter],
+    debounce(([newSearch, newStatus]) => {
         router.get(
             '/admin/usulan-buku',
             {
                 search: newSearch,
                 status: newStatus === 'all' ? null : newStatus,
             },
-            {
-                preserveState: true,
-                replace: true,
-            },
+            { preserveState: true, replace: true, preserveScroll: true },
         );
-    }, 300);
-});
+    }, 300),
+);
 
 const exportUrl = computed(() => {
     const params = new URLSearchParams();
-
-    if (search.value) {
-        params.append('search', search.value);
-    }
-
-    if (statusFilter.value && statusFilter.value !== 'all') {
+    if (search.value) params.append('search', search.value);
+    if (statusFilter.value && statusFilter.value !== 'all')
         params.append('status', statusFilter.value);
-    }
-
-    // Return URL lengkap dengan query string
     return `/admin/usulan-buku/export?${params.toString()}`;
 });
 </script>
@@ -166,249 +181,276 @@ const exportUrl = computed(() => {
 <template>
     <Head title="Manajemen Usulan Buku" />
 
-    <div class="min-h-screen bg-[#f3fff3] p-6 font-sans text-gray-800 lg:p-8">
-        <div
-            class="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center"
-        >
-            <div>
-                <h1 class="text-2xl font-bold text-[#0f3800]">
-                    Manajemen Usulan Buku
-                </h1>
-                <p class="mt-1 text-sm text-gray-500">
-                    Kelola dan validasi usulan pembelian buku dari pengguna.
-                </p>
-            </div>
-            <a
-                :href="exportUrl || ''"
-                target="_blank"
-                class="flex transform items-center gap-2 rounded-lg bg-[#00637b] px-5 py-2.5 text-sm font-semibold text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-[#0f3800] hover:shadow-lg"
-            >
-                <Download class="h-4 w-4" />
-                Export Excel
-            </a>
-        </div>
-
-        <div class="mb-8 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
+    <div class="space-y-8 font-sans text-slate-600">
+        <!-- 1. Stats Section -->
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
             <div
-                class="group relative flex items-center justify-between overflow-hidden rounded-xl border border-[#99cc33]/30 bg-white p-5 shadow-sm transition hover:shadow-md"
+                class="group relative overflow-hidden rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
             >
-                <div class="relative z-10">
+                <div class="flex items-center gap-4">
                     <div
-                        class="mb-1 text-xs font-bold tracking-wider text-gray-500 uppercase"
+                        class="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 transition-transform group-hover:scale-110"
                     >
-                        Total Usulan
+                        <FileText class="h-7 w-7" />
                     </div>
-                    <div class="text-3xl font-bold text-[#0f3800]">
-                        {{ stats.total }}
+                    <div>
+                        <p
+                            class="text-xs font-bold tracking-wider text-slate-400 uppercase"
+                        >
+                            Total Usulan
+                        </p>
+                        <h3 class="text-3xl font-black text-slate-800">
+                            {{ stats.total }}
+                        </h3>
                     </div>
-                </div>
-                <div class="rounded-lg bg-[#f3fff3] p-3 text-[#00637b]">
-                    <BookOpen class="h-6 w-6" />
                 </div>
             </div>
 
             <div
-                class="flex items-center justify-between rounded-xl border border-blue-100 bg-white p-5 shadow-sm transition hover:shadow-md"
+                class="group relative overflow-hidden rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
             >
-                <div>
+                <div class="flex items-center gap-4">
                     <div
-                        class="mb-1 text-xs font-bold tracking-wider text-gray-500 uppercase"
+                        class="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 transition-transform group-hover:scale-110"
                     >
-                        Diproses
+                        <Clock class="h-7 w-7" />
                     </div>
-                    <div class="text-3xl font-bold text-blue-600">
-                        {{ stats.pending }}
+                    <div>
+                        <p
+                            class="text-xs font-bold tracking-wider text-blue-400 uppercase"
+                        >
+                            Diproses
+                        </p>
+                        <h3 class="text-3xl font-black text-blue-700">
+                            {{ stats.pending }}
+                        </h3>
                     </div>
-                </div>
-                <div class="rounded-lg bg-blue-50 p-3 text-blue-600">
-                    <Clock class="h-6 w-6" />
                 </div>
             </div>
 
             <div
-                class="flex items-center justify-between rounded-xl border border-[#99cc33]/50 bg-white p-5 shadow-sm transition hover:shadow-md"
+                class="group relative overflow-hidden rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
             >
-                <div>
+                <div class="flex items-center gap-4">
                     <div
-                        class="mb-1 text-xs font-bold tracking-wider text-gray-500 uppercase"
+                        class="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 transition-transform group-hover:scale-110"
                     >
-                        Disetujui
+                        <CheckCircle class="h-7 w-7" />
                     </div>
-                    <div class="text-3xl font-bold text-[#00637b]">
-                        {{ stats.approved }}
+                    <div>
+                        <p
+                            class="text-xs font-bold tracking-wider text-emerald-400 uppercase"
+                        >
+                            Disetujui
+                        </p>
+                        <h3 class="text-3xl font-black text-emerald-700">
+                            {{ stats.approved }}
+                        </h3>
                     </div>
-                </div>
-                <div class="rounded-lg bg-[#f3fff3] p-3 text-[#99cc33]">
-                    <CheckCircle class="h-6 w-6" />
                 </div>
             </div>
 
             <div
-                class="flex items-center justify-between rounded-xl border border-red-100 bg-white p-5 shadow-sm transition hover:shadow-md"
+                class="group relative overflow-hidden rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
             >
-                <div>
+                <div class="flex items-center gap-4">
                     <div
-                        class="mb-1 text-xs font-bold tracking-wider text-gray-500 uppercase"
+                        class="flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-50 text-rose-600 transition-transform group-hover:scale-110"
                     >
-                        Ditolak
+                        <XCircle class="h-7 w-7" />
                     </div>
-                    <div class="text-3xl font-bold text-red-500">
-                        {{ stats.rejected }}
+                    <div>
+                        <p
+                            class="text-xs font-bold tracking-wider text-rose-400 uppercase"
+                        >
+                            Ditolak
+                        </p>
+                        <h3 class="text-3xl font-black text-rose-700">
+                            {{ stats.rejected }}
+                        </h3>
                     </div>
-                </div>
-                <div class="rounded-lg bg-red-50 p-3 text-red-500">
-                    <XCircle class="h-6 w-6" />
                 </div>
             </div>
         </div>
 
+        <!-- 2. Toolbar: Search, Filter, Export -->
         <div
-            class="mb-6 flex flex-col items-center justify-between gap-4 rounded-xl border border-[#99cc33]/20 bg-white p-4 shadow-sm md:flex-row"
+            class="flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm md:flex-row"
         >
-            <div class="relative w-full md:w-96">
-                <div
-                    class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
-                >
-                    <Search class="h-4 w-4 text-gray-400" />
-                </div>
-                <input
-                    v-model="search"
-                    type="text"
-                    placeholder="Cari nama pengusul, judul buku..."
-                    class="w-full rounded-lg border border-gray-200 bg-[#f3fff3]/30 py-2.5 pr-4 pl-10 text-sm transition outline-none hover:bg-white focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]"
-                />
-            </div>
-            <div class="flex w-full items-center gap-2 md:w-auto">
-                <div class="relative w-full md:w-auto">
+            <!-- Search & Filter -->
+            <div class="flex w-full flex-col gap-3 sm:flex-row md:w-auto">
+                <!-- Search -->
+                <div class="group relative w-full sm:w-80">
                     <div
-                        class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
+                        class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 transition-colors group-focus-within:text-[#99cc33]"
                     >
-                        <Filter class="h-4 w-4 text-[#00637b]" />
+                        <Search class="h-5 w-5" />
+                    </div>
+                    <input
+                        v-model="search"
+                        type="text"
+                        placeholder="Cari nama pengusul, judul buku..."
+                        class="block w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pr-3 pl-10 leading-5 placeholder-slate-400 transition-all focus:border-[#99cc33] focus:bg-white focus:ring-4 focus:ring-[#99cc33]/10 focus:outline-none sm:text-sm"
+                    />
+                </div>
+
+                <!-- Filter -->
+                <div class="group relative w-full sm:w-48">
+                    <div
+                        class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 group-focus-within:text-[#99cc33]"
+                    >
+                        <Filter class="h-4 w-4" />
                     </div>
                     <select
                         v-model="statusFilter"
-                        class="w-full cursor-pointer rounded-lg border border-gray-200 bg-white py-2.5 pr-10 pl-10 text-sm font-medium text-gray-700 outline-none hover:bg-gray-50 focus:border-[#00637b] focus:ring-2 focus:ring-[#00637b] md:w-auto"
+                        class="block w-full cursor-pointer appearance-none rounded-xl border border-slate-200 bg-slate-50 py-2.5 pr-8 pl-10 leading-5 transition-all focus:border-[#99cc33] focus:bg-white focus:ring-4 focus:ring-[#99cc33]/10 focus:outline-none sm:text-sm"
                     >
                         <option value="all">Semua Status</option>
                         <option value="pending">Diproses</option>
                         <option value="approved">Disetujui</option>
                         <option value="rejected">Ditolak</option>
                     </select>
+                    <div
+                        class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400"
+                    >
+                        <ChevronDown class="h-4 w-4" />
+                    </div>
                 </div>
             </div>
+
+            <!-- Export Button -->
+            <a
+                :href="exportUrl"
+                target="_blank"
+                class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-transparent bg-[#00637b] px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-[#0f3800] active:translate-y-0 sm:w-auto"
+            >
+                <Download class="h-4 w-4" />
+                Export Excel
+            </a>
         </div>
 
+        <!-- 3. Data Table -->
         <div
-            class="overflow-hidden rounded-xl border border-[#99cc33]/30 bg-white shadow-md"
+            class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
         >
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm">
-                    <thead class="bg-[#00637b]">
+                <table class="min-w-full divide-y divide-slate-100">
+                    <thead class="bg-slate-50">
                         <tr>
                             <th
-                                class="px-6 py-4 text-left text-xs font-bold tracking-wider text-white uppercase"
+                                class="px-6 py-4 text-left text-xs font-bold tracking-wider text-slate-500 uppercase"
                             >
-                                Nama Pengusul
+                                Pengusul
                             </th>
                             <th
-                                class="px-6 py-4 text-left text-xs font-bold tracking-wider text-white uppercase"
+                                class="px-6 py-4 text-left text-xs font-bold tracking-wider text-slate-500 uppercase"
                             >
-                                Judul Buku
+                                Informasi Buku
                             </th>
                             <th
-                                class="px-6 py-4 text-left text-xs font-bold tracking-wider text-white uppercase"
+                                class="px-6 py-4 text-left text-xs font-bold tracking-wider text-slate-500 uppercase"
                             >
-                                Pengarang
+                                Tanggal
                             </th>
                             <th
-                                class="px-6 py-4 text-left text-xs font-bold tracking-wider text-white uppercase"
-                            >
-                                ISBN/Tahun
-                            </th>
-                            <th
-                                class="px-6 py-4 text-left text-xs font-bold tracking-wider text-white uppercase"
+                                class="px-6 py-4 text-left text-xs font-bold tracking-wider text-slate-500 uppercase"
                             >
                                 Status
                             </th>
                             <th
-                                class="px-6 py-4 text-center text-xs font-bold tracking-wider text-white uppercase"
+                                class="px-6 py-4 text-right text-xs font-bold tracking-wider text-slate-500 uppercase"
                             >
                                 Aksi
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100">
+                    <tbody class="divide-y divide-slate-100">
                         <tr
                             v-for="proposal in proposals.data"
                             :key="proposal.id"
-                            class="group transition-colors duration-150 hover:bg-[#f3fff3]"
+                            class="group transition-colors hover:bg-[#f3fff3]/50"
                         >
-                            <td class="max-w-[180px] px-6 py-4">
-                                <div
-                                    class="truncate font-bold text-[#0f3800]"
-                                    :title="proposal.nama_pengusul"
-                                >
-                                    {{ proposal.nama_pengusul }}
-                                </div>
-                                <div
-                                    class="mt-1 flex items-center gap-1 truncate text-xs text-gray-500"
-                                >
-                                    <span
-                                        class="rounded bg-gray-100 px-1.5 py-0.5"
-                                        >{{ proposal.nim }}</span
-                                    >
-                                    <span>{{ proposal.prodi }}</span>
-                                </div>
-                            </td>
-
-                            <td class="max-w-[220px] px-6 py-4">
-                                <div
-                                    class="truncate font-bold text-[#00637b]"
-                                    :title="proposal.title"
-                                >
-                                    {{ proposal.title }}
-                                </div>
-                                <div
-                                    class="mt-1 truncate text-xs font-normal text-gray-500"
-                                    :title="proposal.publisher"
-                                >
-                                    {{ proposal.publisher }}
-                                </div>
-                            </td>
-
-                            <td class="max-w-[150px] px-6 py-4">
-                                <div
-                                    class="truncate text-gray-700"
-                                    :title="proposal.author"
-                                >
-                                    {{ proposal.author }}
-                                </div>
-                            </td>
-
-                            <td
-                                class="px-6 py-4 whitespace-nowrap text-gray-700"
-                            >
-                                <div class="font-mono text-xs">
-                                    {{ proposal.isbn }}
-                                </div>
-                                <div class="text-xs text-gray-500">
-                                    {{ proposal.year }}
-                                </div>
-                            </td>
-
+                            <!-- Pengusul -->
                             <td class="px-6 py-4">
-                                <div class="relative w-32">
+                                <div class="flex flex-col">
+                                    <span
+                                        class="max-w-[200px] truncate text-sm font-bold text-slate-800"
+                                        :title="proposal.nama_pengusul"
+                                    >
+                                        {{ proposal.nama_pengusul }}
+                                    </span>
+                                    <div class="mt-1 flex items-center gap-2">
+                                        <span
+                                            class="rounded border border-slate-200 bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-500"
+                                        >
+                                            {{ proposal.nim }}
+                                        </span>
+                                        <span
+                                            class="max-w-[120px] truncate text-xs text-slate-400"
+                                            :title="proposal.prodi"
+                                            >{{ proposal.prodi }}</span
+                                        >
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- Info Buku -->
+                            <td class="px-6 py-4">
+                                <div class="flex max-w-[250px] flex-col">
+                                    <span
+                                        class="truncate text-sm font-bold text-[#00637b]"
+                                        :title="proposal.title"
+                                    >
+                                        {{ proposal.title }}
+                                    </span>
+                                    <span
+                                        class="mt-0.5 truncate text-xs text-slate-500"
+                                    >
+                                        {{ proposal.author }} •
+                                        {{ proposal.publisher }}
+                                    </span>
+                                    <div class="mt-1 flex items-center gap-2">
+                                        <span
+                                            class="rounded border border-slate-100 bg-slate-50 px-1 font-mono text-[10px] text-slate-400"
+                                            >{{ proposal.isbn }}</span
+                                        >
+                                        <span
+                                            class="text-[10px] text-slate-400"
+                                            >{{ proposal.year }}</span
+                                        >
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- Tanggal -->
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span
+                                    class="rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600"
+                                >
+                                    {{ formatDate(proposal.created_at) }}
+                                </span>
+                            </td>
+
+                            <!-- Status (Dropdown Action) -->
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="relative w-36">
                                     <select
                                         :value="proposal.status"
                                         @change="
                                             updateStatus(
                                                 proposal.id,
-                                                $event.target.value,
+                                                (
+                                                    $event.target as HTMLSelectElement
+                                                ).value,
                                             )
                                         "
+                                        class="w-full cursor-pointer appearance-none rounded-lg border py-1.5 pr-8 pl-3 text-xs font-bold shadow-sm transition outline-none focus:ring-2 focus:ring-offset-1"
                                         :class="[
-                                            'w-full cursor-pointer appearance-none rounded-md border py-1.5 pr-8 pl-3 text-xs font-bold shadow-sm transition focus:ring-2 focus:ring-offset-1 focus:outline-none',
-                                            getStatusColor(proposal.status),
+                                            getStatusBadge(proposal.status).bg,
+                                            getStatusBadge(proposal.status)
+                                                .text,
+                                            getStatusBadge(proposal.status)
+                                                .border,
                                         ]"
                                     >
                                         <option value="pending">
@@ -424,30 +466,24 @@ const exportUrl = computed(() => {
                                     <div
                                         class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 opacity-60"
                                     >
-                                        <ChevronRight
-                                            class="h-3 w-3 rotate-90"
-                                        />
+                                        <ChevronDown class="h-3 w-3" />
                                     </div>
                                 </div>
                             </td>
 
-                            <td class="px-6 py-4">
-                                <div class="flex justify-center gap-2">
+                            <!-- Aksi -->
+                            <td class="px-6 py-4 text-right whitespace-nowrap">
+                                <div class="flex justify-end gap-2">
                                     <button
                                         @click="openDetailModal(proposal)"
-                                        class="rounded-full border border-[#00637b]/20 bg-[#f3fff3] p-2 text-[#00637b] shadow-sm transition hover:bg-[#00637b] hover:text-white"
+                                        class="rounded-lg border border-sky-100 bg-sky-50 p-2 text-sky-600 transition-colors hover:bg-sky-100"
                                         title="Lihat Detail"
                                     >
                                         <Eye class="h-4 w-4" />
                                     </button>
-
                                     <button
-                                        v-if="
-                                            proposal.status === 'rejected' ||
-                                            proposal.status === 'approved'
-                                        "
-                                        @click="confirmDelete(proposal.id)"
-                                        class="rounded-full border border-red-200 bg-red-50 p-2 text-red-600 shadow-sm transition hover:bg-red-600 hover:text-white"
+                                        @click="confirmDelete(proposal)"
+                                        class="rounded-lg border border-rose-100 bg-rose-50 p-2 text-rose-600 transition-colors hover:bg-rose-100"
                                         title="Hapus"
                                     >
                                         <Trash2 class="h-4 w-4" />
@@ -455,20 +491,27 @@ const exportUrl = computed(() => {
                                 </div>
                             </td>
                         </tr>
+
+                        <!-- Empty State -->
                         <tr v-if="proposals.data.length === 0">
-                            <td
-                                colspan="6"
-                                class="bg-[#f3fff3]/30 px-6 py-12 text-center text-gray-500"
-                            >
+                            <td colspan="5" class="px-6 py-16 text-center">
                                 <div
                                     class="flex flex-col items-center justify-center"
                                 >
-                                    <BookOpen
-                                        class="mb-2 h-10 w-10 text-gray-300"
-                                    />
-                                    <p>
+                                    <div
+                                        class="mb-3 rounded-full bg-slate-50 p-4"
+                                    >
+                                        <Search
+                                            class="h-8 w-8 text-slate-400"
+                                        />
+                                    </div>
+                                    <p class="font-medium text-slate-500">
                                         Tidak ada data usulan buku yang
                                         ditemukan.
+                                    </p>
+                                    <p class="mt-1 text-xs text-slate-400">
+                                        Coba ubah filter atau kata kunci
+                                        pencarian.
                                     </p>
                                 </div>
                             </td>
@@ -477,293 +520,207 @@ const exportUrl = computed(() => {
                 </table>
             </div>
 
+            <!-- Pagination -->
             <div
-                v-if="proposals.links.length > 3"
-                class="flex flex-col items-center justify-between gap-4 border-t border-gray-200 bg-white px-6 py-4 sm:flex-row"
+                class="flex flex-col items-center justify-between gap-4 border-t border-slate-100 bg-slate-50 px-6 py-4 sm:flex-row"
             >
-                <div class="text-sm text-gray-500">
+                <div class="text-xs text-slate-500">
                     Menampilkan
-                    <span class="font-bold text-[#0f3800]">{{
+                    <span class="font-bold text-slate-700">{{
                         proposals.from
                     }}</span>
                     -
-                    <span class="font-bold text-[#0f3800]">{{
+                    <span class="font-bold text-slate-700">{{
                         proposals.to
                     }}</span>
                     dari
-                    <span class="font-bold text-[#0f3800]">{{
+                    <span class="font-bold text-slate-700">{{
                         proposals.total
                     }}</span>
                     data
                 </div>
-                <div class="flex gap-1">
-                    <Component
-                        :is="link.url ? Link : 'span'"
-                        v-for="(link, key) in proposals.links"
-                        :key="key"
-                        :href="link.url"
-                        v-html="link.label"
-                        class="rounded-md border px-3 py-1.5 text-sm font-medium transition-all duration-200"
-                        :class="[
-                            link.active
-                                ? 'border-[#00637b] bg-[#00637b] text-white shadow-md'
-                                : 'border-gray-200 bg-white text-gray-600 hover:border-[#99cc33] hover:bg-[#f3fff3] hover:text-[#00637b]',
-                            !link.url
-                                ? 'cursor-not-allowed bg-gray-50 opacity-50'
-                                : '',
-                        ]"
-                    />
-                </div>
+                <PaginationLink :links="proposals.links" />
             </div>
         </div>
 
-        <Teleport to="body">
+        <!-- MODAL DETAIL -->
+        <transition name="modal">
             <div
-                v-if="isDetailModalOpen"
-                class="relative z-[9999]"
-                aria-labelledby="modal-title"
-                role="dialog"
-                aria-modal="true"
+                v-if="isDetailModalOpen && selectedProposal"
+                class="fixed inset-0 z-[70] flex items-center justify-center p-4"
             >
                 <div
+                    class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity"
                     @click="closeDetailModal"
-                    class="fixed inset-0 bg-[#0f3800]/50 backdrop-blur-sm transition-opacity"
                 ></div>
-                <div class="fixed inset-0 z-10 overflow-y-auto">
-                    <div
-                        class="flex min-h-full items-center justify-center p-4 text-center sm:p-0"
-                    >
-                        <div
-                            class="relative transform overflow-hidden rounded-xl border-t-4 border-[#99cc33] bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-2xl"
-                        >
-                            <div
-                                class="flex items-center justify-between border-b border-[#99cc33]/20 bg-[#f3fff3] px-6 py-4"
-                            >
-                                <h3
-                                    class="flex items-center gap-2 text-lg font-bold text-[#0f3800]"
-                                >
-                                    <BookOpen class="h-5 w-5 text-[#00637b]" />
-                                    Detail Usulan Buku
-                                </h3>
-                                <button
-                                    @click="closeDetailModal"
-                                    class="text-gray-400 transition hover:text-[#00637b]"
-                                >
-                                    <XCircle class="h-6 w-6" />
-                                </button>
-                            </div>
 
-                            <div class="px-6 py-6" v-if="selectedProposal">
-                                <div
-                                    class="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2"
-                                >
-                                    <div class="col-span-full">
-                                        <h4
-                                            class="mb-3 border-b border-[#99cc33]/20 pb-1 text-xs font-bold tracking-wider text-[#00637b] uppercase"
-                                        >
-                                            Informasi Pengusul
-                                        </h4>
-                                    </div>
-                                    <div>
-                                        <label
-                                            class="mb-1 block text-xs text-gray-500"
-                                            >Nama</label
-                                        >
-                                        <p
-                                            class="text-sm font-semibold text-[#0f3800]"
-                                        >
-                                            {{ selectedProposal.nama_pengusul }}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <label
-                                            class="mb-1 block text-xs text-gray-500"
-                                            >NIM/NIP</label
-                                        >
-                                        <p
-                                            class="text-sm font-semibold text-[#0f3800]"
-                                        >
-                                            {{ selectedProposal.nim }}
-                                        </p>
-                                    </div>
-                                    <div class="col-span-full">
-                                        <label
-                                            class="mb-1 block text-xs text-gray-500"
-                                            >Prodi</label
-                                        >
-                                        <p
-                                            class="text-sm font-semibold text-[#0f3800]"
-                                        >
-                                            {{ selectedProposal.prodi }}
-                                        </p>
-                                    </div>
-
-                                    <div class="col-span-full mt-2">
-                                        <h4
-                                            class="mb-3 border-b border-[#99cc33]/20 pb-1 text-xs font-bold tracking-wider text-[#00637b] uppercase"
-                                        >
-                                            Informasi Buku
-                                        </h4>
-                                    </div>
-                                    <div class="col-span-full">
-                                        <label
-                                            class="mb-1 block text-xs text-gray-500"
-                                            >Judul</label
-                                        >
-                                        <p
-                                            class="rounded border border-[#99cc33]/20 bg-[#f3fff3] p-2 text-base font-bold text-[#0f3800]"
-                                        >
-                                            {{ selectedProposal.title }}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <label
-                                            class="mb-1 block text-xs text-gray-500"
-                                            >Pengarang</label
-                                        >
-                                        <p
-                                            class="text-sm font-medium text-gray-800"
-                                        >
-                                            {{ selectedProposal.author }}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <label
-                                            class="mb-1 block text-xs text-gray-500"
-                                            >Penerbit</label
-                                        >
-                                        <p
-                                            class="text-sm font-medium text-gray-800"
-                                        >
-                                            {{ selectedProposal.publisher }}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <label
-                                            class="mb-1 block text-xs text-gray-500"
-                                            >Harga Estimasi</label
-                                        >
-                                        <p
-                                            class="text-sm font-bold text-[#00637b]"
-                                        >
-                                            {{
-                                                formatRupiah(
-                                                    selectedProposal.price,
-                                                )
-                                            }}
-                                        </p>
-                                    </div>
-                                    <div class="col-span-full">
-                                        <label
-                                            class="mb-1 block text-xs text-gray-500"
-                                            >Alasan Pembelian</label
-                                        >
-                                        <div
-                                            class="rounded-lg border border-gray-200 bg-gray-50 p-3 text-justify text-sm leading-relaxed text-gray-600 italic"
-                                        >
-                                            "{{
-                                                selectedProposal.reason || '-'
-                                            }}"
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div
-                                class="flex justify-end border-t border-gray-200 bg-gray-50 px-6 py-4"
-                            >
-                                <button
-                                    type="button"
-                                    @click="closeDetailModal"
-                                    class="rounded-lg border border-gray-300 bg-white px-5 py-2 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 hover:text-[#00637b]"
-                                >
-                                    Tutup
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </Teleport>
-
-        <Teleport to="body">
-            <div
-                v-if="isDeleteModalOpen"
-                class="relative z-[9999]"
-                aria-labelledby="modal-title"
-                role="dialog"
-                aria-modal="true"
-            >
                 <div
-                    @click="closeDeleteModal"
-                    class="fixed inset-0 bg-[#0f3800]/50 backdrop-blur-sm transition-opacity"
-                ></div>
-                <div class="fixed inset-0 z-10 overflow-y-auto">
+                    class="relative z-10 w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all"
+                >
+                    <!-- Header -->
                     <div
-                        class="flex min-h-full items-center justify-center p-4 text-center sm:p-0"
+                        class="flex items-center justify-between border-b border-[#99cc33]/20 bg-[#f3fff3] px-6 py-4"
                     >
-                        <div
-                            class="relative transform overflow-hidden rounded-lg border-t-4 border-red-500 bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-md"
+                        <h3
+                            class="flex items-center gap-2 text-lg font-bold text-[#0f3800]"
                         >
-                            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                                <div class="sm:flex sm:items-start">
-                                    <div
-                                        class="mx-auto flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
+                            <BookOpen class="h-5 w-5 text-[#99cc33]" />
+                            Detail Usulan Buku
+                        </h3>
+                        <button
+                            @click="closeDetailModal"
+                            class="rounded-full bg-white p-1 text-slate-400 shadow-sm transition hover:text-slate-600"
+                        >
+                            <X class="h-5 w-5" />
+                        </button>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="space-y-6 p-6">
+                        <!-- Section 1: Pengusul -->
+                        <div
+                            class="rounded-xl border border-slate-100 bg-slate-50 p-4"
+                        >
+                            <h4
+                                class="mb-3 border-b border-slate-200 pb-2 text-xs font-bold tracking-wider text-[#00637b] uppercase"
+                            >
+                                Informasi Pengusul
+                            </h4>
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <p class="mb-1 text-xs text-slate-400">
+                                        Nama Lengkap
+                                    </p>
+                                    <p class="font-bold text-slate-800">
+                                        {{ selectedProposal.nama_pengusul }}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p class="mb-1 text-xs text-slate-400">
+                                        NIM/NIP
+                                    </p>
+                                    <p class="font-bold text-slate-800">
+                                        {{ selectedProposal.nim }}
+                                    </p>
+                                </div>
+                                <div class="col-span-2">
+                                    <p class="mb-1 text-xs text-slate-400">
+                                        Program Studi
+                                    </p>
+                                    <p class="font-bold text-slate-800">
+                                        {{ selectedProposal.prodi }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section 2: Buku -->
+                        <div>
+                            <h4
+                                class="mb-3 border-b border-slate-100 pb-2 text-xs font-bold tracking-wider text-[#00637b] uppercase"
+                            >
+                                Detail Buku
+                            </h4>
+                            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                <div class="md:col-span-2">
+                                    <p class="mb-1 text-xs text-slate-400">
+                                        Judul Buku
+                                    </p>
+                                    <p
+                                        class="rounded-lg border border-[#99cc33]/20 bg-[#f3fff3] p-3 text-lg leading-tight font-bold text-[#0f3800]"
                                     >
-                                        <AlertTriangle
-                                            class="h-6 w-6 text-red-600"
-                                        />
-                                    </div>
+                                        {{ selectedProposal.title }}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p class="mb-1 text-xs text-slate-400">
+                                        Pengarang
+                                    </p>
+                                    <p class="font-medium text-slate-700">
+                                        {{ selectedProposal.author }}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p class="mb-1 text-xs text-slate-400">
+                                        Penerbit
+                                    </p>
+                                    <p class="font-medium text-slate-700">
+                                        {{ selectedProposal.publisher }}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p class="mb-1 text-xs text-slate-400">
+                                        Tahun / ISBN
+                                    </p>
+                                    <p class="font-medium text-slate-700">
+                                        {{ selectedProposal.year }} /
+                                        <span class="font-mono text-xs">{{
+                                            selectedProposal.isbn
+                                        }}</span>
+                                    </p>
+                                </div>
+                                <div>
+                                    <p class="mb-1 text-xs text-slate-400">
+                                        Estimasi Harga
+                                    </p>
+                                    <p class="font-bold text-[#00637b]">
+                                        {{
+                                            formatRupiah(selectedProposal.price)
+                                        }}
+                                    </p>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <p class="mb-1 text-xs text-slate-400">
+                                        Alasan Usulan
+                                    </p>
                                     <div
-                                        class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left"
+                                        class="rounded-xl border border-slate-100 bg-slate-50 p-4 text-sm leading-relaxed text-slate-600 italic"
                                     >
-                                        <h3
-                                            class="text-lg leading-6 font-bold text-gray-900"
-                                        >
-                                            Hapus Usulan Buku
-                                        </h3>
-                                        <div class="mt-2">
-                                            <p class="text-sm text-gray-500">
-                                                Apakah Anda yakin ingin
-                                                menghapus data ini?
-                                                <span
-                                                    class="mt-2 block rounded border border-red-100 bg-red-50 p-2 font-semibold text-red-600"
-                                                    >Tindakan ini tidak dapat
-                                                    dibatalkan.</span
-                                                >
-                                            </p>
-                                        </div>
+                                        "{{
+                                            selectedProposal.reason ||
+                                            'Tidak ada alasan yang diberikan.'
+                                        }}"
                                     </div>
                                 </div>
                             </div>
-                            <div
-                                class="gap-2 bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6"
-                            >
-                                <button
-                                    type="button"
-                                    @click="deleteProposal"
-                                    :disabled="isDeleting"
-                                    class="inline-flex w-full justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-base font-medium text-white shadow-sm transition hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none disabled:opacity-50 sm:w-auto sm:text-sm"
-                                >
-                                    {{
-                                        isDeleting
-                                            ? 'Menghapus...'
-                                            : 'Ya, Hapus'
-                                    }}
-                                </button>
-                                <button
-                                    type="button"
-                                    @click="closeDeleteModal"
-                                    :disabled="isDeleting"
-                                    class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 focus:ring-2 focus:ring-[#00637b] focus:ring-offset-2 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm"
-                                >
-                                    Batal
-                                </button>
-                            </div>
                         </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div
+                        class="flex justify-end border-t border-slate-100 bg-slate-50 px-6 py-4"
+                    >
+                        <button
+                            @click="closeDetailModal"
+                            class="rounded-xl border border-slate-200 bg-white px-6 py-2.5 font-bold text-slate-600 shadow-sm transition-colors hover:bg-slate-100"
+                        >
+                            Tutup
+                        </button>
                     </div>
                 </div>
             </div>
-        </Teleport>
+        </transition>
+
+        <!-- Confirm Modal -->
+        <ConfirmModal />
     </div>
 </template>
+
+<style scoped>
+.modal-enter-active,
+.modal-leave-active {
+    transition: opacity 0.3s ease;
+}
+.modal-enter-from,
+.modal-leave-to {
+    opacity: 0;
+}
+.modal-enter-active .transform,
+.modal-leave-active .transform {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.modal-enter-from .transform,
+.modal-leave-to .transform {
+    transform: scale(0.95) translateY(10px);
+}
+</style>

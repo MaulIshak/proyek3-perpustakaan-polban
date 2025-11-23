@@ -1,59 +1,89 @@
-<script setup>
+<script setup lang="ts">
 import AdminLayout from '@/layouts/AdminLayout.vue';
-import { useForm } from '@inertiajs/vue3';
-import { ref } from 'vue';
-import { Trash2, Edit, Plus, Save, UploadCloud, FileText, Image as ImageIcon } from 'lucide-vue-next';
+import { useForm, router } from '@inertiajs/vue3';
+import { ref, computed } from 'vue';
+import {
+    Trash2,
+    Edit,
+    Plus,
+    Save,
+    UploadCloud,
+    FileText,
+    Image as ImageIcon,
+    GitGraph,
+    CheckSquare,
+    BookOpen,
+    ShieldCheck,
+    Download,
+    X
+} from 'lucide-vue-next';
+import { useConfirmModal } from '@/composables/userConfirmModal';
 
 // Layout Setup
 defineOptions({
-    layout: (h, page) =>
+    layout: (h: any, page: any) =>
         h(
             AdminLayout,
             {
                 title: 'Manajemen Bebas Masalah',
-                subTitle: 'Atur konten halaman bebas masalah perpustakaan',
+                subTitle: 'Atur konten, persyaratan, dan panduan halaman bebas masalah',
             },
             { default: () => page },
         ),
 });
 
-// Props dari Controller
-const props = defineProps({
-    settings: Object,
-    requirements: Array,
-    guides: Array,
-});
+// Props
+const props = defineProps<{
+    settings: any;
+    requirements: any[];
+    guides: any[];
+}>();
 
+// State
 const activeTab = ref('alur');
+const { open } = useConfirmModal();
 
-// --- FORM SETTINGS ---
+// Tabs Configuration
+const tabs = [
+    { id: 'alur', label: 'Diagram Alur', icon: GitGraph },
+    { id: 'persyaratan', label: 'Persyaratan', icon: CheckSquare },
+    { id: 'panduan', label: 'Panduan', icon: BookOpen },
+    { id: 'template', label: 'Template Surat', icon: FileText },
+    { id: 'watermark', label: 'Watermark', icon: ShieldCheck },
+];
+
+// --- FORM SETTINGS (Single Endpoint Update) ---
 const formSettings = useForm({
-    _method: 'POST',
+    _method: 'POST', // Trick for Laravel file upload on update
     alur_description: props.settings?.alur_description || '',
-    alur_image: null,
+    alur_image: null as File | null,
+
     template_title: props.settings?.template_title || '',
     template_info: props.settings?.template_info || '',
     template_instruction: props.settings?.template_instruction || '',
-    template_file: null,
+    template_file: null as File | null,
+
     watermark_title: props.settings?.watermark_title || '',
     watermark_info: props.settings?.watermark_info || '',
     watermark_instruction: props.settings?.watermark_instruction || '',
-    watermark_image: null,
+    watermark_image: null as File | null,
 });
 
 const submitSettings = () => {
-    // UBAH DISINI: Menggunakan URL Manual
     formSettings.post('/admin/bebas-masalah/settings', {
         preserveScroll: true,
-        onSuccess: () => formSettings.reset('alur_image', 'template_file', 'watermark_image'),
+        onSuccess: () => {
+            formSettings.reset('alur_image', 'template_file', 'watermark_image');
+            // Optional: Show toast
+        },
     });
 };
 
-// --- LOGIC CRUD ---
+// --- CRUD LIST (Requirements & Guides) ---
 const showModal = ref(false);
-const modalMode = ref('create');
-const modalType = ref('requirement');
-const editingId = ref(null);
+const modalMode = ref<'create' | 'edit'>('create');
+const modalType = ref<'requirement' | 'guide'>('requirement');
+const editingId = ref<number | null>(null);
 
 const formList = useForm({
     title: '',
@@ -61,11 +91,11 @@ const formList = useForm({
     sort_order: 0,
 });
 
-const openModal = (type, mode, item = null) => {
+const openModal = (type: 'requirement' | 'guide', mode: 'create' | 'edit', item: any = null) => {
     modalType.value = type;
     modalMode.value = mode;
     showModal.value = true;
-    
+
     if (mode === 'edit' && item) {
         editingId.value = item.id;
         formList.title = item.title;
@@ -73,255 +103,336 @@ const openModal = (type, mode, item = null) => {
         formList.sort_order = item.sort_order;
     } else {
         formList.reset();
-        formList.sort_order = type === 'requirement' ? props.requirements.length + 1 : props.guides.length + 1;
+        // Auto increment sort order suggestion
+        const list = type === 'requirement' ? props.requirements : props.guides;
+        formList.sort_order = list.length + 1;
     }
 };
 
 const submitList = () => {
-    let url = '';
-    
-    // UBAH DISINI: Logic URL Manual
-    if (modalType.value === 'requirement') {
-        // URL untuk Requirement
-        if (modalMode.value === 'create') {
-            url = '/admin/bebas-masalah/requirements';
-        } else {
-            url = `/admin/bebas-masalah/requirements/${editingId.value}`;
-        }
-    } else {
-        // URL untuk Guide
-        if (modalMode.value === 'create') {
-            url = '/admin/bebas-masalah/guides';
-        } else {
-            url = `/admin/bebas-masalah/guides/${editingId.value}`;
-        }
-    }
+    const resource = modalType.value === 'requirement' ? 'requirements' : 'guides';
+    const url = modalMode.value === 'create'
+        ? `/admin/bebas-masalah/${resource}`
+        : `/admin/bebas-masalah/${resource}/${editingId.value}`;
 
-    const options = { onSuccess: () => showModal.value = false };
-    
-    // Kirim request (POST untuk create, PUT untuk update)
-    modalMode.value === 'create' ? formList.post(url, options) : formList.put(url, options);
+    const options = {
+        onSuccess: () => { showModal.value = false; formList.reset(); },
+        preserveScroll: true
+    };
+
+    if (modalMode.value === 'create') {
+        formList.post(url, options);
+    } else {
+        formList.put(url, options);
+    }
 };
 
-const deleteItem = (type, id) => {
-    if (!confirm('Yakin ingin menghapus data ini?')) return;
-    
-    // UBAH DISINI: URL Manual Delete
-    const url = type === 'requirement' 
-        ? `/admin/bebas-masalah/requirements/${id}`
-        : `/admin/bebas-masalah/guides/${id}`;
-        
-    formList.delete(url);
+const handleDelete = (type: 'requirement' | 'guide', item: any) => {
+    open({
+        title: 'Hapus Data?',
+        message: `Apakah Anda yakin ingin menghapus data "${item.title}"?`,
+        actionLabel: 'Hapus',
+        confirmClass: 'bg-rose-600 hover:bg-rose-700 text-white',
+        onConfirm: () => {
+            const resource = type === 'requirement' ? 'requirements' : 'guides';
+            router.delete(`/admin/bebas-masalah/${resource}/${item.id}`, {
+                preserveScroll: true
+            });
+        },
+    });
+};
+
+// File Input Helper
+const handleFileChange = (field: 'alur_image' | 'template_file' | 'watermark_image', event: Event) => {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) formSettings[field] = file;
 };
 </script>
 
 <template>
-    <div class="bg-[#f3fff3] min-h-[80vh] rounded-xl shadow-sm border border-[#99cc33]/30 p-6">
-        
-        <div class="flex flex-wrap gap-2 mb-8 p-1 bg-white rounded-lg border border-[#99cc33]/20 w-fit shadow-sm">
+    <div class="space-y-8 font-sans text-slate-600">
+
+        <!-- 1. Tabs Navigation -->
+        <div class="flex flex-wrap gap-2 bg-white p-2 rounded-2xl border border-slate-100 shadow-sm w-fit">
             <button
-                v-for="tab in ['alur', 'persyaratan', 'panduan', 'template', 'watermark']"
-                :key="tab"
-                class="px-5 py-2.5 text-sm font-semibold rounded-md transition-all duration-300 flex items-center gap-2"
-                :class="activeTab === tab 
-                    ? 'bg-[#00637b] text-white shadow-md transform scale-105' 
-                    : 'text-[#0f3800] hover:bg-[#f3fff3] hover:text-[#00637b]'"
-                @click="activeTab = tab"
+                v-for="tab in tabs"
+                :key="tab.id"
+                @click="activeTab = tab.id"
+                class="flex items-center gap-2 px-5 py-2.5 text-sm font-bold rounded-xl transition-all duration-300"
+                :class="activeTab === tab.id
+                    ? 'bg-[#99cc33] text-white shadow-md transform scale-105'
+                    : 'text-slate-500 hover:bg-slate-50 hover:text-[#99cc33]'"
             >
-                {{ tab.charAt(0).toUpperCase() + tab.slice(1) }}
+                <component :is="tab.icon" class="w-4 h-4" />
+                {{ tab.label }}
             </button>
         </div>
 
-        <div class="bg-white rounded-xl shadow-md border border-[#99cc33]/20 p-6 lg:p-8 relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-[#f3fff3] rounded-full -mr-16 -mt-16 opacity-50 pointer-events-none"></div>
+        <!-- 2. Content Area -->
+        <div class="bg-white rounded-3xl border border-slate-100 shadow-lg shadow-slate-200/50 p-6 sm:p-8 min-h-[500px] relative overflow-hidden">
 
-            <div v-if="activeTab === 'alur'" class="space-y-6 relative z-10">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                    <div class="space-y-5">
-                        <h3 class="text-xl font-bold text-[#0f3800] flex items-center gap-2">
-                            <Edit class="w-5 h-5 text-[#99cc33]" /> Edit Konten Alur
-                        </h3>
-                        
-                        <div>
-                            <label class="block text-sm font-semibold text-[#00637b] mb-1">Deskripsi Alur</label>
-                            <textarea 
-                                v-model="formSettings.alur_description" 
-                                rows="4" 
-                                class="w-full rounded-lg border border-[#99cc33] focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/50 focus:outline-none transition-all duration-200 bg-[#f3fff3]/30 text-gray-700 placeholder-gray-400"
-                                placeholder="Masukkan deskripsi alur..."
-                            ></textarea>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-semibold text-[#00637b] mb-1">Upload Gambar Baru</label>
-                            <div class="flex items-center justify-center w-full">
-                                <label for="alur-upload" class="flex flex-col items-center justify-center w-full h-32 border-2 border-[#99cc33] border-dashed rounded-lg cursor-pointer bg-[#f3fff3] hover:bg-[#e6ffe6] transition">
-                                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                        <UploadCloud class="w-8 h-8 text-[#00637b] mb-2" />
-                                        <p class="text-sm text-[#0f3800]"><span class="font-semibold">Klik untuk upload</span> gambar alur</p>
-                                    </div>
-                                    <input id="alur-upload" type="file" class="hidden" @input="formSettings.alur_image = $event.target.files[0]" />
-                                </label>
+            <!-- Decorative Blob -->
+            <div class="absolute -top-20 -right-20 w-64 h-64 bg-[#99cc33]/5 rounded-full blur-3xl pointer-events-none"></div>
+
+            <transition name="fade" mode="out-in">
+
+                <!-- TAB: ALUR -->
+                <div v-if="activeTab === 'alur'" key="alur" class="relative z-10">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                        <!-- Form -->
+                        <div class="space-y-6">
+                            <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-4">
+                                <GitGraph class="w-5 h-5 text-[#99cc33]" />
+                                Edit Konten Alur
+                            </h3>
+
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Deskripsi Alur</label>
+                                <textarea
+                                    v-model="formSettings.alur_description"
+                                    rows="6"
+                                    class="w-full rounded-xl border-slate-200 bg-slate-50 focus:border-[#99cc33] focus:ring-4 focus:ring-[#99cc33]/10 transition-all text-slate-700 placeholder:text-slate-400 resize-none p-4"
+                                    placeholder="Jelaskan alur proses bebas masalah..."
+                                ></textarea>
                             </div>
-                            <p v-if="formSettings.alur_image" class="mt-2 text-sm text-[#00637b] font-medium">
-                                File terpilih: {{ formSettings.alur_image.name }}
-                            </p>
+
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Upload Gambar Diagram</label>
+                                <label class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-slate-300 rounded-xl cursor-pointer bg-slate-50 hover:bg-[#99cc33]/5 hover:border-[#99cc33] transition-all group">
+                                    <div class="flex flex-col items-center justify-center pt-5 pb-6 text-slate-400 group-hover:text-[#99cc33] transition-colors">
+                                        <UploadCloud class="w-10 h-10 mb-3" />
+                                        <p class="text-sm font-medium"><span class="font-bold">Klik untuk upload</span> gambar baru</p>
+                                        <p class="text-xs opacity-70 mt-1">PNG, JPG (Max 2MB)</p>
+                                    </div>
+                                    <input type="file" class="hidden" accept="image/*" @change="handleFileChange('alur_image', $event)" />
+                                </label>
+                                <p v-if="formSettings.alur_image" class="mt-2 text-sm text-[#99cc33] font-bold flex items-center gap-1">
+                                    <CheckSquare class="w-4 h-4"/> File terpilih: {{ formSettings.alur_image.name }}
+                                </p>
+                            </div>
+
+                            <button @click="submitSettings" :disabled="formSettings.processing" class="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#99cc33] hover:bg-[#88b82d] text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-[#99cc33]/30 hover:shadow-[#99cc33]/50 transition-all active:scale-95">
+                                <Save class="w-4 h-4"/> Simpan Perubahan
+                            </button>
                         </div>
 
-                        <button @click="submitSettings" :disabled="formSettings.processing" class="flex items-center justify-center w-full sm:w-auto bg-[#00637b] hover:bg-[#0f3800] text-white px-6 py-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 font-medium">
-                            <Save class="w-4 h-4 mr-2"/> Simpan Perubahan
+                        <!-- Preview -->
+                        <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 h-full min-h-[300px] flex flex-col">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Preview Gambar Saat Ini</p>
+                            <div class="flex-1 flex items-center justify-center overflow-hidden rounded-xl bg-white shadow-sm border border-slate-100 p-2">
+                                <img
+                                    v-if="settings?.alur_image_path"
+                                    :src="settings.alur_image_path"
+                                    class="max-w-full max-h-[400px] object-contain"
+                                    alt="Alur Preview"
+                                />
+                                <div v-else class="flex flex-col items-center text-slate-300">
+                                    <ImageIcon class="w-12 h-12 mb-2" />
+                                    <span class="text-sm">Belum ada gambar</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: LIST (Requirements & Guides) -->
+                <div v-else-if="activeTab === 'persyaratan' || activeTab === 'panduan'" key="list" class="relative z-10">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+                        <div>
+                            <h3 class="text-xl font-bold text-slate-800">
+                                List {{ activeTab === 'persyaratan' ? 'Persyaratan' : 'Panduan' }}
+                            </h3>
+                            <p class="text-sm text-slate-500 mt-1">Kelola daftar poin yang tampil di halaman user</p>
+                        </div>
+                        <button @click="openModal(activeTab === 'persyaratan' ? 'requirement' : 'guide', 'create')" class="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-900 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg transition-all hover:-translate-y-0.5">
+                            <Plus class="w-5 h-5"/> Tambah Data
                         </button>
                     </div>
 
-                    <div class="flex flex-col gap-2">
-                         <p class="text-sm font-semibold text-[#00637b]">Preview Saat Ini:</p>
-                         <div class="border-4 border-[#f3fff3] rounded-xl shadow-inner bg-gray-50 p-2 h-full flex items-center justify-center overflow-hidden relative">
-                            <img :src="settings?.alur_image_path" class="max-w-full rounded-lg shadow-md object-contain" alt="Current Alur" />
-                            <div class="absolute inset-0 border-2 border-[#99cc33]/30 rounded-xl pointer-events-none"></div>
-                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <div v-if="activeTab === 'persyaratan' || activeTab === 'panduan'" class="relative z-10">
-                <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-                    <div>
-                        <h3 class="text-xl font-bold text-[#0f3800]">
-                            List {{ activeTab === 'persyaratan' ? 'Persyaratan' : 'Panduan' }}
-                        </h3>
-                        <p class="text-sm text-gray-500">Kelola daftar data yang tampil di halaman user</p>
-                    </div>
-                    <button @click="openModal(activeTab === 'persyaratan' ? 'requirement' : 'guide', 'create')" class="bg-[#99cc33] hover:bg-[#88b82b] text-[#0f3800] px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all flex items-center font-bold">
-                        <Plus class="w-5 h-5 mr-2"/> Tambah Data
-                    </button>
-                </div>
-
-                <div class="overflow-hidden rounded-xl border border-[#99cc33]/30 shadow-sm">
-                    <table class="min-w-full divide-y divide-[#f3fff3]">
-                        <thead class="bg-[#00637b]">
-                            <tr>
-                                <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">No</th>
-                                <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">Judul</th>
-                                <th class="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">Deskripsi</th>
-                                <th class="px-6 py-4 text-right text-xs font-bold text-white uppercase tracking-wider">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-100">
-                            <tr v-for="item in (activeTab === 'persyaratan' ? requirements : guides)" :key="item.id" class="hover:bg-[#f3fff3] transition-colors duration-150">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-[#00637b]">{{ item.sort_order }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-[#0f3800]">{{ item.title }}</td>
-                                <td class="px-6 py-4 text-sm text-gray-600 max-w-md truncate">{{ item.description }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                                    <button @click="openModal(activeTab === 'persyaratan' ? 'requirement' : 'guide', 'edit', item)" class="p-2 bg-[#f3fff3] text-[#00637b] rounded-full hover:bg-[#00637b] hover:text-white transition"><Edit class="w-4 h-4"/></button>
-                                    <button @click="deleteItem(activeTab === 'persyaratan' ? 'requirement' : 'guide', item.id)" class="p-2 bg-red-50 text-red-600 rounded-full hover:bg-red-600 hover:text-white transition"><Trash2 class="w-4 h-4"/></button>
-                                </td>
-                            </tr>
-                            <tr v-if="(activeTab === 'persyaratan' ? requirements : guides).length === 0">
-                                <td colspan="4" class="px-6 py-8 text-center text-gray-500 italic bg-[#f3fff3]/50">
-                                    Belum ada data yang tersedia.
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div v-if="activeTab === 'template' || activeTab === 'watermark'" class="max-w-4xl mx-auto relative z-10">
-                <div class="flex items-center gap-4 mb-6 border-b border-[#99cc33]/30 pb-4">
-                    <div class="p-3 bg-[#f3fff3] rounded-lg border border-[#99cc33]">
-                        <FileText v-if="activeTab === 'template'" class="w-8 h-8 text-[#00637b]" />
-                        <ImageIcon v-else class="w-8 h-8 text-[#00637b]" />
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-bold text-[#0f3800]">Pengaturan {{ activeTab === 'template' ? 'Template Dokumen' : 'Watermark' }}</h3>
-                        <p class="text-sm text-gray-500">Sesuaikan file yang akan diunduh oleh mahasiswa</p>
+                    <!-- Table List -->
+                    <div class="overflow-hidden rounded-xl border border-slate-200 shadow-sm bg-white">
+                        <table class="min-w-full divide-y divide-slate-100">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider w-16">No</th>
+                                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Judul</th>
+                                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Deskripsi</th>
+                                    <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <tr
+                                    v-for="item in (activeTab === 'persyaratan' ? requirements : guides)"
+                                    :key="item.id"
+                                    class="hover:bg-slate-50/80 transition-colors group"
+                                >
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-[#99cc33]">{{ item.sort_order }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-slate-700">{{ item.title }}</td>
+                                    <td class="px-6 py-4 text-sm text-slate-500 max-w-md truncate">{{ item.description }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                                        <button @click="openModal(activeTab === 'persyaratan' ? 'requirement' : 'guide', 'edit', item)" class="p-2 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 transition-colors">
+                                            <Edit class="w-4 h-4"/>
+                                        </button>
+                                        <button @click="handleDelete(activeTab === 'persyaratan' ? 'requirement' : 'guide', item)" class="p-2 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 transition-colors">
+                                            <Trash2 class="w-4 h-4"/>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr v-if="(activeTab === 'persyaratan' ? requirements : guides).length === 0">
+                                    <td colspan="4" class="px-6 py-12 text-center text-slate-400 flex flex-col items-center">
+                                        <FileText class="w-10 h-10 mb-2 opacity-20" />
+                                        <span class="text-sm italic">Belum ada data yang tersedia.</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 gap-6 bg-[#f3fff3]/30 p-6 rounded-xl border border-[#99cc33]/20">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-semibold text-[#00637b] mb-1">Judul {{ activeTab === 'template' ? 'Dokumen' : 'Watermark' }}</label>
-                            <input type="text" v-model="formSettings[activeTab + '_title']" class="w-full h-8 rounded-lg border border-[#99cc33] focus:ring-2 focus:outline-none focus:ring-[#99cc33]" />
+                <!-- TAB: FILE SETTINGS (Template/Watermark) -->
+                <div v-else key="file-settings" class="max-w-4xl mx-auto relative z-10">
+                    <div class="flex items-center gap-4 mb-8 pb-6 border-b border-slate-100">
+                        <div class="p-4 bg-[#99cc33]/10 rounded-2xl text-[#99cc33]">
+                            <component :is="activeTab === 'template' ? FileText : ShieldCheck" class="w-8 h-8" />
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold text-[#00637b] mb-1">Info File</label>
-                            <input type="text" v-model="formSettings[activeTab + '_info']" class="w-full h-8 rounded-lg border border-[#99cc33] focus:ring-2 focus:outline-none focus:ring-[#99cc33]" />
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-semibold text-[#00637b] mb-1">Instruksi</label>
-                        <textarea v-model="formSettings[activeTab + '_instruction']" rows="3" class="w-full rounded-lg border border-[#99cc33] focus:ring-2 focus:outline-none focus:ring-[#99cc33]"></textarea>
-                    </div>
-
-                    <div class="flex flex-col md:flex-row gap-6 items-start mt-2 bg-white p-4 rounded-lg border border-[#99cc33]/30 shadow-sm">
-                        <div v-if="activeTab === 'watermark'" class="bg-[#f3fff3] p-2 rounded border border-gray-200 h-24 w-24 flex items-center justify-center flex-shrink-0">
-                            <img :src="settings?.watermark_image_path" class="max-h-full max-w-full" alt="Preview" />
-                        </div>
-                        <div v-else class="h-24 w-24 flex items-center justify-center bg-[#f3fff3] rounded text-[#99cc33] flex-shrink-0">
-                            <FileText class="w-10 h-10" />
-                        </div>
-
-                        <div class="flex-1 w-full">
-                             <div class="flex justify-between items-start">
-                                 <label class="block text-sm font-bold text-[#0f3800] mb-1">Ganti File</label>
-                                 <a :href="settings?.[activeTab + (activeTab === 'template' ? '_file_path' : '_image_path')]" target="_blank" class="text-xs text-[#00637b] hover:text-[#99cc33] underline font-semibold">Lihat File Saat Ini</a>
-                             </div>
-                             <input type="file" @input="formSettings[activeTab + (activeTab === 'template' ? '_file' : '_image')] = $event.target.files[0]" 
-                                class="mt-1 block w-full text-sm text-slate-500
-                                file:mr-4 file:py-2 file:px-4
-                                file:rounded-full file:border-0
-                                file:text-sm file:font-semibold
-                                file:bg-[#f3fff3] file:text-[#00637b]
-                                hover:file:bg-[#e6ffe6] transition"/>
+                            <h3 class="text-2xl font-bold text-slate-800">Pengaturan {{ activeTab === 'template' ? 'Template Dokumen' : 'Watermark' }}</h3>
+                            <p class="text-sm text-slate-500">Sesuaikan file aset yang dapat diunduh oleh mahasiswa</p>
                         </div>
                     </div>
 
-                    <div class="flex justify-end pt-4">
-                        <button @click="submitSettings" :disabled="formSettings.processing" class="flex items-center bg-[#00637b] hover:bg-[#0f3800] text-white px-6 py-3 rounded-lg transition shadow-lg hover:shadow-xl font-medium">
-                            <Save class="w-4 h-4 mr-2"/> Simpan Pengaturan
-                        </button>
+                    <div class="bg-slate-50 p-8 rounded-3xl border border-slate-200 space-y-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Judul Display</label>
+                                <input type="text" v-model="formSettings[activeTab + '_title']" class="w-full rounded-xl border-slate-200 focus:border-[#99cc33] focus:ring-4 focus:ring-[#99cc33]/10 transition-all" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Info File (Size/Format)</label>
+                                <input type="text" v-model="formSettings[activeTab + '_info']" class="w-full rounded-xl border-slate-200 focus:border-[#99cc33] focus:ring-4 focus:ring-[#99cc33]/10 transition-all" />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Instruksi Penggunaan</label>
+                            <textarea v-model="formSettings[activeTab + '_instruction']" rows="3" class="w-full rounded-xl border-slate-200 focus:border-[#99cc33] focus:ring-4 focus:ring-[#99cc33]/10 transition-all resize-none"></textarea>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-center gap-6">
+                            <!-- File Preview -->
+                            <div class="shrink-0">
+                                <div v-if="activeTab === 'watermark' && settings?.watermark_image_path" class="h-24 w-24 bg-slate-100 rounded-xl flex items-center justify-center p-2 border border-slate-200">
+                                    <img :src="settings.watermark_image_path" class="max-h-full max-w-full object-contain" alt="Preview" />
+                                </div>
+                                <div v-else class="h-24 w-24 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 border border-slate-200">
+                                    <FileText class="w-10 h-10" />
+                                </div>
+                            </div>
+
+                            <div class="flex-1 w-full">
+                                 <div class="flex justify-between items-center mb-2">
+                                     <label class="text-sm font-bold text-slate-700">Upload File Baru</label>
+                                     <a v-if="settings?.[activeTab + (activeTab === 'template' ? '_file_path' : '_image_path')]"
+                                        :href="settings?.[activeTab + (activeTab === 'template' ? '_file_path' : '_image_path')]"
+                                        target="_blank"
+                                        class="text-xs font-bold text-[#99cc33] hover:underline flex items-center gap-1">
+                                        <Download class="w-3 h-3" /> Download File Saat Ini
+                                     </a>
+                                 </div>
+                                 <input
+                                    type="file"
+                                    @change="handleFileChange(activeTab + (activeTab === 'template' ? '_file' : '_image'), $event)"
+                                    class="block w-full text-sm text-slate-500
+                                    file:mr-4 file:py-2.5 file:px-4
+                                    file:rounded-full file:border-0
+                                    file:text-xs file:font-bold
+                                    file:bg-[#99cc33]/10 file:text-[#99cc33]
+                                    hover:file:bg-[#99cc33]/20 transition-all cursor-pointer"
+                                />
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end pt-4 border-t border-slate-200">
+                            <button @click="submitSettings" :disabled="formSettings.processing" class="flex items-center gap-2 bg-[#99cc33] hover:bg-[#88b82d] text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-[#99cc33]/30 transition-all active:scale-95">
+                                <Save class="w-4 h-4"/> Simpan Pengaturan
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
 
+            </transition>
         </div>
     </div>
 
-    <Teleport to="body">
-        <div v-if="showModal" class="fixed inset-0 z-[60] flex items-center justify-center p-4">
-            <div class="absolute inset-0 bg-[#0f3800]/50 backdrop-blur-sm transition-opacity" @click="showModal = false"></div>
-            
-            <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full overflow-hidden transform transition-all scale-100 relative z-10 border-t-4 border-[#99cc33]">
-                <div class="bg-[#f3fff3] px-6 py-4 border-b border-[#99cc33]/20 flex justify-between items-center">
-                    <h3 class="text-lg font-bold text-[#0f3800]">
-                        {{ modalMode === 'create' ? 'Tambah' : 'Edit' }} 
-                        <span class="text-[#00637b]">{{ modalType === 'requirement' ? 'Persyaratan' : 'Panduan' }}</span>
+    <!-- Modal CRUD -->
+    <transition name="modal">
+        <div v-if="showModal" class="fixed inset-0 z-[70] flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" @click="showModal = false"></div>
+
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg relative z-10 overflow-hidden transform transition-all">
+                <!-- Modal Header -->
+                <div class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-slate-800">
+                        {{ modalMode === 'create' ? 'Tambah' : 'Edit' }}
+                        <span class="text-[#99cc33]">{{ modalType === 'requirement' ? 'Persyaratan' : 'Panduan' }}</span>
                     </h3>
-                    <button @click="showModal = false" class="text-gray-400 hover:text-[#00637b]"><Trash2 class="w-5 h-5 rotate-45"/></button>
+                    <button @click="showModal = false" class="text-slate-400 hover:text-slate-600 transition-colors bg-white p-1 rounded-full hover:bg-slate-200 shadow-sm">
+                        <X class="w-5 h-5"/>
+                    </button>
                 </div>
-                
+
+                <!-- Modal Form -->
                 <div class="p-6 space-y-5">
                     <div>
-                        <label class="block text-sm font-semibold text-[#00637b]">Nomor Urut</label>
-                        <input type="number" v-model="formList.sort_order" class="mt-1 block w-full rounded-lg border-gray-300 focus:border-[#99cc33] focus:ring-[#99cc33] bg-[#f3fff3]/30"/>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Nomor Urut</label>
+                        <input type="number" v-model="formList.sort_order" class="w-full rounded-xl border-slate-200 focus:border-[#99cc33] focus:ring-4 focus:ring-[#99cc33]/10 transition-all"/>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-[#00637b]">Judul</label>
-                        <input type="text" v-model="formList.title" class="mt-1 block w-full rounded-lg border-gray-300 focus:border-[#99cc33] focus:ring-[#99cc33] bg-[#f3fff3]/30"/>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Judul</label>
+                        <input type="text" v-model="formList.title" class="w-full rounded-xl border-slate-200 focus:border-[#99cc33] focus:ring-4 focus:ring-[#99cc33]/10 transition-all" placeholder="Contoh: Upload Dokumen"/>
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-[#00637b]">Deskripsi</label>
-                        <textarea v-model="formList.description" rows="4" class="mt-1 block w-full rounded-lg border-gray-300 focus:border-[#99cc33] focus:ring-[#99cc33] bg-[#f3fff3]/30"></textarea>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Deskripsi</label>
+                        <textarea v-model="formList.description" rows="4" class="w-full rounded-xl border-slate-200 focus:border-[#99cc33] focus:ring-4 focus:ring-[#99cc33]/10 transition-all resize-none" placeholder="Penjelasan detail..."></textarea>
                     </div>
                 </div>
-                
-                <div class="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t border-gray-100">
-                    <button @click="showModal = false" class="px-5 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition">Batal</button>
-                    <button @click="submitList" :disabled="formList.processing" class="px-5 py-2 bg-[#00637b] text-white rounded-lg hover:bg-[#0f3800] font-medium shadow-md transition">Simpan Data</button>
+
+                <!-- Modal Footer -->
+                <div class="bg-slate-50 px-6 py-4 flex justify-end gap-3 border-t border-slate-100">
+                    <button @click="showModal = false" class="px-5 py-2.5 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-100 transition-colors shadow-sm">Batal</button>
+                    <button @click="submitList" :disabled="formList.processing" class="px-6 py-2.5 bg-[#99cc33] text-white font-bold rounded-xl hover:bg-[#88b82d] shadow-lg shadow-[#99cc33]/30 transition-all">Simpan</button>
                 </div>
             </div>
         </div>
-    </Teleport>
+    </transition>
 </template>
+
+<style scoped>
+/* Simple fade transition for tabs */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Modal Transition */
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity 0.3s ease;
+}
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+.modal-enter-active .transform,
+.modal-leave-active .transform {
+    transition: transform 0.3s ease;
+}
+.modal-enter-from .transform,
+.modal-leave-to .transform {
+    transform: scale(0.95);
+}
+</style>
