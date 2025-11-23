@@ -1,13 +1,37 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useForm } from '@inertiajs/vue3';
 import AdminLayout from '@/layouts/AdminLayout.vue';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Head, router, useForm } from '@inertiajs/vue3';
+import {
+    AlertCircle,
+    Book,
+    Image as ImageIcon,
+    Plus,
+    RotateCcw,
+    Save,
+    Trash2,
+    UploadCloud,
+    X,
+} from 'lucide-vue-next';
+import { ref } from 'vue';
 
-// --- TYPES ---
+// Import ConfirmModal
+import ConfirmModal from '@/components/admin/ConfirmModal.vue';
+import { useConfirmModal } from '@/composables/userConfirmModal';
+
+// --- LAYOUT ---
+defineOptions({
+    layout: (h: any, page: any) =>
+        h(
+            AdminLayout,
+            {
+                title: 'Cover Buku',
+                subTitle: 'Kelola aset visual sampul buku untuk katalog',
+            },
+            { default: () => page },
+        ),
+});
+
+// --- TYPES & PROPS ---
 interface Cover {
     id: number;
     title: string;
@@ -18,16 +42,13 @@ const props = defineProps<{
     covers: Cover[];
 }>();
 
+const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+
 // --- STATE ---
-const showModal = ref(false); 
-const fileInput = ref<HTMLInputElement | null>(null);
-
-const showResultModal = ref(false); 
-const resultMessage = ref('');
-const isError = ref(false);
-
-const showConfirmModal = ref(false); 
-const deleteId = ref<number | null>(null);
+const showModal = ref(false);
+const fileInputRef = ref<HTMLInputElement | null>(null);
+const previewImage = ref<string | null>(null);
+const { open } = useConfirmModal();
 
 // --- FORM ---
 const form = useForm({
@@ -36,175 +57,336 @@ const form = useForm({
     _method: 'POST',
 });
 
-// --- HELPER NOTIF ---
-const showNotif = (msg: string, err = false) => {
-    resultMessage.value = msg;
-    isError.value = err;
-    showResultModal.value = true;
-};
-
 // --- ACTIONS ---
 const openAddModal = () => {
     form.reset();
-    form._method = 'POST';
+    form.clearErrors();
+    previewImage.value = null;
     showModal.value = true;
 };
 
 const closeModal = () => {
     showModal.value = false;
-    form.reset();
-    if (fileInput.value) fileInput.value.value = '';
+    setTimeout(() => {
+        form.reset();
+        previewImage.value = null;
+    }, 300);
+};
+
+const handleFileChange = (event: Event) => {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) {
+        if (file.size > MAX_FILE_SIZE) {
+            form.setError('image', 'Ukuran file maksimal 2MB.');
+            previewImage.value = null;
+            return;
+        }
+        form.clearErrors('image');
+        form.image = file;
+        previewImage.value = URL.createObjectURL(file);
+    }
+};
+
+const triggerFileInput = () => {
+    fileInputRef.value?.click();
 };
 
 const submit = () => {
     form.post('/admin/cover-buku/store', {
         forceFormData: true,
+        preserveScroll: true,
         onSuccess: () => {
             closeModal();
-            showNotif('Cover berhasil ditambahkan!');
         },
-        onError: () => showNotif('Gagal simpan! Cek inputan.', true),
     });
 };
 
-// --- DELETE ACTIONS ---
-const confirmDelete = (id: number) => {
-    deleteId.value = id;
-    showConfirmModal.value = true;
+const handleDelete = (cover: Cover) => {
+    open({
+        title: 'Hapus Cover Buku?',
+        message: `Apakah Anda yakin ingin menghapus cover "${cover.title}"? Gambar akan hilang permanen dari server.`,
+        actionLabel: 'Hapus',
+        // confirmClass: 'bg-rose-600 hover:bg-rose-700 text-white',
+        onConfirm: () => {
+            router.delete(`/admin/cover-buku/delete/${cover.id}`, {
+                preserveScroll: true,
+            });
+        },
+    });
 };
-
-const executeDelete = () => {
-    if (deleteId.value) {
-        form.delete(`/admin/cover-buku/delete/${deleteId.value}`, {
-            onSuccess: () => {
-                showConfirmModal.value = false;
-                showNotif('Cover berhasil dihapus!');
-            },
-            onError: () => showNotif('Gagal menghapus.', true),
-        });
-    }
-};
-
-defineOptions({
-    layout: (h: any, page: any) =>
-        h(AdminLayout, { title: 'Cover Buku', subTitle: 'Kelola Galeri Cover Buku' }, { default: () => page })
-});
 </script>
 
 <template>
-    <div class="space-y-6 relative">
-        
-        <div class="flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-gray-800">Galeri Cover Buku</h1>
-            <Button @click="openAddModal" class="bg-green-600 hover:bg-green-700 text-white shadow-md transition-transform hover:-translate-y-1">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-                Tambah Cover
-            </Button>
-        </div>
+    <Head title="Cover Buku" />
 
-        <div v-if="covers.length === 0" class="flex flex-col items-center justify-center py-20 bg-white rounded-lg shadow-sm border border-dashed border-gray-300">
-            <div class="bg-green-50 p-4 rounded-full mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
+    <div class="space-y-8 font-sans text-slate-600">
+        <!-- 1. Toolbar -->
+        <div
+            class="flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:flex-row"
+        >
+            <div class="flex items-center gap-3">
+                <div class="rounded-xl bg-[#99cc33]/10 p-2 text-[#99cc33]">
+                    <Book class="h-6 w-6" />
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">
+                        Galeri Cover
+                    </h2>
+                    <p class="text-xs font-medium text-slate-500">
+                        Total {{ props.covers.length }} cover buku
+                    </p>
+                </div>
             </div>
-            <h3 class="text-lg font-medium text-gray-900">Belum ada cover buku</h3>
-            <p class="text-gray-500 mt-1">Silakan tambahkan cover buku baru untuk ditampilkan.</p>
+
+            <button
+                @click="openAddModal"
+                class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-transparent bg-[#99cc33] px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#99cc33]/30 transition-all hover:-translate-y-0.5 hover:bg-[#88b82d] active:translate-y-0 sm:w-auto"
+            >
+                <Plus class="h-5 w-5" />
+                Tambah Cover
+            </button>
         </div>
 
-        <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            <div v-for="cover in covers" :key="cover.id" class="group relative flex flex-col">
-                <div class="relative w-full aspect-[3/4] bg-gray-100 rounded-lg overflow-hidden shadow-sm border border-gray-200 cursor-pointer">
-                    <img 
-                        :src="`/storage/${cover.image_path}`" 
-                        :alt="cover.title" 
-                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+        <!-- 2. Grid Covers -->
+        <div
+            v-if="covers.length > 0"
+            class="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
+        >
+            <div
+                v-for="cover in covers"
+                :key="cover.id"
+                class="group relative flex flex-col"
+            >
+                <!-- Image Container -->
+                <div
+                    class="relative aspect-[2/3] w-full cursor-pointer overflow-hidden rounded-xl border border-slate-200 bg-slate-100 shadow-md transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl group-hover:shadow-[#99cc33]/20"
+                >
+                    <img
+                        :src="`/storage/${cover.image_path}`"
+                        :alt="cover.title"
+                        class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        loading="lazy"
                     />
-                    <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
-                        <button 
-                            @click="confirmDelete(cover.id)"
-                            class="bg-red-600 text-white p-3 rounded-full shadow-lg hover:bg-red-700 hover:scale-110 transition-all transform"
-                            title="Hapus Gambar"
+
+                    <!-- Overlay Actions -->
+                    <div
+                        class="absolute inset-0 z-10 flex items-center justify-center bg-slate-900/40 opacity-0 backdrop-blur-[1px] transition-all duration-300 group-hover:opacity-100"
+                    >
+                        <button
+                            @click="handleDelete(cover)"
+                            class="transform rounded-full border border-white/30 bg-white/20 p-3 text-white shadow-lg backdrop-blur-md transition-all hover:scale-110 hover:border-rose-500 hover:bg-rose-500"
+                            title="Hapus Cover"
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
+                            <Trash2 class="h-5 w-5" />
                         </button>
                     </div>
                 </div>
-                <div class="mt-3 text-center px-1">
-                    <h3 class="text-sm font-bold text-gray-800 line-clamp-2 leading-tight group-hover:text-green-700 transition-colors">
+
+                <!-- Title -->
+                <div class="mt-3 px-1 text-center">
+                    <h3
+                        class="line-clamp-2 text-xs leading-tight font-bold text-slate-700 transition-colors group-hover:text-[#99cc33]"
+                    >
                         {{ cover.title }}
                     </h3>
                 </div>
             </div>
         </div>
 
-        <Teleport to="body">
-            <div v-if="showModal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                <Card class="w-full max-w-md shadow-2xl animate-in fade-in zoom-in duration-200 bg-white">
-                    <CardHeader class="border-b bg-green-50/50 pb-3">
-                        <CardTitle class="text-green-800">Tambah Cover Buku</CardTitle>
-                    </CardHeader>
-                    <CardContent class="pt-6">
-                        <form @submit.prevent="submit" class="space-y-4">
-                            <div class="space-y-2">
-                                <Label for="title">Judul Buku</Label>
-                                <Input id="title" v-model="form.title" placeholder="Masukkan judul buku..." />
-                                <p v-if="form.errors.title" class="text-red-500 text-xs">{{ form.errors.title }}</p>
-                            </div>
+        <!-- 3. Empty State -->
+        <div
+            v-else
+            class="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-white py-24 text-center"
+        >
+            <div
+                class="mb-4 flex h-20 w-20 animate-pulse items-center justify-center rounded-full bg-slate-50"
+            >
+                <ImageIcon class="h-10 w-10 text-slate-400" />
+            </div>
+            <h3 class="mb-2 text-xl font-bold text-slate-800">
+                Belum Ada Cover
+            </h3>
+            <p class="max-w-md text-sm leading-relaxed text-slate-500">
+                Koleksi cover buku masih kosong. Silakan tambahkan cover buku
+                baru untuk mempercantik katalog.
+            </p>
+            <button
+                @click="openAddModal"
+                class="mt-6 text-sm font-bold text-[#99cc33] hover:text-[#88b82d] hover:underline"
+            >
+                Tambah Cover Sekarang
+            </button>
+        </div>
 
-                            <div class="space-y-2">
-                                <Label>File Gambar</Label>
-                                <Input 
-                                    id="image"
-                                    ref="fileInput"
-                                    type="file" 
-                                    accept="image/*"
-                                    @input="form.image = (($event.target as HTMLInputElement).files?.[0] || null)"
-                                    class="cursor-pointer file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
+        <!-- MODAL FORM -->
+        <Transition
+            enter-active-class="transition duration-300 ease-out"
+            enter-from-class="opacity-0 scale-95"
+            enter-to-class="opacity-100 scale-100"
+            leave-active-class="transition duration-200 ease-in"
+            leave-from-class="opacity-100 scale-100"
+            leave-to-class="opacity-0 scale-95"
+        >
+            <div
+                v-if="showModal"
+                class="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-6"
+            >
+                <div
+                    @click="closeModal"
+                    class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity"
+                ></div>
+
+                <div
+                    class="relative z-10 flex max-h-[90vh] w-full max-w-md transform flex-col overflow-hidden rounded-2xl bg-white shadow-2xl transition-all"
+                >
+                    <!-- Modal Header -->
+                    <div
+                        class="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-4"
+                    >
+                        <h2 class="text-lg font-bold text-slate-800">
+                            Tambah Cover Buku
+                        </h2>
+                        <button
+                            @click="closeModal"
+                            class="rounded-full p-1 text-slate-400 transition-colors hover:bg-slate-200 hover:text-slate-600"
+                        >
+                            <X class="h-5 w-5" />
+                        </button>
+                    </div>
+
+                    <!-- Modal Body -->
+                    <div class="space-y-6 overflow-y-auto bg-white p-6">
+                        <form
+                            @submit.prevent="submit"
+                            id="createForm"
+                            class="space-y-5"
+                        >
+                            <!-- Judul Buku -->
+                            <div class="space-y-1.5">
+                                <label class="text-sm font-bold text-slate-700"
+                                    >Judul Buku
+                                    <span class="text-red-500">*</span></label
+                                >
+                                <input
+                                    v-model="form.title"
+                                    type="text"
+                                    class="w-full rounded-xl border-slate-200 transition-all placeholder:text-slate-400 focus:border-[#99cc33] focus:ring-4 focus:ring-[#99cc33]/10"
+                                    placeholder="Contoh: Algoritma Pemrograman"
                                 />
-                                <p v-if="form.errors.image" class="text-red-500 text-xs">{{ form.errors.image }}</p>
+                                <p
+                                    v-if="form.errors.title"
+                                    class="mt-1 text-xs font-medium text-rose-500"
+                                >
+                                    {{ form.errors.title }}
+                                </p>
                             </div>
 
-                            <div class="flex justify-end gap-3 pt-4">
-                                <Button type="button" variant="outline" @click="closeModal">Batal</Button>
-                                <Button type="submit" class="bg-green-600 hover:bg-green-700 text-white" :disabled="form.processing">
-                                    {{ form.processing ? 'Menyimpan...' : 'Simpan' }}
-                                </Button>
+                            <!-- Image Upload Dropzone -->
+                            <div class="space-y-2">
+                                <label
+                                    class="block text-sm font-bold text-slate-700"
+                                    >File Cover</label
+                                >
+                                <div
+                                    @click="triggerFileInput"
+                                    class="group relative flex h-64 w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed bg-slate-50 text-center transition-all"
+                                    :class="[
+                                        form.errors.image
+                                            ? 'border-red-300 bg-red-50'
+                                            : 'border-slate-300 hover:border-[#99cc33] hover:bg-[#99cc33]/5',
+                                        previewImage ? 'border-solid' : '',
+                                    ]"
+                                >
+                                    <!-- Case 1: Ada Preview Image -->
+                                    <template v-if="previewImage">
+                                        <img
+                                            :src="previewImage"
+                                            class="h-full w-full object-contain p-2"
+                                        />
+                                        <!-- Overlay Hover -->
+                                        <div
+                                            class="absolute inset-0 flex flex-col items-center justify-center bg-black/60 text-white opacity-0 backdrop-blur-[1px] transition-opacity group-hover:opacity-100"
+                                        >
+                                            <RotateCcw class="mb-2 h-8 w-8" />
+                                            <span class="text-sm font-bold"
+                                                >Ganti Gambar</span
+                                            >
+                                        </div>
+                                    </template>
+
+                                    <!-- Case 2: Belum Ada Image -->
+                                    <div
+                                        v-else
+                                        class="flex flex-col items-center justify-center p-6 transition-transform duration-300 group-hover:scale-105"
+                                    >
+                                        <div
+                                            class="mb-3 rounded-full bg-white p-4 shadow-sm group-hover:shadow-md"
+                                        >
+                                            <UploadCloud
+                                                class="h-8 w-8 text-[#99cc33]"
+                                            />
+                                        </div>
+                                        <p
+                                            class="text-sm font-bold text-slate-700 transition-colors group-hover:text-[#99cc33]"
+                                        >
+                                            Klik untuk pilih file
+                                        </p>
+                                        <p
+                                            class="mt-1 text-xs font-medium text-slate-400"
+                                        >
+                                            JPG, PNG (Max 2MB)
+                                        </p>
+                                    </div>
+
+                                    <input
+                                        ref="fileInputRef"
+                                        type="file"
+                                        @change="handleFileChange"
+                                        accept="image/*"
+                                        class="hidden"
+                                    />
+                                </div>
+                                <p
+                                    v-if="form.errors.image"
+                                    class="mt-2 flex animate-pulse items-center text-xs font-medium text-red-500"
+                                >
+                                    <AlertCircle class="mr-1 h-3 w-3" />
+                                    {{ form.errors.image }}
+                                </p>
                             </div>
                         </form>
-                    </CardContent>
-                </Card>
-            </div>
-        </Teleport>
-
-        <Teleport to="body">
-            <div v-if="showResultModal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                <div class="bg-white rounded-lg shadow-2xl w-full max-w-sm p-6 text-center">
-                    <div :class="`rounded-full p-3 mb-4 inline-block ${isError ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`">
-                        <svg v-if="isError" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                        <svg v-else class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                     </div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-2">{{ isError ? 'Gagal' : 'Berhasil' }}</h3>
-                    <p class="text-sm text-gray-500 mb-6">{{ resultMessage }}</p>
-                    <Button @click="showResultModal = false" class="w-full bg-gray-900 text-white hover:bg-gray-800">Tutup</Button>
+
+                    <!-- Footer -->
+                    <div
+                        class="flex items-center justify-end gap-3 border-t border-slate-100 bg-slate-50 p-6"
+                    >
+                        <button
+                            @click="closeModal"
+                            type="button"
+                            class="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-bold text-slate-600 shadow-sm transition-colors hover:bg-slate-100"
+                        >
+                            Batal
+                        </button>
+                        <button
+                            type="submit"
+                            form="createForm"
+                            :disabled="form.processing"
+                            class="flex items-center gap-2 rounded-xl bg-[#99cc33] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#99cc33]/30 transition-all hover:-translate-y-0.5 hover:bg-[#88b82d] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-70"
+                        >
+                            <span
+                                v-if="form.processing"
+                                class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+                            ></span>
+                            <Save v-else class="h-4 w-4" />
+                            {{ form.processing ? 'Menyimpan...' : 'Simpan' }}
+                        </button>
+                    </div>
                 </div>
             </div>
-        </Teleport>
+        </Transition>
 
-        <Teleport to="body">
-            <div v-if="showConfirmModal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                <div class="bg-white rounded-lg shadow-2xl w-full max-w-md p-6">
-                    <h3 class="text-lg font-bold text-gray-900">Hapus Cover Buku?</h3>
-                    <p class="text-gray-500 mt-2">Tindakan ini tidak dapat dibatalkan. Gambar akan dihapus permanen.</p>
-                    <div class="mt-6 flex justify-end gap-3">
-                        <Button variant="outline" @click="showConfirmModal = false">Batal</Button>
-                        <Button variant="destructive" @click="executeDelete" class="bg-red-600 hover:bg-red-700">Hapus</Button>
-                    </div>
-                </div>
-            </div>
-        </Teleport>
-
+        <!-- Confirm Modal -->
+        <ConfirmModal />
     </div>
 </template>

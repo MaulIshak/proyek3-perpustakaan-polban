@@ -19,32 +19,26 @@ const props = defineProps({
         }>,
         default: [],
     },
+    latest_news: {
+        type: Array<{
+            article_id: string;
+            url_thumbnail: string | null;
+            judul: string;
+            content: string;
+            created_date: string;
+        }>,
+        default: [],
+    },
+    latest_announcements: {
+        type: Array<{
+            article_id: string;
+            judul: string;
+            content: string;
+            created_date: string;
+        }>,
+        default: [],
+    },
 });
-
-// Data Pengumuman
-const pengumumanList = [
-    {
-        id: 1,
-        title: 'Libur Perpustakaan pada Hari Raya Imlek 2025',
-        content:
-            '<p>UPT Perpustakaan POLBAN akan tutup pada tanggal 29 Januari 2025 dalam rangka perayaan Imlek.</p>',
-        date: '2025-01-20',
-    },
-    {
-        id: 2,
-        title: 'Perubahan Jam Operasional Selama UAS',
-        content:
-            '<p>Selama periode ujian akhir semester, jam operasional perpustakaan akan diperpanjang hingga pukul 22.00 WIB.</p>',
-        date: '2025-01-15',
-    },
-    {
-        id: 3,
-        title: 'Maintenance Server E-Library',
-        content:
-            '<p>Akan dilakukan pemeliharaan server pada tanggal 2 Februari 2025. Layanan katalog digital mungkin terganggu.</p>',
-        date: '2025-01-10',
-    },
-];
 
 // Konfigurasi Tab
 const tabs = [
@@ -92,7 +86,7 @@ const activeTab = ref('berita');
                     <transition name="fade-slide" mode="out-in">
                         <!-- CONTENT: BERITA -->
                         <div v-if="activeTab === 'berita'" key="berita">
-                            <BeritaHighlight />
+                            <BeritaHighlight :articles="latest_news" />
                         </div>
 
                         <!-- CONTENT: PENGUMUMAN -->
@@ -128,12 +122,12 @@ const activeTab = ref('berita');
 
                             <div class="grid gap-6">
                                 <PengumumanCard
-                                    v-for="pengumuman in pengumumanList"
-                                    :key="pengumuman.id"
-                                    :id="pengumuman.id"
-                                    :title="pengumuman.title"
+                                    v-for="pengumuman in latest_announcements"
+                                    :key="pengumuman.article_id"
+                                    :id="pengumuman.article_id"
+                                    :title="pengumuman.judul"
                                     :content="pengumuman.content"
-                                    :date="pengumuman.date"
+                                    :date="pengumuman.created_date"
                                     class="transform border-slate-200 bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
                                 />
                             </div>

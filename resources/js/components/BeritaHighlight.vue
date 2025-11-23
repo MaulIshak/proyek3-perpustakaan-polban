@@ -2,32 +2,18 @@
 import BeritaCard from '@/components/BeritaCard.vue';
 import { ArrowRight, Newspaper } from 'lucide-vue-next';
 
-const beritaList = [
-    {
-        id: 1,
-        title: 'Workshop Literasi Digital untuk Mahasiswa Baru 2025',
-        content:
-            '<p>Perpustakaan POLBAN mengadakan workshop literasi digital bagi mahasiswa baru tahun 2025...</p>',
-        thumbnail: '/hero-bg.jpg',
-        date: '2024-06-15',
+const props = defineProps({
+    articles: {
+        type: Array<{
+            article_id: string;
+            url_thumbnail: string | null;
+            judul: string;
+            content: string;
+            created_date: string;
+        }>,
+        default: [],
     },
-    {
-        id: 2,
-        title: 'Pameran Buku Langka di Perpustakaan POLBAN',
-        content:
-            '<p>Perpustakaan POLBAN mempersembahkan pameran buku langka yang berisi koleksi istimewa...</p>',
-        thumbnail: '/hero-bg.jpg',
-        date: '2024-06-10',
-    },
-    {
-        id: 3,
-        title: 'Peluncuran Aplikasi Mobile Perpustakaan POLBAN',
-        content:
-            '<p>Perpustakaan POLBAN meluncurkan aplikasi mobile terbaru untuk memudahkan akses koleksi...</p>',
-        thumbnail: '/hero-bg.jpg',
-        date: '2024-06-05',
-    },
-];
+});
 </script>
 
 <template>
@@ -69,13 +55,13 @@ const beritaList = [
             <!-- Grid Content -->
             <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                 <BeritaCard
-                    v-for="berita in beritaList"
-                    :key="berita.id"
-                    :id="berita.id"
-                    :title="berita.title"
+                    v-for="berita in articles"
+                    :key="berita.article_id"
+                    :id="berita.article_id"
+                    :title="berita.judul"
                     :content="berita.content"
-                    :thumbnail="berita.thumbnail"
-                    :date="berita.date"
+                    :thumbnail="berita.url_thumbnail"
+                    :date="berita.created_date"
                     class="h-full transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
                 />
             </div>

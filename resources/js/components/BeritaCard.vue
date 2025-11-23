@@ -7,7 +7,7 @@ const props = defineProps<{
     id: string | number;
     title: string;
     content: string;
-    thumbnail: string;
+    thumbnail: string | null;
     date: string;
 }>();
 
@@ -41,7 +41,7 @@ function stripHtml(html: string) {
         <!-- Image Container -->
         <div class="relative h-52 overflow-hidden shrink-0">
             <img
-                :src="thumbnail"
+                :src="thumbnail ?? ''"
                 :alt="title"
                 class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
             />

@@ -187,10 +187,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
     ->name('pengumumanStore');
     Route::get('pengumuman/detail/{id}', [ArticleController::class, 'showPengumuman'])->middleware('auth:admin')->name('pengumumanShow');
     Route::get('pengumuman/edit/{id}', [ArticleController::class, 'editPengumuman'])->middleware('auth:admin');
-    Route::post('pengumuman/update/{id}', [ArticleController::class, 'updatePengumuman'])->middleware('auth:admin');
+    Route::put('pengumuman/update/{id}', [ArticleController::class, 'updatePengumuman'])->middleware('auth:admin');
     Route::delete('pengumuman/delete/{id}', [ArticleController::class, 'destroyPengumuman'])->middleware('auth:admin');
     Route::get('berita/edit/{id}', [ArticleController::class, 'editBerita'])->middleware('auth:admin');
-    Route::post('berita/update/{id}', [ArticleController::class, 'updateBerita'])->middleware('auth:admin');
+    Route::put('berita/update/{id}', [ArticleController::class, 'updateBerita'])->middleware('auth:admin');
     Route::delete('berita/delete/{id}', [ArticleController::class, 'destroyBerita'])->middleware('auth:admin');
 
     // galeri
@@ -204,7 +204,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::patch('usulan-buku/{id}/status', [BookProposalController::class, 'updateStatus'])->middleware('auth:admin')->name('book-proposals.update-status');
     Route::delete('usulan-buku/{id}', [BookProposalController::class, 'destroy'])->middleware('auth:admin')->name('book-proposals.destroy');
     Route::get('usulan-buku/export', [BookProposalController::class, 'export'])->middleware('auth:admin')->name('book-proposals.export');
-    
+
 
     // Tim manajemen
     Route::get('tim-manajemen', [TimManajemen::class, 'TmAdminPage'])->middleware('auth:admin')->name('tim.index');
@@ -239,10 +239,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::delete('/bebas-masalah/guides/{id}', [BebasMasalahController::class, 'destroyGuide'])->middleware('auth:admin')->name('admin.bebas-masalah.guides.destroy');
 
     // ecollection
-    Route::get('/e-collections', [CollectionController::class, 'index']); 
+    Route::get('/e-collections', [CollectionController::class, 'index']);
     Route::post('/e-collections', [CollectionController::class, 'store']);
     // Edit pakai POST karena method spoofing
-    Route::post('/e-collections/{id}', [CollectionController::class, 'update']); 
+    Route::post('/e-collections/{id}', [CollectionController::class, 'update']);
     Route::delete('/e-collections/{id}', [CollectionController::class, 'destroy']);
 
     // Ejournal
