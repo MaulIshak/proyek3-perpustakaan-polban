@@ -1,49 +1,80 @@
-<script setup>
-import AdminLayout from '@/layouts/AdminLayout.vue';
+<script setup lang="ts">
 import PaginationLink from '@/components/admin/PaginationLink.vue';
-import { router, useForm, Head } from '@inertiajs/vue3';
+import AdminLayout from '@/layouts/AdminLayout.vue';
+import { Head, router, useForm } from '@inertiajs/vue3';
 import debounce from 'lodash/debounce';
-import { 
-    FileSearch, Plus, Search, Pencil, Trash2, 
-    ExternalLink, X, Save, Image as ImageIcon, 
-    Copy 
+import {
+    Copy,
+    ExternalLink,
+    FileSearch,
+    Image as ImageIcon,
+    Pencil,
+    Plus,
+    RotateCcw,
+    Save,
+    Search,
+    Trash2,
+    UploadCloud,
+    X,
 } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 
-const props = defineProps({
-    collections: Object,
-    searchQuery: String,
+// Import ConfirmModal
+import ConfirmModal from '@/components/admin/ConfirmModal.vue';
+import { useConfirmModal } from '@/composables/userConfirmModal';
+
+const props = defineProps<{
+    collections: {
+        data: any[];
+        links: any[];
+    };
+    searchQuery: string;
+}>();
+
+// Layout
+defineOptions({
+    layout: (h: any, page: any) =>
+        h(
+            AdminLayout,
+            {
+                title: 'E-Collection',
+                subTitle: 'Kelola daftar koleksi digital dan referensi',
+            },
+            { default: () => page },
+        ),
 });
 
 // --- SEARCH LOGIC ---
-const search = ref(props.searchQuery);
+const search = ref(props.searchQuery || '');
 
 watch(
     search,
-    debounce((value) => {
+    debounce((value: string) => {
         router.get(
             '/admin/e-collections',
             { search: value },
-            { preserveState: true, replace: true }
+            { preserveState: true, replace: true },
         );
-    }, 300)
+    }, 300),
 );
 
 // --- MODAL & FORM LOGIC ---
-// Ubah nama variabel dari isDrawerOpen jadi isModalOpen biar sesuai konteks
-const isModalOpen = ref(false); 
+const isModalOpen = ref(false);
 const isEditMode = ref(false);
-const imagePreview = ref(null);
+const imagePreview = ref<string | null>(null);
+const fileInputRef = ref<HTMLInputElement | null>(null);
 
 const form = useForm({
-    id: null,
+    id: null as number | null,
     title: '',
     url: '',
     description: '',
     is_active: true,
-    image: null,
+    image: null as File | null,
     _method: 'POST',
 });
+
+const { open } = useConfirmModal();
 
 const openCreate = () => {
     isEditMode.value = false;
@@ -54,7 +85,7 @@ const openCreate = () => {
     isModalOpen.value = true;
 };
 
-const openEdit = (item) => {
+const openEdit = (item: any) => {
     isEditMode.value = true;
     form.clearErrors();
     form.id = item.id;
@@ -63,243 +94,446 @@ const openEdit = (item) => {
     form.description = item.description;
     form.is_active = Boolean(item.is_active);
     form.image = null;
-    form._method = 'POST';
+    form._method = 'POST'; // Inertia handles multipart via POST with _method PUT if needed, but mostly POST for files
     imagePreview.value = item.image_path;
     isModalOpen.value = true;
 };
 
 const closeModal = () => {
     isModalOpen.value = false;
-    setTimeout(() => { form.reset(); imagePreview.value = null; }, 300);
+    setTimeout(() => {
+        form.reset();
+        imagePreview.value = null;
+    }, 300);
 };
 
-const handleImageUpload = (event) => {
-    const file = event.target.files[0];
+const handleImageUpload = (event: Event) => {
+    const file = (event.target as HTMLInputElement).files?.[0];
     if (file) {
         form.image = file;
         imagePreview.value = URL.createObjectURL(file);
     }
 };
 
+const triggerFileInput = () => {
+    fileInputRef.value?.click();
+};
+
 const submit = () => {
-    const url = isEditMode.value ? `/admin/e-collections/${form.id}` : '/admin/e-collections';
+    const url = isEditMode.value
+        ? `/admin/e-collections/${form.id}`
+        : '/admin/e-collections';
     form.post(url, {
         onSuccess: () => closeModal(),
-        preserveScroll: true
+        preserveScroll: true,
     });
 };
 
-const handleDelete = (id) => {
-    if (confirm('Apakah Anda yakin ingin menghapus koleksi ini?')) {
-        router.delete(`/admin/e-collections/${id}`);
-    }
+const handleDelete = (item: any) => {
+    open({
+        title: 'Hapus Koleksi?',
+        message: `Apakah Anda yakin ingin menghapus koleksi "${item.title}"?`,
+        actionLabel: 'Hapus',
+        // confirmClass: 'bg-rose-600 hover:bg-rose-700 text-white',
+        onConfirm: () => {
+            router.delete(`/admin/e-collections/${item.id}`, {
+                preserveScroll: true,
+            });
+        },
+    });
 };
 
 // Helper Copy HTML
-const copySnippet = (type) => {
+const copySnippet = (type: 'blue' | 'yellow') => {
     let text = '';
-    if(type === 'blue') text = '<h4 class="text-blue-500 font-bold mb-1 mt-4">Judul Sub-Bab</h4>';
-    if(type === 'yellow') text = '<div class="bg-yellow-300 p-3 border border-black text-sm mt-4">Info penting...</div>';
+    if (type === 'blue')
+        text =
+            '<h4 class="text-[#00637b] font-bold text-sm mb-1 mt-4">Judul Sub-Bab</h4>';
+    if (type === 'yellow')
+        text =
+            '<div class="bg-amber-50 p-3 border-l-4 border-amber-400 text-xs text-amber-800 mt-4 rounded-r-md">Info penting...</div>';
     navigator.clipboard.writeText(text);
+    // Optional toast here
 };
 
-// Helper Strip HTML untuk Card Preview
-const stripHtml = (html) => {
+// Helper Strip HTML
+const stripHtml = (html: string) => {
     return html ? html.replace(/<[^>]*>?/gm, '') : '';
-}
-
-defineOptions({
-    layout: (h, page) => h(AdminLayout, { title: 'E-Collection', subTitle: 'Kelola daftar koleksi digital' }, { default: () => page }),
-});
+};
 </script>
 
 <template>
     <Head title="E-Collection" />
 
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <div class="relative flex-1 max-w-md">
-            <Search class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input 
-                v-model="search" 
-                type="text" 
-                placeholder="Cari koleksi..." 
-                class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 focus:border-[var(--primary-green)] focus:ring-1 focus:ring-[var(--primary-green)] outline-none transition-all"
-            >
-        </div>
-
-        <button 
-            @click="openCreate"
-            class="inline-flex items-center justify-center gap-2 rounded-xl bg-[var(--primary-green)] px-5 py-2.5 font-medium text-white transition hover:opacity-90 shadow-sm"
+    <div class="space-y-8 font-sans text-slate-600">
+        <!-- 1. Toolbar -->
+        <div
+            class="flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:flex-row"
         >
-            <Plus class="w-5 h-5" />
-            <span>Buat Koleksi Baru</span>
-        </button>
-    </div>
-
-    <div v-if="collections.data.length > 0" class="grid gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        <div 
-            v-for="item in collections.data" 
-            :key="item.id" 
-            class="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col overflow-hidden"
-        >
-            <div class="h-40 bg-gray-50 flex items-center justify-center overflow-hidden relative border-b border-gray-100">
-                <img 
-                    v-if="item.image_path" 
-                    :src="item.image_path" 
-                    class="w-full h-full object-contain p-4 transition-transform duration-500 group-hover:scale-105" 
+            <!-- Search Input -->
+            <div class="group relative w-full sm:max-w-md">
+                <div
+                    class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 transition-colors group-focus-within:text-[#99cc33]"
+                >
+                    <Search class="h-5 w-5" />
+                </div>
+                <input
+                    v-model="search"
+                    type="text"
+                    placeholder="Cari koleksi..."
+                    class="block w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pr-3 pl-10 leading-5 placeholder-slate-400 transition-all focus:border-[#99cc33] focus:bg-white focus:ring-4 focus:ring-[#99cc33]/10 focus:outline-none sm:text-sm"
                 />
-                <ImageIcon v-else class="w-12 h-12 text-gray-300" />
-                <div class="absolute top-3 right-3">
-                    <span :class="item.is_active ? 'bg-emerald-100 text-emerald-600' : 'bg-gray-100 text-gray-500'" class="px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wide">
-                        {{ item.is_active ? 'Aktif' : 'Nonaktif' }}
-                    </span>
-                </div>
             </div>
 
-            <div class="p-5 flex-1 flex flex-col">
-                <h3 class="font-bold text-gray-800 mb-2 line-clamp-1" :title="item.title">
-                    {{ item.title }}
-                </h3>
-                <p class="text-sm text-gray-500 line-clamp-3 mb-4 flex-1 leading-relaxed">
-                    {{ stripHtml(item.description) }}
-                </p>
+            <!-- Create Button -->
+            <button
+                @click="openCreate"
+                class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-transparent bg-[#99cc33] px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#99cc33]/30 transition-all hover:-translate-y-0.5 hover:bg-[#88b82d] active:translate-y-0 sm:w-auto"
+            >
+                <Plus class="h-5 w-5" />
+                <span>Buat Koleksi Baru</span>
+            </button>
+        </div>
 
-                <div class="flex items-center justify-between pt-4 border-t border-gray-50 mt-auto">
-                    <a 
-                        v-if="item.url" 
-                        :href="item.url" 
-                        target="_blank" 
-                        class="text-xs font-medium text-blue-600 flex items-center gap-1 hover:underline"
+        <!-- 2. Content Grid -->
+        <div
+            v-if="collections.data.length > 0"
+            class="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+        >
+            <div
+                v-for="item in collections.data"
+                :key="item.id"
+                class="group relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#99cc33]/40 hover:shadow-xl"
+            >
+                <!-- Image Area -->
+                <div
+                    class="relative flex h-40 items-center justify-center overflow-hidden border-b border-slate-100 bg-slate-50 p-4"
+                >
+                    <img
+                        v-if="item.image_path"
+                        :src="item.image_path"
+                        class="h-full w-full object-contain transition-transform duration-500 group-hover:scale-110"
+                        alt="Collection Logo"
+                    />
+                    <div
+                        v-else
+                        class="flex h-16 w-16 items-center justify-center rounded-full bg-white text-slate-300 shadow-sm"
                     >
-                        <ExternalLink class="w-3 h-3" /> Link
-                    </a>
-                    <span v-else class="text-xs text-gray-400">-</span>
+                        <ImageIcon class="h-8 w-8" />
+                    </div>
 
-                    <div class="flex items-center gap-2">
-                        <button @click="openEdit(item)" class="p-2 rounded-lg text-amber-600 bg-amber-50 hover:bg-amber-100 transition-colors" title="Edit">
-                            <Pencil class="w-4 h-4" />
-                        </button>
-                        <button @click="handleDelete(item.id)" class="p-2 rounded-lg text-rose-600 bg-rose-50 hover:bg-rose-100 transition-colors" title="Hapus">
-                            <Trash2 class="w-4 h-4" />
-                        </button>
+                    <!-- Status Badge -->
+                    <div class="absolute top-3 right-3">
+                        <span
+                            class="rounded-lg border px-2 py-1 text-[10px] font-bold tracking-wide uppercase shadow-sm"
+                            :class="
+                                item.is_active
+                                    ? 'border-emerald-200 bg-emerald-100 text-emerald-700'
+                                    : 'border-slate-200 bg-slate-100 text-slate-500'
+                            "
+                        >
+                            {{ item.is_active ? 'Aktif' : 'Nonaktif' }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div class="flex flex-1 flex-col p-5">
+                    <h3
+                        class="mb-2 line-clamp-1 text-lg font-bold text-slate-800 transition-colors group-hover:text-[#99cc33]"
+                        :title="item.title"
+                    >
+                        {{ item.title }}
+                    </h3>
+                    <p
+                        class="mb-4 line-clamp-3 flex-1 text-sm leading-relaxed text-slate-500"
+                    >
+                        {{ stripHtml(item.description) }}
+                    </p>
+
+                    <!-- Footer Actions -->
+                    <div
+                        class="mt-auto flex items-center justify-between border-t border-slate-100 pt-4"
+                    >
+                        <a
+                            v-if="item.url"
+                            :href="item.url"
+                            target="_blank"
+                            class="inline-flex items-center gap-1.5 text-xs font-bold text-sky-600 transition-colors hover:text-sky-700 hover:underline"
+                        >
+                            <ExternalLink class="h-3.5 w-3.5" /> Kunjungi
+                        </a>
+                        <span v-else class="text-xs text-slate-400 italic"
+                            >No Link</span
+                        >
+
+                        <div class="flex items-center gap-2">
+                            <button
+                                @click="openEdit(item)"
+                                class="rounded-lg border border-amber-100 bg-amber-50 p-2 text-amber-600 shadow-sm transition-colors hover:bg-amber-100"
+                                title="Edit"
+                            >
+                                <Pencil class="h-4 w-4" />
+                            </button>
+                            <button
+                                @click="handleDelete(item)"
+                                class="rounded-lg border border-rose-100 bg-rose-50 p-2 text-rose-600 shadow-sm transition-colors hover:bg-rose-100"
+                                title="Hapus"
+                            >
+                                <Trash2 class="h-4 w-4" />
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div v-else class="flex flex-col items-center justify-center py-20 text-center bg-white rounded-2xl border border-dashed border-gray-200">
-        <FileSearch class="mb-4 h-20 w-20 text-gray-300" />
-        <h3 class="text-2xl font-semibold text-gray-600">
-            {{ search ? 'Koleksi Tidak Ditemukan' : 'Belum Ada Koleksi' }}
-        </h3>
-        <p class="mt-2 max-w-sm text-gray-500">
-            {{ search ? 'Sistem tidak menemukan data yang cocok.' : 'Belum ada data E-Collection. Silakan buat yang baru.' }}
-        </p>
-        <button v-if="!search" @click="openCreate" class="mt-6 rounded-xl bg-[var(--primary-green)] px-5 py-3 font-medium text-white transition hover:opacity-90">
-            Buat Koleksi Baru
-        </button>
-    </div>
+        <!-- 3. Empty State -->
+        <div
+            v-else
+            class="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-white py-20 text-center"
+        >
+            <div
+                class="mb-4 flex h-20 w-20 animate-pulse items-center justify-center rounded-full bg-slate-50"
+            >
+                <FileSearch class="h-10 w-10 text-slate-400" />
+            </div>
+            <h3 class="mb-2 text-xl font-bold text-slate-800">
+                {{ search ? 'Koleksi Tidak Ditemukan' : 'Belum Ada Koleksi' }}
+            </h3>
+            <p class="max-w-sm text-sm leading-relaxed text-slate-500">
+                {{
+                    search
+                        ? 'Coba gunakan kata kunci lain.'
+                        : 'Mulai tambahkan koleksi digital pertama Anda.'
+                }}
+            </p>
+            <button
+                v-if="!search"
+                @click="openCreate"
+                class="mt-6 text-sm font-bold text-[#99cc33] hover:text-[#88b82d] hover:underline"
+            >
+                Buat Koleksi Baru
+            </button>
+        </div>
 
-    <div class="mt-6">
-        <PaginationLink :links="collections.links" />
-    </div>
+        <!-- Pagination -->
+        <div class="mt-8 flex justify-center">
+            <PaginationLink :links="collections.links" />
+        </div>
 
-    <Transition
-        enter-active-class="transition duration-200 ease-out"
-        enter-from-class="opacity-0 scale-95"
-        enter-to-class="opacity-100 scale-100"
-        leave-active-class="transition duration-150 ease-in"
-        leave-from-class="opacity-100 scale-100"
-        leave-to-class="opacity-0 scale-95"
-    >
-        <div v-if="isModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
-            
-            <div @click="closeModal" class="absolute inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity"></div>
+        <!-- MODAL FORM -->
+        <Transition
+            enter-active-class="transition duration-300 ease-out"
+            enter-from-class="opacity-0 scale-95"
+            enter-to-class="opacity-100 scale-100"
+            leave-active-class="transition duration-200 ease-in"
+            leave-from-class="opacity-100 scale-100"
+            leave-to-class="opacity-0 scale-95"
+        >
+            <div
+                v-if="isModalOpen"
+                class="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-6"
+            >
+                <div
+                    @click="closeModal"
+                    class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity"
+                ></div>
 
-            <div class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden z-10">
-                
-                <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-white">
-                    <h2 class="text-lg font-bold text-gray-800">
-                        {{ isEditMode ? 'Edit Koleksi' : 'Buat Koleksi Baru' }}
-                    </h2>
-                    <button @click="closeModal" class="p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors">
-                        <X class="w-5 h-5" />
-                    </button>
-                </div>
+                <div
+                    class="relative z-10 flex max-h-[90vh] w-full max-w-lg transform flex-col overflow-hidden rounded-2xl bg-white shadow-2xl transition-all"
+                >
+                    <!-- Modal Header -->
+                    <div
+                        class="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-4"
+                    >
+                        <h2 class="text-lg font-bold text-slate-800">
+                            {{
+                                isEditMode
+                                    ? 'Edit Koleksi'
+                                    : 'Buat Koleksi Baru'
+                            }}
+                        </h2>
+                        <button
+                            @click="closeModal"
+                            class="rounded-full p-1 text-slate-400 transition-colors hover:bg-slate-200 hover:text-slate-600"
+                        >
+                            <X class="h-6 w-6" />
+                        </button>
+                    </div>
 
-                <div class="flex-1 overflow-y-auto p-6 space-y-5 bg-gray-50/50">
-                    
-                    <div class="space-y-4">
+                    <!-- Modal Body -->
+                    <div class="flex-1 space-y-6 overflow-y-auto bg-white p-6">
+                        <!-- Title & URL -->
+                        <div class="space-y-4">
+                            <div>
+                                <label
+                                    class="mb-2 block text-sm font-bold text-slate-700"
+                                    >Judul Koleksi</label
+                                >
+                                <input
+                                    v-model="form.title"
+                                    type="text"
+                                    class="w-full rounded-xl border-slate-200 transition-all focus:border-[#99cc33] focus:ring-4 focus:ring-[#99cc33]/10"
+                                    placeholder="Contoh: Emerald Insight"
+                                />
+                                <p
+                                    v-if="form.errors.title"
+                                    class="mt-1 text-xs font-medium text-rose-500"
+                                >
+                                    {{ form.errors.title }}
+                                </p>
+                            </div>
+
+                            <div>
+                                <label
+                                    class="mb-2 block text-sm font-bold text-slate-700"
+                                    >Link URL</label
+                                >
+                                <input
+                                    v-model="form.url"
+                                    type="url"
+                                    class="w-full rounded-xl border-slate-200 transition-all focus:border-[#99cc33] focus:ring-4 focus:ring-[#99cc33]/10"
+                                    placeholder="https://..."
+                                />
+                            </div>
+                        </div>
+
+                        <!-- Image Upload Dropzone -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Judul <span class="text-red-500">*</span></label>
-                            <input v-model="form.title" type="text" class="w-full rounded-lg border-gray-300 focus:ring-[var(--primary-green)] focus:border-[var(--primary-green)]" placeholder="Nama koleksi...">
-                            <p v-if="form.errors.title" class="text-red-500 text-xs mt-1">{{ form.errors.title }}</p>
+                            <label
+                                class="mb-2 block text-sm font-bold text-slate-700"
+                                >Logo / Gambar</label
+                            >
+                            <div
+                                @click="triggerFileInput"
+                                class="group relative flex h-32 w-full cursor-pointer items-center justify-center rounded-xl border-2 border-dashed bg-slate-50 transition-all hover:bg-[#99cc33]/5"
+                                :class="
+                                    imagePreview
+                                        ? 'border-slate-300'
+                                        : 'border-slate-300 hover:border-[#99cc33]'
+                                "
+                            >
+                                <div
+                                    v-if="imagePreview"
+                                    class="relative flex h-full w-full items-center justify-center p-2"
+                                >
+                                    <img
+                                        :src="imagePreview"
+                                        class="max-h-full max-w-full object-contain"
+                                    />
+                                    <!-- Edit Overlay -->
+                                    <div
+                                        class="absolute inset-0 flex flex-col items-center justify-center rounded-lg bg-black/40 text-white opacity-0 backdrop-blur-[1px] transition-opacity group-hover:opacity-100"
+                                    >
+                                        <RotateCcw class="mb-1 h-6 w-6" />
+                                        <span class="text-xs font-bold"
+                                            >Ganti</span
+                                        >
+                                    </div>
+                                </div>
+                                <div
+                                    v-else
+                                    class="flex flex-col items-center text-slate-400 transition-colors group-hover:text-[#99cc33]"
+                                >
+                                    <UploadCloud class="mb-1 h-8 w-8" />
+                                    <span class="text-xs font-bold"
+                                        >Upload Logo</span
+                                    >
+                                </div>
+                                <input
+                                    ref="fileInputRef"
+                                    type="file"
+                                    @change="handleImageUpload"
+                                    accept="image/*"
+                                    class="hidden"
+                                />
+                            </div>
+                            <p class="mt-1 ml-1 text-xs text-slate-400">
+                                Format: JPG, PNG. Max 2MB.
+                            </p>
                         </div>
 
+                        <!-- Description & Helper -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Link URL</label>
-                            <input v-model="form.url" type="url" class="w-full rounded-lg border-gray-300 focus:ring-[var(--primary-green)] focus:border-[var(--primary-green)]" placeholder="https://...">
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-4 rounded-xl border border-gray-200">
-                        <label class="block text-xs font-bold text-gray-400 uppercase mb-3">Gambar / Logo</label>
-                        <div class="flex items-center gap-4">
-                            <div class="shrink-0 w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden border border-dashed border-gray-300">
-                                <img v-if="imagePreview" :src="imagePreview" class="w-full h-full object-contain" />
-                                <ImageIcon v-else class="w-8 h-8 text-gray-300" />
+                            <div class="mb-2 flex items-center justify-between">
+                                <label
+                                    class="block text-sm font-bold text-slate-700"
+                                    >Deskripsi</label
+                                >
+                                <div class="flex gap-2">
+                                    <button
+                                        type="button"
+                                        @click="copySnippet('blue')"
+                                        class="flex items-center gap-1 rounded-md border border-sky-100 bg-sky-50 px-2 py-1 text-[10px] font-bold text-sky-600 transition-colors hover:bg-sky-100"
+                                    >
+                                        <Copy class="h-3 w-3" /> Header Biru
+                                    </button>
+                                    <button
+                                        type="button"
+                                        @click="copySnippet('yellow')"
+                                        class="flex items-center gap-1 rounded-md border border-amber-100 bg-amber-50 px-2 py-1 text-[10px] font-bold text-amber-600 transition-colors hover:bg-amber-100"
+                                    >
+                                        <Copy class="h-3 w-3" /> Box Kuning
+                                    </button>
+                                </div>
                             </div>
-                            <div class="flex-1 min-w-0">
-                                <input type="file" @change="handleImageUpload" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 transition-all"/>
-                                <p class="text-xs text-gray-400 mt-1">Format: JPG, PNG. Max 2MB.</p>
-                            </div>
+                            <textarea
+                                v-model="form.description"
+                                rows="5"
+                                class="w-full resize-none rounded-xl border-slate-200 font-mono text-xs leading-relaxed text-slate-600 transition-all focus:border-[#99cc33] focus:ring-4 focus:ring-[#99cc33]/10"
+                                placeholder="Isi deskripsi atau kode HTML sederhana..."
+                            ></textarea>
+                        </div>
+
+                        <!-- Active Toggle -->
+                        <div
+                            class="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-4"
+                        >
+                            <span class="text-sm font-bold text-slate-700"
+                                >Status Aktif</span
+                            >
+                            <label
+                                class="relative inline-flex cursor-pointer items-center"
+                            >
+                                <input
+                                    type="checkbox"
+                                    v-model="form.is_active"
+                                    class="peer sr-only"
+                                />
+                                <div
+                                    class="peer h-6 w-11 rounded-full bg-slate-200 peer-checked:bg-[#99cc33] peer-focus:outline-none after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-full peer-checked:after:border-white"
+                                ></div>
+                            </label>
                         </div>
                     </div>
 
-                    <div>
-                        <div class="flex justify-between items-center mb-2">
-                            <label class="block text-sm font-medium text-gray-700">Deskripsi</label>
-                            <div class="flex gap-2">
-                                <button type="button" @click="copySnippet('blue')" class="text-[10px] bg-blue-50 text-blue-600 px-2 py-1 rounded hover:bg-blue-100 font-semibold">Blue Header</button>
-                                <button type="button" @click="copySnippet('yellow')" class="text-[10px] bg-yellow-50 text-yellow-600 px-2 py-1 rounded hover:bg-yellow-100 font-semibold">Yellow Box</button>
-                            </div>
-                        </div>
-                        <textarea v-model="form.description" rows="5" class="w-full rounded-lg border-gray-300 focus:ring-[var(--primary-green)] focus:border-[var(--primary-green)] font-mono text-xs" placeholder="Isi deskripsi atau HTML..."></textarea>
-                        
-                        <div class="mt-2 p-3 bg-white rounded-lg border border-gray-200">
-                            <p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Live Preview</p>
-                            <div class="rich-text-content text-xs" v-html="form.description || '<span class=\'text-gray-300 italic\'>Preview...</span>'"></div>
-                        </div>
+                    <!-- Footer -->
+                    <div
+                        class="flex items-center justify-end gap-3 border-t border-slate-100 bg-slate-50 p-6"
+                    >
+                        <button
+                            @click="closeModal"
+                            class="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-bold text-slate-600 shadow-sm transition-colors hover:bg-slate-100"
+                        >
+                            Batal
+                        </button>
+                        <button
+                            @click="submit"
+                            :disabled="form.processing"
+                            class="flex items-center gap-2 rounded-xl bg-[#99cc33] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#99cc33]/30 transition-all hover:-translate-y-0.5 hover:bg-[#88b82d] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-70"
+                        >
+                            <Save class="h-4 w-4" />
+                            {{
+                                form.processing ? 'Menyimpan...' : 'Simpan Data'
+                            }}
+                        </button>
                     </div>
-
-                    <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-200">
-                        <span class="text-sm font-medium text-gray-700">Status Aktif</span>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" v-model="form.is_active" class="sr-only peer">
-                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--primary-green)]"></div>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="p-6 border-t border-gray-100 bg-white flex items-center justify-end gap-3">
-                    <button @click="closeModal" class="px-5 py-2.5 rounded-xl text-gray-500 hover:bg-gray-50 font-medium text-sm transition-colors">Batal</button>
-                    <button @click="submit" :disabled="form.processing" class="px-6 py-2.5 rounded-xl bg-[var(--primary-green)] text-white font-bold text-sm hover:opacity-90 flex items-center gap-2 disabled:opacity-70 transition-opacity shadow-lg shadow-green-900/10">
-                        <Save class="w-4 h-4" />
-                        {{ form.processing ? 'Menyimpan...' : 'Simpan Data' }}
-                    </button>
                 </div>
             </div>
-        </div>
-    </Transition>
+        </Transition>
+
+        <!-- Confirm Modal -->
+        <ConfirmModal />
+    </div>
 </template>
-
-<style>
-/* CSS untuk Preview HTML (Sama seperti sebelumnya) */
-.rich-text-content h4 { color: #3b82f6; font-weight: 700; margin-top: 8px; margin-bottom: 4px; }
-.rich-text-content p { margin-bottom: 6px; }
-.rich-text-content .warning-box, 
-.rich-text-content div[class*="bg-yellow"] {
-    background-color: #fef9c3; border: 1px solid #fde047; color: #854d0e; padding: 8px; border-radius: 6px; margin-top: 8px;
-}
-</style>

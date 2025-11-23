@@ -1,13 +1,23 @@
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3';
 import AdminLayout from '@/layouts/AdminLayout.vue';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { useForm } from '@inertiajs/vue3';
+import {
+    AlertCircle,
+    CheckCircle2,
+    Eye,
+    FileCheck,
+    FileText,
+    Save,
+    Trash2,
+    UploadCloud,
+} from 'lucide-vue-next';
 import { ref } from 'vue';
 
-// 1. DEFINISIKAN TIPE DATA PDF
+// Import ConfirmModal & Composable
+import ConfirmModal from '@/components/admin/ConfirmModal.vue';
+import { useConfirmModal } from '@/composables/userConfirmModal';
+
+// --- TYPE DEFINITION ---
 interface PdfFile {
     id: number;
     name: string;
@@ -16,71 +26,77 @@ interface PdfFile {
     updated_at?: string;
 }
 
-// 2. GUNAKAN GENERIC PROPS
+// --- PROPS ---
 const props = defineProps<{
     pdf?: PdfFile | null;
 }>();
 
-const fileInput = ref<HTMLInputElement | null>(null);
-const form = useForm({ file: null as File | null, _method: 'POST' });
+// --- STATE ---
+const fileInputRef = ref<HTMLInputElement | null>(null);
+const selectedFile = ref<File | null>(null);
+const { open } = useConfirmModal();
 
-// --- STATE MODAL ---
-const showResultModal = ref(false);
-const resultMessage = ref('');
-const isError = ref(false);
+// Form Inertia
+const form = useForm({
+    file: null as File | null,
+    _method: 'POST',
+});
 
-const showConfirmModal = ref(false);
-const confirmMessage = ref('');
-const onConfirmAction = ref<(() => void) | null>(null);
+// Helper: File Selection
+const handleFileChange = (event: Event) => {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0] || null;
 
-// --- HELPER MODAL ---
-const showNotification = (msg: string, error = false) => {
-    resultMessage.value = msg;
-    isError.value = error;
-    showResultModal.value = true;
-};
+    if (file) {
+        // Validasi sederhana (Client side)
+        if (file.type !== 'application/pdf') {
+            alert('Hanya file PDF yang diperbolehkan.');
+            target.value = '';
+            return;
+        }
+        // 10MB Limit (sesuaikan kebutuhan)
+        if (file.size > 10 * 1024 * 1024) {
+            alert('Ukuran file maksimal 10MB.');
+            target.value = '';
+            return;
+        }
 
-const triggerConfirm = (msg: string, action: () => void) => {
-    confirmMessage.value = msg;
-    onConfirmAction.value = action;
-    showConfirmModal.value = true;
-};
-
-const handleConfirmYes = () => {
-    if (onConfirmAction.value) {
-        onConfirmAction.value();
+        selectedFile.value = file;
+        form.file = file;
+        form.clearErrors();
     }
-    showConfirmModal.value = false;
 };
 
-// --- LOGIC UTAMA ---
+const triggerFileInput = () => {
+    fileInputRef.value?.click();
+};
+
+// --- ACTIONS ---
 const submit = () => {
+    if (!form.file) return;
+
     if (props.pdf) {
-        form.transform((data) => ({
-            ...data,
-            _method: 'PUT',
-        })).post(`/admin/renstra/update/${props.pdf.id}`, {
-            forceFormData: true,
-            onSuccess: () => {
-                showNotification('Berhasil memperbarui dokumen PDF!');
-                form.reset();
-                if (fileInput.value) fileInput.value.value = '';
+        // Update Mode
+        form.transform((data) => ({ ...data, _method: 'PUT' })).post(
+            `/admin/renstra/update/${props.pdf.id}`,
+            {
+                forceFormData: true,
+                preserveScroll: true,
+                onSuccess: () => {
+                    selectedFile.value = null;
+                    if (fileInputRef.value) fileInputRef.value.value = '';
+                },
             },
-            onError: () => {
-                showNotification('Gagal update! Pastikan format PDF dan ukuran sesuai.', true);
-            }
-        });
+        );
     } else {
+        // Create Mode
         form.post('/admin/renstra/store', {
             forceFormData: true,
+            preserveScroll: true,
             onSuccess: () => {
-                showNotification('Berhasil mengunggah dokumen PDF!');
-                form.reset();
-                if (fileInput.value) fileInput.value.value = '';
+                selectedFile.value = null;
+                if (fileInputRef.value) fileInputRef.value.value = '';
             },
-            onError: () => {
-                showNotification('Gagal upload! Pastikan file dipilih.', true);
-            }
         });
     }
 };
@@ -88,196 +104,267 @@ const submit = () => {
 const deletePdf = () => {
     if (!props.pdf) return;
 
-    triggerConfirm('Apakah Anda yakin ingin menghapus file ini secara permanen? Tindakan ini tidak bisa dibatalkan.', () => {
-        if (props.pdf) {
-            form.delete(`/admin/renstra/delete/${props.pdf.id}`, {
-                onSuccess: () => showNotification('Dokumen PDF berhasil dihapus!'),
-                onError: () => showNotification('Gagal menghapus dokumen.', true),
+    open({
+        title: 'Hapus Dokumen Renstra?',
+        message:
+            'Dokumen ini akan dihapus secara permanen dan tidak akan tampil lagi di halaman publik. Apakah Anda yakin?',
+        actionLabel: 'Hapus Permanen',
+        // confirmClass: 'bg-rose-600 hover:bg-rose-700 text-white',
+        onConfirm: () => {
+            form.delete(`/admin/renstra/delete/${props.pdf!.id}`, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    selectedFile.value = null;
+                },
             });
-        }
+        },
     });
 };
 
+// Layout Definition
 defineOptions({
     layout: (h: any, page: any) =>
-        h(AdminLayout, { title: 'Rencana Strategi', subTitle: 'Kelola Data File Rencana Strategi' }, { default: () => page })
-}); 
+        h(
+            AdminLayout,
+            {
+                title: 'Rencana Strategi',
+                subTitle: 'Kelola dokumen PDF Rencana Strategi (Renstra)',
+            },
+            { default: () => page },
+        ),
+});
 </script>
 
 <template>
-    <div class="space-y-6 relative">
-        
-        <div v-if="pdf" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
-            <div class="lg:col-span-2 space-y-4">
-                <Card class="h-full shadow-md">
-                    <CardHeader>
-                        <CardTitle class="text-lg flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+    <div class="space-y-8 font-sans text-slate-600">
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
+            <!-- LEFT COLUMN: PDF Preview (Dominant) -->
+            <div class="lg:col-span-2">
+                <div
+                    class="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+                >
+                    <!-- Header Preview -->
+                    <div
+                        class="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-4"
+                    >
+                        <h3
+                            class="flex items-center gap-2 font-bold text-slate-800"
+                        >
+                            <Eye class="h-5 w-5 text-[#99cc33]" />
                             Preview Dokumen
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent class="p-0">
+                        </h3>
+                        <span
+                            v-if="pdf"
+                            class="flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700"
+                        >
+                            <CheckCircle2 class="h-3 w-3" /> Tayang
+                        </span>
+                        <span
+                            v-else
+                            class="flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500"
+                        >
+                            <AlertCircle class="h-3 w-3" /> Kosong
+                        </span>
+                    </div>
+
+                    <!-- Iframe Container -->
+                    <div
+                        class="relative min-h-[500px] flex-grow bg-slate-100 lg:min-h-[700px]"
+                    >
                         <iframe
+                            v-if="pdf"
                             :src="`/storage/${pdf.path}#toolbar=0&navpanes=0&scrollbar=0`"
-                            class="w-full h-[700px] rounded-b-lg bg-gray-50"
+                            class="absolute inset-0 h-full w-full"
                             title="Preview PDF"
                         ></iframe>
-                    </CardContent>
-                </Card>
-            </div>
 
-            <div class="space-y-6">
-                <Card class="border-l-4 border-l-green-500 shadow-sm transition-all hover:shadow-md">
-                    <CardHeader class="pb-2">
-                        <CardTitle class="text-base text-gray-700">Informasi File</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div>
-                            <p class="text-xs text-gray-500 uppercase font-semibold mb-1">Nama File Saat Ini:</p>
-                            <div class="flex items-center gap-2 bg-green-50 p-3 rounded-md border border-green-100">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                                <p class="font-medium text-green-900 text-sm truncate" :title="pdf.name">{{ pdf.name }}</p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card class="shadow-sm transition-all hover:shadow-md">
-                    <CardHeader class="pb-3">
-                        <CardTitle class="text-base text-gray-800 flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-                            Ganti File
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <form @submit.prevent="submit" class="space-y-4">
-                            <div class="space-y-2">
-                                <Label for="update-file" class="text-xs text-gray-500 uppercase font-semibold">Pilih PDF Baru</Label>
-                                <Input 
-                                    id="update-file"
-                                    ref="fileInput" 
-                                    type="file" 
-                                    accept="application/pdf"
-                                    @input="form.file = (($event.target as HTMLInputElement).files?.[0] || null)" 
-                                    class="text-sm file:bg-green-50 file:text-green-700 hover:file:bg-green-100 cursor-pointer"
-                                />
-                                <p v-if="form.errors.file" class="text-red-500 text-xs">{{ form.errors.file }}</p>
-                            </div>
-                            
-                            <Button 
-                                type="submit" 
-                                :disabled="form.processing" 
-                                class="w-full bg-green-600 hover:bg-green-700 text-white shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+                        <!-- Empty State -->
+                        <div
+                            v-else
+                            class="absolute inset-0 flex flex-col items-center justify-center p-8 text-center"
+                        >
+                            <div
+                                class="mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-white shadow-sm"
                             >
-                                {{ form.processing ? 'Mengganti...' : 'Simpan Perubahan' }}
-                            </Button>
+                                <FileText class="h-10 w-10 text-slate-300" />
+                            </div>
+                            <h4 class="text-lg font-bold text-slate-700">
+                                Belum Ada Dokumen
+                            </h4>
+                            <p class="max-w-xs text-sm text-slate-500">
+                                Silakan unggah file PDF Rencana Strategi melalui
+                                panel di sebelah kanan.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Controls -->
+            <div class="space-y-6">
+                <!-- Card 1: Info File (If Exists) -->
+                <div
+                    v-if="pdf"
+                    class="rounded-2xl border-y border-r border-l-4 border-slate-200 border-l-[#99cc33] bg-white p-5 shadow-sm"
+                >
+                    <h4
+                        class="mb-3 text-xs font-bold tracking-wider text-slate-400 uppercase"
+                    >
+                        File Aktif
+                    </h4>
+                    <div class="flex items-start gap-3">
+                        <div
+                            class="shrink-0 rounded-lg bg-[#99cc33]/10 p-2 text-[#99cc33]"
+                        >
+                            <FileCheck class="h-6 w-6" />
+                        </div>
+                        <div class="min-w-0">
+                            <p
+                                class="truncate text-sm font-bold text-slate-800"
+                                :title="pdf.name"
+                            >
+                                {{ pdf.name }}
+                            </p>
+                            <p class="mt-0.5 text-xs text-slate-500">
+                                Diunggah pada:
+                                <span class="font-medium">{{
+                                    new Date(
+                                        pdf.created_at || '',
+                                    ).toLocaleDateString('id-ID')
+                                }}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Upload Form -->
+                <div
+                    class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+                >
+                    <div class="border-b border-slate-100 px-6 py-4">
+                        <h3
+                            class="flex items-center gap-2 font-bold text-slate-800"
+                        >
+                            <UploadCloud class="h-5 w-5 text-[#99cc33]" />
+                            {{ pdf ? 'Ganti Dokumen' : 'Upload Dokumen' }}
+                        </h3>
+                    </div>
+
+                    <div class="p-6">
+                        <form @submit.prevent="submit" class="space-y-5">
+                            <!-- Custom File Input -->
+                            <div class="space-y-2">
+                                <label
+                                    class="mb-1 block text-sm font-bold text-slate-700"
+                                    >Pilih File PDF</label
+                                >
+
+                                <div
+                                    @click="triggerFileInput"
+                                    class="group relative flex h-40 w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed bg-slate-50 text-center transition-all hover:bg-[#99cc33]/5"
+                                    :class="
+                                        form.errors.file
+                                            ? 'border-red-300 bg-red-50'
+                                            : 'border-slate-300 hover:border-[#99cc33]'
+                                    "
+                                >
+                                    <div
+                                        class="relative z-10 flex flex-col items-center p-4"
+                                    >
+                                        <div
+                                            class="mb-3 rounded-full bg-white p-3 shadow-sm transition-transform group-hover:scale-110"
+                                        >
+                                            <FileText
+                                                class="h-6 w-6 text-[#99cc33]"
+                                            />
+                                        </div>
+                                        <p
+                                            v-if="selectedFile"
+                                            class="max-w-full truncate px-4 text-sm font-bold text-[#99cc33]"
+                                        >
+                                            {{ selectedFile.name }}
+                                        </p>
+                                        <div v-else>
+                                            <p
+                                                class="text-sm font-bold text-slate-700 transition-colors group-hover:text-[#99cc33]"
+                                            >
+                                                Klik untuk pilih file
+                                            </p>
+                                            <p
+                                                class="mt-1 text-xs text-slate-400"
+                                            >
+                                                PDF (Maks. 10MB)
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <input
+                                        ref="fileInputRef"
+                                        type="file"
+                                        accept="application/pdf"
+                                        class="hidden"
+                                        @change="handleFileChange"
+                                    />
+                                </div>
+
+                                <p
+                                    v-if="form.errors.file"
+                                    class="mt-1 flex items-center text-xs font-medium text-red-500"
+                                >
+                                    <AlertCircle class="mr-1 h-3 w-3" />
+                                    {{ form.errors.file }}
+                                </p>
+                            </div>
+
+                            <!-- Action Button -->
+                            <button
+                                type="submit"
+                                :disabled="form.processing || !form.file"
+                                class="flex w-full items-center justify-center gap-2 rounded-xl bg-[#99cc33] py-3 font-bold text-white shadow-lg shadow-[#99cc33]/30 transition-all hover:-translate-y-0.5 hover:bg-[#88b82d] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0"
+                            >
+                                <span
+                                    v-if="form.processing"
+                                    class="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"
+                                ></span>
+                                <Save v-else class="h-5 w-5" />
+                                {{
+                                    form.processing
+                                        ? 'Menyimpan...'
+                                        : 'Simpan Perubahan'
+                                }}
+                            </button>
                         </form>
-                    </CardContent>
-                </Card>
+                    </div>
+                </div>
 
-                <Card class="border-red-100 bg-red-50/50 shadow-sm transition-all hover:shadow-md">
-                    <CardHeader class="pb-2">
-                        <CardTitle class="text-red-600 text-base flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                            Zona Berbahaya
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p class="text-sm text-gray-600 mb-4">
-                            Menghapus file ini akan menghilangkannya dari tampilan publik website.
-                        </p>
-                        
-                        <Button 
-                            @click="deletePdf" 
-                            variant="destructive" 
-                            class="w-full bg-red-600 hover:bg-red-700 text-white shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-red-600"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-                            Hapus Dokumen Permanen
-                        </Button>
-
-                    </CardContent>
-                </Card>
+                <!-- Card 3: Danger Zone (Only if PDF exists) -->
+                <div
+                    v-if="pdf"
+                    class="rounded-2xl border border-red-100 bg-red-50/50 p-5"
+                >
+                    <h4
+                        class="mb-2 flex items-center gap-2 text-sm font-bold text-red-700"
+                    >
+                        <AlertCircle class="h-4 w-4" />
+                        Zona Berbahaya
+                    </h4>
+                    <p class="mb-4 text-xs leading-relaxed text-red-600/80">
+                        Menghapus dokumen akan menghilangkannya dari halaman
+                        publik secara permanen.
+                    </p>
+                    <button
+                        @click="deletePdf"
+                        class="flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 bg-white py-2.5 text-sm font-bold text-red-600 shadow-sm transition-all hover:border-transparent hover:bg-red-600 hover:text-white"
+                    >
+                        <Trash2 class="h-4 w-4" />
+                        Hapus Dokumen
+                    </button>
+                </div>
             </div>
         </div>
 
-        <div v-else class="flex justify-center py-20">
-            <Card class="w-full max-w-lg shadow-lg border-t-4 border-t-green-500">
-                <CardHeader class="text-center pb-2">
-                    <div class="mx-auto bg-green-50 w-16 h-16 rounded-full flex items-center justify-center mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
-                    </div>
-                    <CardTitle class="text-xl">Upload Rencana Strategi</CardTitle>
-                    <p class="text-gray-500 text-sm">Silakan upload dokumen PDF untuk menampilkannya di website.</p>
-                </CardHeader>
-                <CardContent>
-                    <form @submit.prevent="submit" class="space-y-4">
-                        <div class="grid w-full items-center gap-1.5">
-                            <Label for="upload-file">File Dokumen</Label>
-                            <Input 
-                                id="upload-file"
-                                ref="fileInput" 
-                                type="file" 
-                                accept="application/pdf"
-                                @input="form.file = (($event.target as HTMLInputElement).files?.[0] || null)" 
-                                class="cursor-pointer file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
-                            />
-                            <p v-if="form.errors.file" class="text-red-500 text-sm">{{ form.errors.file }}</p>
-                        </div>
-                        
-                        <Button type="submit" :disabled="form.processing" 
-                            class="w-full bg-green-600 hover:bg-green-700 text-lg h-12 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
-                        >
-                            <span v-if="form.processing">Mengupload...</span>
-                            <span v-else>Upload Sekarang</span>
-                        </Button>
-                    </form>
-                </CardContent>
-            </Card>
-        </div>
-
-        <Teleport to="body">
-            <div v-if="showResultModal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                <div class="bg-white rounded-lg shadow-2xl w-full max-w-sm p-6 transform transition-all scale-100">
-                    <div class="flex flex-col items-center text-center">
-                        <div :class="`rounded-full p-3 mb-4 ${isError ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`">
-                            <svg v-if="isError" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                            <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-                        </div>
-                        <h3 class="text-lg font-bold text-gray-900 mb-2">{{ isError ? 'Terjadi Kesalahan' : 'Berhasil!' }}</h3>
-                        <p class="text-sm text-gray-500 mb-6">{{ resultMessage }}</p>
-                        <Button @click="showResultModal = false" class="w-full" :class="isError ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'">
-                            Tutup
-                        </Button>
-                    </div>
-                </div>
-            </div>
-        </Teleport>
-
-        <Teleport to="body">
-            <div v-if="showConfirmModal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                <div class="bg-white rounded-lg shadow-2xl w-full max-w-md p-6 transform transition-all">
-                    <div class="flex items-start space-x-4">
-                        <div class="bg-red-100 p-2 rounded-full text-red-600 flex-shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                        </div>
-                        <div class="flex-1">
-                            <h3 class="text-lg font-medium text-gray-900">Konfirmasi Penghapusan</h3>
-                            <p class="text-sm text-gray-500 mt-2">{{ confirmMessage }}</p>
-                        </div>
-                    </div>
-                    <div class="mt-6 flex justify-end space-x-3">
-                        <Button variant="outline" @click="showConfirmModal = false" class="bg-gray-100 hover:bg-gray-200 text-gray-700 border-0">
-                            Batal
-                        </Button>
-                        <Button variant="destructive" @click="handleConfirmYes" class="bg-red-600 hover:bg-red-700">
-                            Ya, Hapus File
-                        </Button>
-                    </div>
-                </div>
-            </div>
-        </Teleport>
-
+        <!-- Confirm Modal Component -->
+        <ConfirmModal />
     </div>
 </template>

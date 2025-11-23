@@ -83,9 +83,8 @@ const sidebarWidth = computed(() => (sidebarOpen.value ? 256 : 80)); // px
             </svg>
         </button>
 
-        <!-- KONTEN (bergeser ketika sidebar expand) -->
         <main
-            class="relative z-10 mt-[-60px] h-[calc(100%-60px)] overflow-y-auto p-6 transition-all duration-300"
+            class="relative z-10 mt-[-60px] h-[calc(100%-60px)] overflow-y-auto p-6 pb-16 transition-all duration-300"
             :style="{ marginLeft: sidebarWidth + 'px' }"
         >
             <div class="relative bottom-8">
