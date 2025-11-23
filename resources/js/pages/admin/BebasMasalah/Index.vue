@@ -66,7 +66,7 @@ const formSettings = useForm({
     watermark_title: props.settings?.watermark_title || '',
     watermark_info: props.settings?.watermark_info || '',
     watermark_instruction: props.settings?.watermark_instruction || '',
-    watermark_image: null as File | null,
+    watermark_image: null as File | null,   
 });
 
 const submitSettings = () => {
@@ -132,7 +132,6 @@ const handleDelete = (type: 'requirement' | 'guide', item: any) => {
         title: 'Hapus Data?',
         message: `Apakah Anda yakin ingin menghapus data "${item.title}"?`,
         actionLabel: 'Hapus',
-        confirmClass: 'bg-rose-600 hover:bg-rose-700 text-white',
         onConfirm: () => {
             const resource = type === 'requirement' ? 'requirements' : 'guides';
             router.delete(`/admin/bebas-masalah/${resource}/${item.id}`, {
@@ -147,6 +146,7 @@ const handleFileChange = (field: 'alur_image' | 'template_file' | 'watermark_ima
     const file = (event.target as HTMLInputElement).files?.[0];
     if (file) formSettings[field] = file;
 };
+
 </script>
 
 <template>
@@ -191,7 +191,7 @@ const handleFileChange = (field: 'alur_image' | 'template_file' | 'watermark_ima
                                 <textarea
                                     v-model="formSettings.alur_description"
                                     rows="6"
-                                    class="w-full rounded-xl border-slate-200 bg-slate-50 focus:border-[#99cc33] focus:ring-4 focus:ring-[#99cc33]/10 transition-all text-slate-700 placeholder:text-slate-400 resize-none p-4"
+                                    class="w-full rounded-xl border-[#d0f18e] bg-slate-50 ring-1 focus:border-[#99cc33] focus:ring-4 focus:ring-[#99cc33] transition-all text-slate-700 placeholder:text-slate-400 resize-none p-4"
                                     placeholder="Jelaskan alur proses bebas masalah..."
                                 ></textarea>
                             </div>
@@ -305,17 +305,17 @@ const handleFileChange = (field: 'alur_image' | 'template_file' | 'watermark_ima
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label class="block text-sm font-bold text-slate-700 mb-2">Judul Display</label>
-                                <input type="text" v-model="formSettings[activeTab + '_title']" class="w-full rounded-xl border-slate-200 focus:border-[#99cc33] focus:ring-4 focus:ring-[#99cc33]/10 transition-all" />
+                                <input type="text" v-model="formSettings[activeTab + '_title']" class="w-full px-4 py-3 rounded-xl border border-[#d0f18e] focus:border-[#99cc33] ring-1 focus:ring-2 focus:ring-[#99cc33] transition-all outline-none text-slate-700 placeholder:text-slate-400 font-medium" />
                             </div>
                             <div>
                                 <label class="block text-sm font-bold text-slate-700 mb-2">Info File (Size/Format)</label>
-                                <input type="text" v-model="formSettings[activeTab + '_info']" class="w-full rounded-xl border-slate-200 focus:border-[#99cc33] focus:ring-4 focus:ring-[#99cc33]/10 transition-all" />
+                                <input type="text" v-model="formSettings[activeTab + '_info']" class="w-full px-4 py-3 rounded-xl border border-[#d0f18e] focus:border-[#99cc33] ring-1 focus:ring-2 focus:ring-[#99cc33] transition-all outline-none text-slate-700 placeholder:text-slate-400 font-medium" />
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-2">Instruksi Penggunaan</label>
-                            <textarea v-model="formSettings[activeTab + '_instruction']" rows="3" class="w-full rounded-xl border-slate-200 focus:border-[#99cc33] focus:ring-4 focus:ring-[#99cc33]/10 transition-all resize-none"></textarea>
+                            <textarea v-model="formSettings[activeTab + '_instruction']" rows="5" class="w-full px-4 rounded-xl border-[#d0f18e] focus:border-[#99cc33] ring-1 focus:ring-2 focus:ring-[#99cc33] transition-all resize-none"></textarea>
                         </div>
 
                         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-center gap-6">
@@ -341,7 +341,11 @@ const handleFileChange = (field: 'alur_image' | 'template_file' | 'watermark_ima
                                  </div>
                                  <input
                                     type="file"
-                                    @change="handleFileChange(activeTab + (activeTab === 'template' ? '_file' : '_image'), $event)"
+                                    @change="handleFileChange(
+                                        activeTab === 'template' ? 'template_file' : 
+                                        activeTab === 'watermark' ? 'watermark_image' : 'alur_image', 
+                                        $event
+                                    )"
                                     class="block w-full text-sm text-slate-500
                                     file:mr-4 file:py-2.5 file:px-4
                                     file:rounded-full file:border-0

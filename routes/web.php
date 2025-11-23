@@ -1,5 +1,7 @@
 <?php
 
+
+use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\GaleriController;
 use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\BookProposalController;
@@ -16,6 +18,7 @@ use App\Http\Controllers\CoverBuku;
 use App\Http\Controllers\RencanaStrategi;
 use App\Http\Controllers\TimManajemen;
 
+Route::post('/send-question', [QuestionController::class, 'send']);
 
 Route::get('/pelayanan/{slug}', function (string $slug) {
     return Inertia::render('Pelayanan/Show', [

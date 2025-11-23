@@ -131,7 +131,6 @@ const confirmDelete = (proposal: any) => {
         title: 'Hapus Usulan Buku?',
         message: `Apakah Anda yakin ingin menghapus usulan buku "${proposal.title}" oleh ${proposal.nama_pengusul}?`,
         actionLabel: 'Hapus',
-        confirmClass: 'bg-rose-600 hover:bg-rose-700 text-white',
         onConfirm: () => {
             router.delete(`/admin/usulan-buku/${proposal.id}`, {
                 preserveScroll: true,

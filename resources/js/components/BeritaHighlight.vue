@@ -6,7 +6,7 @@ const props = defineProps({
     articles: {
         type: Array<{
             article_id: string;
-            url_thumbnail: string | '';
+            url_thumbnail: string | null;
             judul: string;
             content: string;
             created_date: string;

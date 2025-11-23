@@ -178,7 +178,7 @@ const emit = defineEmits(['toggle-sidebar']);
                 />
                 <SidebarLink
                     icon="LibraryBig"
-                    label="E-Journal"
+                    label="E-Journal & E-Book"
                     to="/admin/e-journals"
                     :sidebar-open="sidebarOpen"
                 />

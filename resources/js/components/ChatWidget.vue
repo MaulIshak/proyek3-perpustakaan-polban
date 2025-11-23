@@ -22,15 +22,38 @@ const formData = ref({
 const handleSubmit = async (e: Event) => {
     e.preventDefault();
 
-    // Simulasi pengiriman
-    isSent.value = true;
+    try {
+        // Ambil token dengan aman (handle jika null)
+        const csrfElement = document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement;
+        const csrfToken = csrfElement ? csrfElement.content : '';
 
-    // Reset otomatis setelah 3 detik (opsional)
-    setTimeout(() => {
-        if (isOpen.value) {
-            // Logic jika ingin auto-reset
+        const res = await fetch('/send-question', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json', // Tambahkan ini agar server tau kita minta JSON
+                'X-CSRF-TOKEN': csrfToken,
+            },
+            body: JSON.stringify(formData.value)
+        });
+
+        // JIKA ERROR DARI SERVER
+        if (!res.ok) {
+            // Coba ambil pesan error dari server
+            const errorData = await res.json().catch(() => null); 
+            console.error("Detail Error Server:", errorData); // Lihat ini di Console
+            
+            throw new Error(`Server menolak: ${res.status} ${res.statusText}`);
         }
-    }, 3000);
+
+        // Jika sukses
+        isSent.value = true;
+
+    } catch (err) {
+        console.error("Error Catch:", err);
+        // Tampilkan pesan error spesifik jika ada
+        alert("Gagal mengirim: " + (err instanceof Error ? err.message : "Kesalahan jaringan"));
+    }
 };
 
 const resetChat = () => {
