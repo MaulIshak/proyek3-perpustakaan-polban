@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\ArticleController;
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\CoverBuku;
 use App\Http\Controllers\RencanaStrategi;
 use App\Http\Controllers\TimManajemen;
@@ -131,20 +132,15 @@ Route::get('/jam-layanan', function (){
 Route::get('/e-collection', [CollectionController::class, 'ShowUser']);
 
 // Booking Buku
-Route::get('/book-reservation', function(){
-    $data = [
-        'title' => 'Booking buku'
-    ];
+// 1. Untuk Menampilkan Halaman (GET)
+Route::get('/book-reservation', [BookingController::class, 'create'])->name('booking.create');
 
-    return Inertia::render('user/BookingBuku', $data);
-});
+// 2. Untuk Mengirim Data Form (POST) -> Ini yang sebelumnya hilang
+Route::post('/book-reservation', [BookingController::class, 'store'])->name('booking.store');
 
 // Renstra
 Route::get('/renstra', [RencanaStrategi::class, 'viewPDF'])->name('renstra');
 
-
-// Cover Buku Baru USER
-// Route::get('/')
 
 
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -263,6 +259,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::delete('/e-journals/{ejournal}', [EJournalController::class, 'destroy'])
         ->name('e-journals.destroy');
 
+    // Booking Buku
+    Route::get('booking-buku', [BookingController::class, 'indexAdmin'])->name('booking.index');
+    // Update Status (Setuju/Tolak/Batal)
+    Route::patch('booking-buku/{id}/status', [BookingController::class, 'updateStatus'])->name('booking.status');
+    // Hapus Data
+    Route::delete('booking-buku/{id}', [BookingController::class, 'destroy'])->name('booking.destroy');
 
 });
 

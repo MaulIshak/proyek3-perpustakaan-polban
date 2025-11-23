@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Layout from '@/layouts/UserAppLayout.vue';
+import { useForm } from '@inertiajs/vue3'; // WAJIB IMPORT INI
 import {
     BookOpen,
     CalendarCheck,
@@ -10,7 +11,7 @@ import {
     PenTool,
     User,
 } from 'lucide-vue-next';
-import { nextTick, ref } from 'vue';
+import { ref } from 'vue';
 
 defineProps<{
     title: string;
@@ -18,7 +19,8 @@ defineProps<{
 
 const breadcrumb = [{ label: 'Home', link: '/' }, { label: 'Booking Buku' }];
 
-const form = ref({
+// GUNAKAN useForm DARI INERTIA
+const form = useForm({
     namaLengkap: '',
     nimNip: '',
     email: '',
@@ -30,15 +32,27 @@ const form = ref({
 const showMessage = ref(false);
 const messageRef = ref<HTMLElement | null>(null);
 
-const submitForm = async () => {
-    // Simulasi submit (di sini nanti Anda bisa ganti dengan Inertia form.post)
-    console.log('Permintaan Booking Dikirim:', form.value);
+const submitForm = () => {
+    // Kirim data ke route booking.store
+    form.post('/book-reservation', {
+        preserveScroll: true,
+        onSuccess: () => {
+            // Tampilkan pesan sukses
+            showMessage.value = true;
+            
+            // Reset form
+            form.reset();
 
-    showMessage.value = true;
-    await nextTick();
-
-    // Scroll ke pesan sukses agar user sadar
-    messageRef.value?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // Scroll ke pesan sukses
+            setTimeout(() => {
+                messageRef.value?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        },
+        onError: (errors) => {
+            console.error("Gagal submit:", errors);
+            // Opsional: Scroll ke atas jika error
+        }
+    });
 };
 </script>
 
