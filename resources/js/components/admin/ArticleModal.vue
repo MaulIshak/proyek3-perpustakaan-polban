@@ -12,7 +12,7 @@
                 @click="$emit('close')"
             />
 
-            <ArticlePage :article="article" />
+            <ArticlePage :article="article" :is-admin="true" />
         </div>
     </div>
 </template>

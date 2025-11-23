@@ -40,6 +40,7 @@ class ArticleController extends Controller
             'date' => ['required', 'date'],
             'thumbnail' => ['required', 'image', 'max:2048'], // 2MB max
             'attachment' => ['nullable', 'file', 'max:5120'], // 5MB max
+            'created_by' => ['required', 'string', 'max:255'],
         ]);
 
         // Simpan thumbnail ke storage
@@ -67,6 +68,7 @@ class ArticleController extends Controller
             'content' => $validated['content'],
             'type' => 'berita',
             'status' => $validated['status'],
+            'created_by' => $validated['created_by'],
         ]);
 
         // Karena kita punya UUID primary key, generate manual jika belum ada
@@ -98,6 +100,7 @@ public function updateBerita(Request $request, $id)
         'date' => ['required', 'date'],
         'thumbnail' => ['nullable', 'image', 'max:2048'],
         'attachment' => ['nullable', 'file', 'max:5120'],
+        'created_by' => ['required', 'string', 'max:255'],
     ]);
 
     if ($request->hasFile('thumbnail')) {
@@ -123,6 +126,7 @@ public function updateBerita(Request $request, $id)
         'judul' => $validated['judul'],
         'content' => $validated['content'],
         'status' => $validated['status'],
+        'created_by' => $validated['created_by'],
         'updated_date' => now(),
     ]);
 
@@ -165,7 +169,7 @@ public function updateBerita(Request $request, $id)
     public function showBeritaUser($id)
     {
         $article = Article::where('article_id', $id)->firstOrFail();
-
+        // dd($article);
         return inertia('user/Berita/Detail', [
             'article' => [
                 'title' => $article->judul,
@@ -175,6 +179,7 @@ public function updateBerita(Request $request, $id)
                 'url_attachment' => $article->url_attachment,
                 'attachment_name' => $article->attachment_name,
                 'type' => $article->type,
+                'author' => $article->created_by,
             ],
         ]);
     }
@@ -191,6 +196,7 @@ public function updateBerita(Request $request, $id)
                 'url_attachment' => $article->url_attachment,
                 'attachment_name' => $article->attachment_name,
                 'type' => $article->type,
+                'author' => $article->created_by,
             ],
         ]);
     }
@@ -263,6 +269,7 @@ public function updateBerita(Request $request, $id)
             'date' => ['required', 'date'],
             'thumbnail' => ['required', 'image', 'max:2048'],
             'attachment' => ['nullable', 'file', 'max:5120'],
+            'created_by' => ['required', 'string', 'max:255'],
         ]);
 
         $thumbnailPath = null;
@@ -285,6 +292,7 @@ public function updateBerita(Request $request, $id)
             'content' => $validated['content'],
             'type' => 'pengumuman',
             'status' => $validated['status'],
+            'created_by' => $validated['created_by'],
         ]);
 
         $article->article_id = Str::uuid()->toString();
@@ -315,6 +323,7 @@ public function updateBerita(Request $request, $id)
             'date' => ['required', 'date'],
             'thumbnail' => ['nullable', 'image', 'max:2048'],
             'attachment' => ['nullable', 'file', 'max:5120'],
+            'created_by' => ['required', 'string', 'max:255'],
         ]);
 
         if ($request->hasFile('thumbnail')) {
@@ -339,6 +348,7 @@ public function updateBerita(Request $request, $id)
             'judul' => $validated['judul'],
             'content' => $validated['content'],
             'status' => $validated['status'],
+            'created_by' => $validated['created_by'],
             'updated_date' => now(),
         ]);
 

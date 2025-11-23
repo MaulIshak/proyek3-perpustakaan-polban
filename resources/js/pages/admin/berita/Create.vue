@@ -1,42 +1,52 @@
-<script setup>
+<script setup lang="ts">
 import ArticleForm from '@/components/admin/ArticleForm.vue';
 import AdminLayout from '@/layouts/AdminLayout.vue';
 import { useForm, usePage } from '@inertiajs/vue3';
+import { AlertCircle, CheckCircle2, X } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 
+// Layout Definition
 defineOptions({
-    layout: (h, page) =>
+    layout: (h: any, page: any) =>
         h(
             AdminLayout,
             {
                 title: 'Buat Berita Baru',
-                subTitle: 'Kelola konten berita perpustakaan baru',
+                subTitle: 'Kelola konten berita dan publikasi perpustakaan',
             },
             { default: () => page },
         ),
 });
 
-const page = usePage();
-const successMessage = computed(() => page.props.flash?.success || null);
+// --- STATE ---
+const page = usePage<any>();
+const successMessage = computed(() => page.props.flash?.success);
+const showSuccess = ref(false);
 
+// Data lokal untuk v-model ke ArticleForm
 const article = ref({
     title: '',
     content: '',
     status: 'draft',
     date: new Date().toISOString().slice(0, 10),
-    thumbnail: null,
-    attachment: null,
+    thumbnail: null as File | null,
+    url_thumbnail: '', // Untuk preview jika ada
+    attachment: null as File | null,
+    created_by: '',
 });
 
+// Form Inertia
 const form = useForm({
     judul: '',
     content: '',
     status: 'draft',
     date: '',
-    thumbnail: null,
-    attachment: null,
+    thumbnail: null as File | null,
+    attachment: null as File | null,
+    created_by: '',
 });
 
+// --- WATCHER: Sync Local State to Inertia Form ---
 watch(
     article,
     (newVal) => {
@@ -46,94 +56,152 @@ watch(
         form.date = newVal.date;
         form.thumbnail = newVal.thumbnail;
         form.attachment = newVal.attachment;
+        form.created_by = newVal.created_by;
     },
     { deep: true },
 );
 
+// --- ACTIONS ---
 const handleSubmit = () => {
     form.post('/admin/berita/store', {
-        forceFormData: true,
+        forceFormData: true, // Wajib untuk upload file
+        preserveScroll: true,
         onSuccess: () => {
-            form.reset();
+            // Reset state lokal
             article.value = {
                 title: '',
                 content: '',
                 status: 'draft',
                 date: new Date().toISOString().slice(0, 10),
                 thumbnail: null,
+                url_thumbnail: '',
                 attachment: null,
+                created_by: '',
             };
+
+            // Tampilkan notifikasi sukses lokal (selain dari flash)
+            showSuccess.value = true;
+
+            // Auto hide notifikasi
+            setTimeout(() => {
+                showSuccess.value = false;
+            }, 5000);
         },
-        onError: (errors) => console.error('Validasi gagal:', errors),
+        onError: (errors) => {
+            console.error('Validasi gagal:', errors);
+            // Scroll ke atas jika error
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        },
     });
 };
 </script>
 
 <template>
-    <!-- Notifikasi Sukses -->
-    <transition name="fade">
-        <div
-            v-if="successMessage"
-            class="mb-4 rounded-md border border-green-300 bg-green-50 px-4 py-3 text-green-700 shadow-sm"
+    <div class="relative">
+        <!-- 1. Notifikasi Sukses (Floating/Sticky) -->
+        <transition
+            enter-active-class="transition ease-out duration-300"
+            enter-from-class="opacity-0 -translate-y-2"
+            enter-to-class="opacity-100 translate-y-0"
+            leave-active-class="transition ease-in duration-200"
+            leave-from-class="opacity-100 translate-y-0"
+            leave-to-class="opacity-0 -translate-y-2"
         >
-            ✅ {{ successMessage }}
-        </div>
-    </transition>
-    <div class="relative rounded-xl bg-white p-6 shadow">
-        <!-- Komponen Form -->
+            <div
+                v-if="successMessage || showSuccess"
+                class="mb-6 flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-800 shadow-sm"
+            >
+                <CheckCircle2 class="mt-0.5 h-5 w-5 text-emerald-600" />
+                <div class="flex-1">
+                    <h4 class="text-sm font-bold">Berhasil Disimpan!</h4>
+                    <p class="text-sm opacity-90">
+                        {{
+                            successMessage ||
+                            'Berita baru berhasil ditambahkan ke database.'
+                        }}
+                    </p>
+                </div>
+                <button
+                    @click="showSuccess = false"
+                    class="text-emerald-600 hover:text-emerald-800"
+                >
+                    <X class="h-4 w-4" />
+                </button>
+            </div>
+        </transition>
+
+        <!-- 2. Notifikasi Error (Jika ada error validasi global) -->
+        <transition name="fade">
+            <div
+                v-if="Object.keys(form.errors).length > 0"
+                class="mb-6 flex items-start gap-3 rounded-xl border border-rose-200 bg-rose-50 p-4 text-rose-800 shadow-sm"
+            >
+                <AlertCircle class="mt-0.5 h-5 w-5 text-rose-600" />
+                <div>
+                    <h4 class="text-sm font-bold">Gagal Menyimpan</h4>
+                    <p class="mb-2 text-sm opacity-90">
+                        Mohon periksa kembali isian formulir berikut:
+                    </p>
+                    <ul
+                        class="list-inside list-disc space-y-1 text-xs opacity-80"
+                    >
+                        <li v-for="(msg, key) in form.errors" :key="key">
+                            {{ msg }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </transition>
+
+        <!-- 3. Komponen Form Utama -->
         <ArticleForm
             v-model="article"
             :show-attachment="false"
+            back-href="/admin/berita"
             @submit="handleSubmit"
         />
 
-        <!-- Pesan Error Validasi -->
-        <div
-            v-if="Object.keys(form.errors).length"
-            class="mt-6 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700"
-        >
-            <p class="mb-2 font-semibold">Terdapat kesalahan:</p>
-            <ul class="ml-4 list-disc space-y-1">
-                <li v-for="(msg, key) in form.errors" :key="key">{{ msg }}</li>
-            </ul>
-        </div>
-
-        <!-- Progress Upload -->
-        <div v-if="form.progress" class="mt-4 text-sm text-gray-600">
-            Mengunggah... {{ Math.round(form.progress.percentage) }}%
-        </div>
-
-        <!-- Modal Loading -->
+        <!-- 4. Loading Overlay (Full Screen Blocker) -->
         <transition name="fade">
             <div
                 v-if="form.processing"
-                class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+                class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm"
             >
                 <div
-                    class="flex flex-col items-center rounded-lg bg-white px-8 py-6 shadow-xl"
+                    class="mx-4 flex w-full max-w-sm flex-col items-center justify-center rounded-2xl bg-white p-8 text-center shadow-2xl"
                 >
-                    <svg
-                        class="h-10 w-10 animate-spin text-emerald-600"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
+                    <!-- Spinner -->
+                    <div class="relative mb-4">
+                        <div
+                            class="absolute inset-0 rounded-full border-4 border-slate-100"
+                        ></div>
+                        <div
+                            class="relative h-12 w-12 animate-spin rounded-full border-4 border-[#99cc33] border-t-transparent"
+                        ></div>
+                    </div>
+
+                    <h3 class="mb-1 text-lg font-bold text-slate-800">
+                        Sedang Memproses
+                    </h3>
+                    <p class="mb-4 text-sm text-slate-500">
+                        Mohon tunggu, sedang mengunggah data...
+                    </p>
+
+                    <!-- Progress Bar (Optional, if supported by backend config) -->
+                    <div
+                        v-if="form.progress"
+                        class="h-2 w-full overflow-hidden rounded-full bg-slate-100"
                     >
-                        <circle
-                            class="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            stroke-width="4"
-                        ></circle>
-                        <path
-                            class="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8v8H4z"
-                        ></path>
-                    </svg>
-                    <p class="mt-4 text-sm font-medium text-gray-600">
-                        Menyimpan berita...
+                        <div
+                            class="h-full bg-[#99cc33] transition-all duration-300"
+                            :style="{ width: form.progress.percentage + '%' }"
+                        ></div>
+                    </div>
+                    <p
+                        v-if="form.progress"
+                        class="mt-2 text-xs font-medium text-slate-400"
+                    >
+                        {{ form.progress.percentage }}% Terunggah
                     </p>
                 </div>
             </div>
@@ -144,7 +212,7 @@ const handleSubmit = () => {
 <style scoped>
 .fade-enter-active,
 .fade-leave-active {
-    transition: opacity 0.3s;
+    transition: opacity 0.3s ease;
 }
 .fade-enter-from,
 .fade-leave-to {

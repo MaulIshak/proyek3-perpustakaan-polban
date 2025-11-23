@@ -21,6 +21,7 @@ const props = defineProps<{
         type: 'berita' | 'pengumuman';
         author?: string; // Tambahkan properti author (opsional)
     };
+    isAdmin?: boolean;
 }>();
 
 // Format Date
@@ -43,28 +44,20 @@ const categoryLabel = computed(() => {
 
 // Fallback author jika data kosong
 const authorName = computed(() => {
-    return props.article.author || 'Tim Humas Perpustakaan';
+    return props.article.author;
 });
 </script>
 
 <template>
-    <!-- Background Decoration -->
-    <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div
-            class="absolute top-0 right-0 h-[600px] w-[600px] rounded-full bg-[#99cc33]/5 blur-3xl"
-        ></div>
-        <div
-            class="absolute bottom-0 left-0 h-[500px] w-[500px] rounded-full bg-gray-100 blur-3xl"
-        ></div>
-    </div>
-
     <div class="relative container mx-auto px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
         <div
             class="mx-auto max-w-4xl overflow-hidden rounded-[2rem] border border-slate-100 bg-white shadow-xl shadow-slate-200/60 sm:rounded-[2.5rem]"
         >
             <!-- 1. Top Navigation & Meta -->
-            <!-- Responsive Padding: p-6 di mobile, p-10 di desktop -->
-            <div class="border-b border-slate-100 p-6 sm:p-10">
+            <div
+                class="border-b border-slate-100 p-6 sm:p-10"
+                :v-show="!props.isAdmin"
+            >
                 <Link
                     :href="backUrl"
                     class="group mb-6 inline-flex items-center gap-2 text-sm font-bold text-slate-500 transition-colors hover:text-[#99cc33] sm:mb-8"

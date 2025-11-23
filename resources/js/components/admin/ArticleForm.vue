@@ -35,6 +35,7 @@ const articleData = defineModel<{
     thumbnail: File | null;
     url_thumbnail?: string;
     attachment?: File | null;
+    created_by: string;
     [key: string]: any;
 }>({
     required: true,
@@ -88,8 +89,6 @@ function clearThumbnail() {
     if (thumbnailPreviewUrl.value && thumbnailPreviewUrl.value.startsWith('blob:')) {
         URL.revokeObjectURL(thumbnailPreviewUrl.value);
     }
-    // Jika url_thumbnail asli dari DB ada, kita biarkan null agar nanti di backend ditangani (misal hapus gambar)
-    // Atau jika ingin reset ke gambar lama, logic-nya beda. Di sini asumsi clear = hapus.
     thumbnailPreviewUrl.value = null;
 
     if (thumbnailInput.value) {
@@ -205,7 +204,7 @@ onUnmounted(() => {
                 <div class="lg:col-span-8 space-y-6">
 
                     <!-- Row 1: Title & Status -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                         <!-- Judul -->
                         <div class="md:col-span-2">
                             <label for="title" class="block text-sm font-bold text-slate-700 mb-2">
@@ -221,8 +220,23 @@ onUnmounted(() => {
                             />
                         </div>
 
+                        <!-- Dibuat Oleh -->
+                        <div class="md:col-span-1">
+                            <label for="created_by" class="block text-sm font-bold text-slate-700 mb-2">
+                                Dibuat Oleh
+                            </label>
+                            <input
+                                id="created_by"
+                                v-model="articleData.created_by"
+                                type="text"
+                                required
+                                class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#99cc33] focus:ring-4 focus:ring-[#99cc33]/10 transition-all outline-none text-slate-700 placeholder:text-slate-400 font-medium"
+                                placeholder="Nama penulis..."
+                            />
+                        </div>
+
                         <!-- Status -->
-                        <div>
+                        <div class="md:col-span-1">
                             <label for="status" class="block text-sm font-bold text-slate-700 mb-2">
                                 Status Publikasi
                             </label>

@@ -52,6 +52,7 @@ class Article extends Model
         'content',
         'type',
         'status',
+        'created_by',
     ];
 
     /**
