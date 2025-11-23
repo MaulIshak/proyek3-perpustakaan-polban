@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\BookingBuku;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-
+use Illuminate\Support\Facades\Mail;
+use App\Mail\BookingStatusMail;
+use Carbon\Carbon;
 
 class BookingController extends Controller
 {
@@ -67,10 +69,9 @@ class BookingController extends Controller
             'rejection_reason' => 'nullable|string'
         ]);
 
-        // Update data
+        // 1. Update Data di Database
         $booking->status = $request->status;
         
-        // Jika ditolak, simpan alasannya. Jika tidak, kosongkan.
         if ($request->status === 'rejected') {
             $booking->rejection_reason = $request->rejection_reason;
         } else {
@@ -79,9 +80,49 @@ class BookingController extends Controller
 
         $booking->save();
 
-        // TODO: DI SINI LOKASI KODE UNTUK KIRIM EMAIL (NANTI)
+        // 2. LOGIKA EMAIL & DEADLINE
+        if ($booking->status !== 'pending') {
+            
+            $deadlineString = '-';
+
+            // Logika Hitung Deadline (Hanya jika Disetujui)
+            if ($booking->status === 'approved') {
+                // Set Locale ke Indonesia biar hari/bulannya bahasa Indo
+                Carbon::setLocale('id');
+                
+                $deadline = Carbon::now()->addDay(); // Tambah 24 Jam
+
+                // Cek Hari Libur (Sabtu & Minggu)
+                if ($deadline->isSaturday()) {
+                    $deadline->addDays(2); // Loncat ke Senin
+                } elseif ($deadline->isSunday()) {
+                    $deadline->addDay();   // Loncat ke Senin
+                }
+
+                // Format: "Senin, 25 November 2025 Pukul 14:30"
+                $deadlineString = $deadline->translatedFormat('l, d F Y') . ' Pukul ' . $deadline->format('H:i');
+            }
+
+            // Data yang dikirim ke Email
+            $emailData = [
+                'name'       => $booking->nama_lengkap,
+                'book_title' => $booking->judul_buku,
+                'status'     => $booking->status,
+                'reason'     => $booking->rejection_reason,
+                'deadline'   => $deadlineString,
+            ];
+
+            // Kirim Email (Gunakan Try-Catch agar app tidak crash jika internet mati/SMTP error)
+            try {
+                Mail::to($booking->email)->send(new BookingStatusMail($emailData));
+            } catch (\Exception $e) {
+                dd($e->getMessage());
+                // Opsional: Log error jika perlu
+                // Log::error("Gagal kirim email ke " . $booking->email . ": " . $e->getMessage());
+            }
+        }
         
-        return redirect()->back()->with('success', 'Status booking berhasil diperbarui.');
+        return redirect()->back()->with('success', 'Status diperbarui & Notifikasi email dikirim.');
     }
 
     public function destroy($id)
