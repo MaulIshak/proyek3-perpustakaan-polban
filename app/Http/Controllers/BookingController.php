@@ -114,7 +114,7 @@ class BookingController extends Controller
 
             // Kirim Email (Gunakan Try-Catch agar app tidak crash jika internet mati/SMTP error)
             try {
-                Mail::to($booking->email)->send(new BookingStatusMail($emailData));
+                Mail::to($booking->email)->queue(new BookingStatusMail($emailData));
             } catch (\Exception $e) {
                 dd($e->getMessage());
                 // Opsional: Log error jika perlu
