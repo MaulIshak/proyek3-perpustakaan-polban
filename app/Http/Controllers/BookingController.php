@@ -5,14 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\BookingBuku;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\BookingStatusMail;
 use Carbon\Carbon;
+// Import Library Brevo
+use Brevo\Client\Api\TransactionalEmailsApi;
+use Brevo\Client\Configuration;
+use Brevo\Client\Model\SendSmtpEmail;
+use GuzzleHttp\Client; // Brevo butuh Guzzle
 
 class BookingController extends Controller
 {
     // --- USER SIDE ---
-    
     public function create()
     {
         return Inertia::render('user/BookingBuku', [
@@ -22,7 +24,6 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
-        // 1. Validasi sesuai nama input di Vue (camelCase)
         $request->validate([
             'namaLengkap' => 'required|string|max:255',
             'nimNip'      => 'required|string|max:50',
@@ -32,7 +33,6 @@ class BookingController extends Controller
             'pengarang'   => 'required|string|max:255',
         ]);
 
-        // 2. Simpan ke Database (Mapping camelCase -> snake_case)
         BookingBuku::create([
             'nama_lengkap' => $request->namaLengkap,
             'nim_nip'      => $request->nimNip,
@@ -46,15 +46,11 @@ class BookingController extends Controller
         return redirect()->back()->with('success', 'Permintaan booking berhasil dikirim!');
     }
 
-
     // --- ADMIN SIDE ---
 
     public function indexAdmin()
     {
-        // Ambil data booking, urutkan dari yang terbaru
-        // Kita bisa tambahkan filter status nanti jika perlu
         $bookings = BookingBuku::latest()->get();
-
         return Inertia::render('admin/booking/Index', [
             'bookings' => $bookings
         ]);
@@ -69,7 +65,6 @@ class BookingController extends Controller
             'rejection_reason' => 'nullable|string'
         ]);
 
-        // 1. Update Data di Database
         $booking->status = $request->status;
         
         if ($request->status === 'rejected') {
@@ -80,54 +75,94 @@ class BookingController extends Controller
 
         $booking->save();
 
-        // 2. LOGIKA EMAIL & DEADLINE
+        // --- LOGIKA API BREVO ---
+        // Kirim email jika status bukan pending
         if ($booking->status !== 'pending') {
-            
-            $deadlineString = '-';
-
-            // Logika Hitung Deadline (Hanya jika Disetujui)
-            if ($booking->status === 'approved') {
-                // Set Locale ke Indonesia biar hari/bulannya bahasa Indo
-                Carbon::setLocale('id');
-                
-                $deadline = Carbon::now()->addDay(); // Tambah 24 Jam
-
-                // Cek Hari Libur (Sabtu & Minggu)
-                if ($deadline->isSaturday()) {
-                    $deadline->addDays(2); // Loncat ke Senin
-                } elseif ($deadline->isSunday()) {
-                    $deadline->addDay();   // Loncat ke Senin
-                }
-
-                // Format: "Senin, 25 November 2025 Pukul 14:30"
-                $deadlineString = $deadline->translatedFormat('l, d F Y') . ' Pukul ' . $deadline->format('H:i');
-            }
-
-            // Data yang dikirim ke Email
-            $emailData = [
-                'name'       => $booking->nama_lengkap,
-                'book_title' => $booking->judul_buku,
-                'status'     => $booking->status,
-                'reason'     => $booking->rejection_reason,
-                'deadline'   => $deadlineString,
-            ];
-
-            // Kirim Email (Gunakan Try-Catch agar app tidak crash jika internet mati/SMTP error)
-            try {
-                Mail::to($booking->email)->queue(new BookingStatusMail($emailData));
-            } catch (\Exception $e) {
-                dd($e->getMessage());
-                // Opsional: Log error jika perlu
-                // Log::error("Gagal kirim email ke " . $booking->email . ": " . $e->getMessage());
-            }
+            $this->sendBrevoEmail($booking);
         }
         
-        return redirect()->back()->with('success', 'Status diperbarui & Notifikasi email dikirim.');
+        return redirect()->back()->with('success', 'Status diperbarui & Email dikirim via API.');
     }
 
     public function destroy($id)
     {
         BookingBuku::findOrFail($id)->delete();
         return redirect()->back()->with('success', 'Data booking berhasil dihapus.');
+    }
+
+    // --- FUNGSI PRIVAT KHUSUS KIRIM EMAIL (NO BLADE, NO MAIL CLASS) ---
+    private function sendBrevoEmail($booking)
+    {
+        // 1. Setup Konfigurasi API
+        $config = Configuration::getDefaultConfiguration()->setApiKey('api-key', env('BREVO_API_KEY'));
+        $apiInstance = new TransactionalEmailsApi(new Client(), $config);
+        $sendSmtpEmail = new SendSmtpEmail();
+
+        // 2. Siapkan Data Variabel
+        $deadlineString = '-';
+        if ($booking->status === 'approved') {
+            Carbon::setLocale('id');
+            $deadline = Carbon::now()->addDay();
+            if ($deadline->isSaturday()) $deadline->addDays(2);
+            elseif ($deadline->isSunday()) $deadline->addDay();
+            $deadlineString = $deadline->translatedFormat('l, d F Y H:i');
+        }
+
+        // 3. Rakit HTML Content secara Manual (Pengganti Blade)
+        // Kita gunakan heredoc syntax (<<<HTML) agar rapi
+        $statusColor = match($booking->status) {
+            'approved' => '#16a34a', // Hijau
+            'rejected' => '#dc2626', // Merah
+            'cancelled' => '#6b7280', // Abu
+            default => '#000000'
+        };
+
+        $statusMessage = '';
+        if ($booking->status == 'approved') {
+            $statusMessage = "
+                <h3 style='color: $statusColor;'>✅ Permintaan Disetujui</h3>
+                <p>Buku yang dipesan dapat diambil di layanan sirkulasi perpustakaan pada hari kerja.</p>
+                <p><strong>Batas Pengambilan:</strong> $deadlineString</p>
+                <small>*Berlaku 1 hari kerja.</small>";
+        } elseif ($booking->status == 'rejected') {
+            $statusMessage = "
+                <h3 style='color: $statusColor;'>❌ Permintaan Ditolak</h3>
+                <p>Mohon maaf buku tidak tersedia.</p>
+                <p><strong>Alasan:</strong> $booking->rejection_reason</p>";
+        } elseif ($booking->status == 'cancelled') {
+            $statusMessage = "
+                <h3 style='color: $statusColor;'>⚠️ Permintaan Dibatalkan</h3>
+                <p>Pesanan dibatalkan karena melewati batas waktu pengambilan.</p>";
+        }
+
+        $htmlContent = <<<HTML
+        <!DOCTYPE html>
+        <html>
+        <body style="font-family: sans-serif; color: #333;">
+            <div style="max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+                <h2 style="color: #2f855a;">Halo, {$booking->nama_lengkap}</h2>
+                <p>Update status peminjaman buku: <strong>{$booking->judul_buku}</strong></p>
+                <div style="background: #f9f9f9; padding: 15px; border-left: 4px solid $statusColor; margin: 20px 0;">
+                    $statusMessage
+                </div>
+                <p>Terima kasih,<br>Perpustakaan Polban</p>
+            </div>
+        </body>
+        </html>
+        HTML;
+
+        // 4. Set Parameter Email
+        $sendSmtpEmail['subject'] = 'Update Status Peminjaman - Perpustakaan Polban';
+        $sendSmtpEmail['sender'] = ['name' => 'Perpustakaan Polban', 'email' => env('MAIL_FROM_ADDRESS')]; // Pastikan email ini verified di Brevo
+        $sendSmtpEmail['to'] = [['email' => $booking->email, 'name' => $booking->nama_lengkap]];
+        $sendSmtpEmail['htmlContent'] = $htmlContent;
+
+        // 5. Tembak API!
+        try {
+            $apiInstance->sendTransacEmail($sendSmtpEmail);
+        } catch (\Exception $e) {
+            // Log error jika perlu: \Log::error($e->getMessage());
+            // Kita biarkan silent fail agar user tidak terganggu error screen jika email gagal
+        }
     }
 }
