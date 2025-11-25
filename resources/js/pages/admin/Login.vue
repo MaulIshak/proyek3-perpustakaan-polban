@@ -125,7 +125,7 @@
             <div
                 class="bg-opacity-10 hidden w-1/2 items-center justify-center bg-[var(--background-green)] lg:flex"
             >
-                <img src="/bookshelf.jpg" alt="" />
+                <img src="/bookshelf.png" alt="" />
             </div>
         </div>
     </div>
