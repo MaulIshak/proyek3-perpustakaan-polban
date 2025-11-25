@@ -53,6 +53,27 @@ const tabs = [
 ];
 
 // --- FORM SETTINGS (Single Endpoint Update) ---
+const settingsKeyMap = {
+    alur: {
+        title: 'alur_description',
+        info: null,
+        instruction: null,
+        file: 'alur_image'
+    },
+    template: {
+        title: 'template_title',
+        info: 'template_info',
+        instruction: 'template_instruction',
+        file: 'template_file'
+    },
+    watermark: {
+        title: 'watermark_title',
+        info: 'watermark_info',
+        instruction: 'watermark_instruction',
+        file: 'watermark_image'
+    }
+} as const;
+
 const formSettings = useForm({
     _method: 'POST', // Trick for Laravel file upload on update
     alur_description: props.settings?.alur_description || '',
