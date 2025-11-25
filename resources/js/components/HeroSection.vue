@@ -25,9 +25,7 @@
             </h1>
 
             <!-- Perubahan: mx-auto diubah menjadi md:mx-auto agar di mobile rata kiri (default), desktop rata tengah -->
-            <div
-                class="h-1.5 w-36 rounded-full bg-[#99cc33] shadow-[0_0_20px_rgba(153,204,51,0.6)] md:mx-auto"
-            ></div>
+            <div class="h-1.5 w-36 rounded-full bg-[#99cc33] md:mx-auto"></div>
         </div>
     </section>
 </template>
