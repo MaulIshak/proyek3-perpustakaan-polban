@@ -16,7 +16,7 @@ class BrevoService
         $this->apiInstance = new TransactionalEmailsApi(null, $config);
     }
 
-    public function sendEmail($toEmail, $toName, $subject, $message)
+    public function sendEmail($subject, $message)
     {
         $emailData = new SendSmtpEmail([
             'sender' => [
@@ -25,8 +25,8 @@ class BrevoService
             ],
             'to' => [
                 [
-                    'email' => $toEmail,
-                    'name'  => $toName
+                    'email' => 'irvansitumorang7@gmail.com',
+                    'name'  => 'irvansitumoragng'
                 ]
             ],
             'subject' => $subject,

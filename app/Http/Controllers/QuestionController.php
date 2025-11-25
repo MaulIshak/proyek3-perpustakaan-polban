@@ -16,8 +16,6 @@ class QuestionController extends Controller
         ]);
 
         $brevo->sendEmail(
-            $request->email,
-            $request->nama,
             'Pertanyaan Baru dari ' . $request->nama,
             "<p><strong>Nama:</strong> {$request->nama}</p>
              <p><strong>Email:</strong> {$request->email}</p>
