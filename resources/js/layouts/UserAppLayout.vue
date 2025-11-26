@@ -48,7 +48,7 @@ defineProps<{
 
                             <div>
                                 <h2
-                                    class="text-2xl font-extrabold text-[var(--background-green)] sm:text-4xl"
+                                    class="text-2xl font-medium text-[var(--background-green)] sm:text-4xl"
                                 >
                                     {{ title }}
                                 </h2>

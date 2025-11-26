@@ -139,7 +139,7 @@ onUnmounted(() => {
                         </div>
                         <div class="flex flex-col justify-center">
                             <h1
-                                class="text-[10px] leading-tight font-extrabold tracking-tight text-slate-800 transition-colors duration-300 group-hover:text-[#99cc33] sm:text-sm md:text-base lg:text-lg"
+                                class="text-[10px] leading-tight font-bold tracking-tight text-slate-800 transition-colors duration-300 group-hover:text-[#99cc33] sm:text-sm md:text-base lg:text-lg"
                             >
                                 PERPUSTAKAAN POLITEKNIK NEGERI BANDUNG
                                 <span
