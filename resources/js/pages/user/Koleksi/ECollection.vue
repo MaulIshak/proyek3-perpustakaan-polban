@@ -1,22 +1,15 @@
 <script setup lang="ts">
 import Layout from '@/layouts/UserAppLayout.vue';
 import { Head } from '@inertiajs/vue3';
-import { AlertCircle, BookOpen, ExternalLink, Sparkles } from 'lucide-vue-next';
-
-// 1. Definisi Interface agar tidak error 'item type unknown'
-interface CollectionItem {
-    id: number;
-    title: string;
-    description: string;
-    image_path: string | null;
-    url: string | null;
-    is_active?: boolean;
-}
-
-// 2. Definisi Props dengan tipe data yang jelas
-defineProps<{
-    collections: CollectionItem[];
-}>();
+import {
+    Apple,
+    ExternalLink,
+    Info,
+    Library,
+    Smartphone,
+    Sparkles,
+    UserPlus,
+} from 'lucide-vue-next';
 
 const breadcrumb = [{ label: 'Layanan' }, { label: 'E-Collection' }];
 </script>
@@ -27,185 +20,270 @@ const breadcrumb = [{ label: 'Layanan' }, { label: 'E-Collection' }];
     <Layout :page="true" :breadcrumb="breadcrumb" title="E-Collection">
         <div class="fixed inset-0 -z-10 h-full w-full bg-slate-50">
             <div
-                class="absolute top-0 right-0 -mt-20 -mr-20 h-[500px] w-[500px] rounded-full bg-[#99cc33]/10 blur-[80px]"
+                class="absolute top-0 right-0 h-[500px] w-[500px] rounded-full bg-lime-400/10 blur-[100px]"
             ></div>
             <div
-                class="absolute bottom-0 left-0 -mb-20 -ml-20 h-[500px] w-[500px] rounded-full bg-emerald-200/20 blur-[80px]"
+                class="absolute bottom-0 left-0 h-[500px] w-[500px] rounded-full bg-teal-400/10 blur-[100px]"
+            ></div>
+            <div
+                class="absolute top-1/2 left-1/2 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2 bg-[url('/images/grid-pattern.svg')] opacity-[0.03]"
             ></div>
         </div>
 
-        <div class="relative container mx-auto px-4 py-10 sm:px-6 lg:px-8">
+        <div class="relative container mx-auto px-4 py-8 sm:px-6 lg:px-8">
             <div
-                class="mx-auto max-w-5xl overflow-hidden rounded-3xl border border-white/50 bg-white/80 shadow-2xl shadow-slate-200/50 backdrop-blur-xl"
+                class="mx-auto max-w-5xl overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-xl shadow-slate-200/60"
             >
                 <div
-                    class="h-1.5 w-full bg-gradient-to-r from-[#99cc33] via-emerald-400 to-teal-500"
+                    class="h-2 w-full bg-gradient-to-r from-lime-400 via-emerald-400 to-teal-400"
                 ></div>
 
-                <div class="p-8 sm:p-10">
-                    <!-- <div class="mb-10 flex flex-col items-start sm:flex-row sm:items-center gap-5 border-b border-slate-100 pb-8">
-                        <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#99cc33]/20 to-emerald-100 shadow-inner text-[#88b82d]">
+                <div class="p-8 md:p-10">
+                    <div class="mb-8 flex items-center gap-4">
+                        <div class="rounded-xl bg-lime-100 p-3 text-lime-700">
                             <Library class="h-8 w-8" />
                         </div>
                         <div>
-                            <h3 class="text-2xl font-bold text-slate-800 tracking-tight">
-                                Daftar E-Collection
-                            </h3>
-                            <p class="mt-2 text-slate-500 leading-relaxed max-w-2xl">
-                                Jelajahi sumber daya digital kami. Akses jurnal, ebook, dan referensi lainnya dengan mudah.
+                            <h1
+                                class="text-2xl font-bold tracking-tight text-slate-800 md:text-3xl"
+                            >
+                                E-Collection Nasional
+                            </h1>
+                            <p class="text-slate-500">
+                                Koleksi digital Perpustakaan Politeknik Negeri
+                                Bandung
                             </p>
                         </div>
-                    </div> -->
+                    </div>
 
-                    <div class="space-y-6">
+                    <div class="grid grid-cols-1 gap-10 lg:grid-cols-12">
                         <div
-                            v-for="(item, index) in collections"
-                            :key="item.id"
-                            class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-1 transition-all hover:border-[#99cc33]/50 hover:shadow-lg hover:shadow-[#99cc33]/10"
+                            class="sticky top-24 flex flex-col gap-6 self-start lg:col-span-4"
                         >
                             <div
-                                class="flex h-full flex-col gap-6 rounded-xl bg-white p-5 md:flex-row md:p-6"
+                                class="group relative flex items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-8"
                             >
                                 <div
-                                    class="flex shrink-0 flex-col items-center justify-center rounded-xl border border-slate-100 bg-slate-50 p-6 transition-colors group-hover:bg-[#99cc33]/5 md:w-48"
+                                    class="absolute inset-0 bg-gradient-to-tr from-lime-500/10 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                                ></div>
+
+                                <img
+                                    src="E-Collection.png"
+                                    alt="E-Journal Cover"
+                                    class="relative z-10 h-auto w-40 transform object-contain drop-shadow-xl transition-transform duration-500 group-hover:scale-105"
+                                    onerror="this.style.display='none'"
+                                />
+
+                                <div
+                                    class="absolute inset-0 flex items-center justify-center text-slate-300 opacity-20"
                                 >
-                                    <img
-                                        v-if="item.image_path"
-                                        :src="item.image_path"
-                                        :alt="item.title"
-                                        class="max-h-20 w-auto transform object-contain drop-shadow-sm transition-transform duration-500 group-hover:scale-110"
-                                    />
-                                    <div
-                                        v-else
-                                        class="flex flex-col items-center text-slate-400"
-                                    >
-                                        <BookOpen
-                                            class="mb-2 h-10 w-10 opacity-40"
-                                        />
-                                        <span
-                                            class="text-[10px] font-bold tracking-wider text-slate-300 uppercase"
-                                            >No Image</span
-                                        >
-                                    </div>
+                                    <Library class="h-32 w-32" />
                                 </div>
+                            </div>
 
-                                <div class="flex flex-1 flex-col">
-                                    <div
-                                        class="mb-4 flex flex-col items-start justify-between gap-4 sm:flex-row"
-                                    >
-                                        <h4
-                                            class="text-lg font-bold text-slate-800 transition-colors group-hover:text-[#7ea82a]"
-                                        >
-                                            {{ item.title }}
-                                        </h4>
-
-                                        <a
-                                            v-if="item.url"
-                                            :href="item.url"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            class="inline-flex shrink-0 items-center gap-2 rounded-full border border-emerald-100 bg-emerald-50 px-4 py-1.5 text-xs font-bold text-emerald-700 shadow-sm transition-all hover:border-[#99cc33] hover:bg-[#99cc33] hover:text-white"
-                                        >
-                                            <span>Buka Tautan</span>
-                                            <ExternalLink class="h-3 w-3" />
-                                        </a>
-                                        <span
-                                            v-else
-                                            class="shrink-0 rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold text-slate-400"
-                                        >
-                                            Info Saja
-                                        </span>
-                                    </div>
-
-                                    <div
-                                        class="rich-text-content text-sm leading-relaxed text-slate-600"
-                                        v-html="item.description"
-                                    ></div>
-                                </div>
+                            <div
+                                class="flex w-full cursor-default items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-100 px-6 py-3 font-medium text-slate-500"
+                            >
+                                <Smartphone class="h-4 w-4" />
+                                <span>Akses via Aplikasi Mobile</span>
                             </div>
                         </div>
 
-                        <div
-                            v-if="collections.length === 0"
-                            class="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-slate-50/50 py-16 text-center"
-                        >
-                            <div
-                                class="mb-4 inline-flex rounded-full bg-white p-4 shadow-sm ring-4 ring-slate-50"
-                            >
-                                <AlertCircle class="h-10 w-10 text-slate-300" />
+                        <div class="space-y-8 lg:col-span-8">
+                            <div class="prose max-w-none prose-slate">
+                                <p
+                                    class="text-lg leading-relaxed text-slate-600"
+                                >
+                                    Merupakan koleksi digital berupa
+                                    <span class="font-semibold text-slate-800"
+                                        >buku, fiksi, majalah, dan koran</span
+                                    >
+                                    dari Perpustakaan POLBAN. Pemustaka dapat
+                                    meminjam, membaca, dan mengembalikan koleksi
+                                    digital kapanpun dan dimanapun tanpa harus
+                                    datang fisik ke perpustakaan.
+                                </p>
                             </div>
-                            <h3 class="text-lg font-bold text-slate-700">
-                                Belum ada koleksi
-                            </h3>
-                            <p class="mt-1 text-sm text-slate-400">
-                                Data E-Collection belum tersedia saat ini.
-                            </p>
+
+                            <div class="h-px bg-slate-100"></div>
+
+                            <div>
+                                <h3
+                                    class="mb-4 flex items-center gap-2 text-lg font-bold text-slate-800"
+                                >
+                                    <Sparkles class="h-5 w-5 text-amber-500" />
+                                    Akses & Pendaftaran
+                                </h3>
+
+                                <div
+                                    class="grid grid-cols-1 gap-4 md:grid-cols-2"
+                                >
+                                    <div
+                                        class="group relative flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-gradient-to-b from-white to-emerald-50/30 p-5 transition hover:border-emerald-400 hover:shadow-lg hover:shadow-emerald-100/50"
+                                    >
+                                        <div
+                                            class="absolute top-0 right-0 translate-x-2 -translate-y-2 transform p-3 opacity-10 transition-opacity group-hover:opacity-20"
+                                        >
+                                            <Smartphone
+                                                class="h-24 w-24 rotate-12 text-emerald-500"
+                                            />
+                                        </div>
+
+                                        <div
+                                            class="relative z-10 flex h-full flex-col"
+                                        >
+                                            <div
+                                                class="mb-3 flex items-start justify-between"
+                                            >
+                                                <div
+                                                    class="rounded-lg border border-emerald-100 bg-white p-2 text-emerald-600 shadow-sm"
+                                                >
+                                                    <Smartphone
+                                                        class="h-6 w-6"
+                                                    />
+                                                </div>
+                                                <span
+                                                    class="rounded-full bg-emerald-100 px-2 py-1 text-[10px] font-bold text-emerald-700"
+                                                    >App Mobile</span
+                                                >
+                                            </div>
+
+                                            <h4
+                                                class="mb-1 font-bold text-slate-800"
+                                            >
+                                                Pengguna Android
+                                            </h4>
+                                            <p
+                                                class="mb-6 text-sm leading-relaxed text-slate-500"
+                                            >
+                                                Unduh dan instal aplikasi
+                                                langsung melalui Google
+                                                PlayStore.
+                                            </p>
+
+                                            <a
+                                                href="https://play.google.com/store/apps/details?id=com.eperpus.saas.ecoll&hl=id"
+                                                target="_blank"
+                                                class="mt-auto inline-flex w-full items-center justify-center gap-2 rounded-lg border border-emerald-200 bg-white px-4 py-2 text-sm font-semibold text-emerald-700 shadow-sm transition-all hover:border-emerald-300 hover:bg-emerald-50"
+                                            >
+                                                Buka PlayStore
+                                                <ExternalLink class="h-3 w-3" />
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="group relative flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-gradient-to-b from-white to-sky-50/30 p-5 transition hover:border-sky-400 hover:shadow-lg hover:shadow-sky-100/50"
+                                    >
+                                        <div
+                                            class="absolute top-0 right-0 translate-x-2 -translate-y-2 transform p-3 opacity-10 transition-opacity group-hover:opacity-20"
+                                        >
+                                            <Apple
+                                                class="h-24 w-24 rotate-12 text-sky-500"
+                                            />
+                                        </div>
+
+                                        <div
+                                            class="relative z-10 flex h-full flex-col"
+                                        >
+                                            <div
+                                                class="mb-3 flex items-start justify-between"
+                                            >
+                                                <div
+                                                    class="rounded-lg border border-sky-100 bg-white p-2 text-sky-600 shadow-sm"
+                                                >
+                                                    <Apple class="h-6 w-6" />
+                                                </div>
+                                                <span
+                                                    class="rounded-full bg-sky-100 px-2 py-1 text-[10px] font-bold text-sky-700"
+                                                    >Web Form</span
+                                                >
+                                            </div>
+
+                                            <h4
+                                                class="mb-1 font-bold text-slate-800"
+                                            >
+                                                Pengguna iOS
+                                            </h4>
+                                            <p
+                                                class="mb-6 text-sm leading-relaxed text-slate-500"
+                                            >
+                                                Pendaftaran akun baru khusus
+                                                perangkat Apple (iPhone/iPad).
+                                            </p>
+
+                                            <a
+                                                href="https://bit.ly/daftar-ecollpolban"
+                                                target="_blank"
+                                                class="mt-auto inline-flex w-full items-center justify-center gap-2 rounded-lg border border-sky-200 bg-white px-4 py-2 text-sm font-semibold text-sky-700 shadow-sm transition-all hover:border-sky-300 hover:bg-sky-50"
+                                            >
+                                                Isi Formulir
+                                                <ExternalLink class="h-3 w-3" />
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        class="group relative flex flex-col items-center gap-4 overflow-hidden rounded-xl border border-slate-200 bg-gradient-to-r from-white to-purple-50/50 p-5 transition hover:border-purple-400 hover:shadow-lg hover:shadow-purple-100/50 sm:flex-row md:col-span-2"
+                                    >
+                                        <div
+                                            class="shrink-0 rounded-lg border border-purple-100 bg-white p-2 text-purple-600 shadow-sm"
+                                        >
+                                            <UserPlus class="h-6 w-6" />
+                                        </div>
+                                        <div
+                                            class="flex-1 text-center sm:text-left"
+                                        >
+                                            <h4
+                                                class="font-bold text-slate-800"
+                                            >
+                                                Dosen & Tenaga Kependidikan
+                                            </h4>
+                                            <p class="text-sm text-slate-500">
+                                                Link pendaftaran khusus untuk
+                                                staf Polban.
+                                            </p>
+                                        </div>
+                                        <a
+                                            href="https://bit.ly/staf-ecollpolban"
+                                            target="_blank"
+                                            class="shrink-0 rounded-lg border border-purple-200 bg-white px-5 py-2.5 text-sm font-semibold text-purple-700 shadow-sm transition hover:bg-purple-50"
+                                        >
+                                            Daftar Sekarang
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div
+                                class="flex items-start gap-3 rounded-xl border border-amber-100 bg-amber-50 p-4"
+                            >
+                                <Info
+                                    class="mt-0.5 h-5 w-5 shrink-0 text-amber-600"
+                                />
+                                <div class="text-sm text-amber-800">
+                                    <span class="font-semibold"
+                                        >Info Penting:</span
+                                    >
+                                    Panduan Akses E-Coll Polban akan dikirimkan
+                                    secara otomatis melalui email setelah Anda
+                                    berhasil melakukan pendaftaran.
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div
-                    class="flex items-center justify-center gap-2 border-t border-slate-100 bg-slate-50 px-8 py-4 text-xs text-slate-400"
+                    class="flex justify-center border-t border-slate-100 bg-slate-50 px-8 py-4"
                 >
-                    <Sparkles class="h-3 w-3 text-[#99cc33]" />
-                    <span>Perpustakaan Politeknik Negeri Bandung</span>
+                    <p
+                        class="flex items-center gap-1.5 text-xs font-medium text-slate-400"
+                    >
+                        &copy; Perpustakaan Politeknik Negeri Bandung
+                    </p>
                 </div>
             </div>
         </div>
     </Layout>
 </template>
-
-<style>
-/* CSS Khusus untuk format HTML dari Database (Rich Text) */
-.rich-text-content h4 {
-    color: #059669; /* emerald-600 - Lebih soft daripada biru murni */
-    font-weight: 700;
-    font-size: 0.95rem;
-    margin-top: 1rem;
-    margin-bottom: 0.5rem;
-    display: flex;
-    align-items: center;
-}
-
-.rich-text-content h4::before {
-    content: '';
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    background-color: #99cc33; /* Aksen hijau user */
-    border-radius: 50%;
-    margin-right: 8px;
-}
-
-.rich-text-content p {
-    margin-bottom: 0.75rem;
-    color: #475569; /* slate-600 */
-}
-
-.rich-text-content a {
-    color: #059669; /* emerald-600 */
-    font-weight: 600;
-    text-decoration-line: underline;
-    text-decoration-color: #a7f3d0; /* emerald-200 */
-    text-underline-offset: 3px;
-    transition: all 0.2s;
-}
-
-.rich-text-content a:hover {
-    color: #047857; /* emerald-700 */
-    text-decoration-color: #34d399;
-}
-
-/* Kotak Kuning - Dibuat lebih soft (Pastel) */
-.rich-text-content .warning-box,
-.rich-text-content div[class*='bg-yellow'] {
-    background-color: #fffbeb; /* amber-50 */
-    border: 1px solid #fcd34d; /* amber-300 */
-    color: #92400e; /* amber-800 */
-    padding: 1rem;
-    border-radius: 0.75rem;
-    font-size: 0.875rem;
-    margin-top: 1.25rem;
-    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-}
-</style>

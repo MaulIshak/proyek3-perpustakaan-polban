@@ -19,9 +19,9 @@ class BebasMasalahSeeder extends Seeder
             'template_info' => 'Format PDF - Ukuran: 150 KB',
             'template_instruction' => 'Cetak template, isi data diri, tandatangani di atas meterai Rp 10.000, dan serahkan ke perpustakaan.',
             
-            'watermark_image_path' => '/files/watermark_logo.png',
-            'watermark_title' => 'Logo POLBAN Watermark',
-            'watermark_info' => 'Format PNG Transparan - Ukuran: 2 MB',
+            'watermark_file_path' => '/files/watermark_logo.pdf',
+            'watermark_title' => 'Watermark Logo POLBAN (PDF)',
+            'watermark_info' => 'Format PDF - Ukuran: 2 MB',
             'watermark_instruction' => 'Tempelkan watermark pada halaman judul tugas akhir dengan posisi di tengah dan opacity 30%.',
         ]);
 
