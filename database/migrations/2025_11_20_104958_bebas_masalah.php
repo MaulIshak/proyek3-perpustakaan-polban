@@ -23,9 +23,9 @@ return new class extends Migration
             $table->text('template_instruction')->nullable();
 
             // Tab Watermark
-            $table->string('watermark_image_path')->nullable(); // Path file download
+            $table->string('watermark_file_path')->nullable(); // Path file download
             $table->string('watermark_title')->default('Logo POLBAN Watermark');
-            $table->string('watermark_info')->default('Format PNG Transparan - Ukuran: 2 MB');
+            $table->string('watermark_info')->default('Format PDF - Ukuran: Max 2 MB');
             $table->text('watermark_instruction')->nullable();
 
             $table->timestamps();

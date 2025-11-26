@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AdminLayout from '@/layouts/AdminLayout.vue';
 import { useForm, router } from '@inertiajs/vue3';
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import {
     Trash2,
     Edit,
@@ -15,7 +15,9 @@ import {
     BookOpen,
     ShieldCheck,
     Download,
-    X
+    X,
+    CheckCircle2, // Tambahan Icon Sukses
+    AlertCircle   // Tambahan Icon Error
 } from 'lucide-vue-next';
 import { useConfirmModal } from '@/composables/userConfirmModal';
 
@@ -43,6 +45,25 @@ const props = defineProps<{
 const activeTab = ref('alur');
 const { open } = useConfirmModal();
 
+// --- LOCAL TOAST STATE (NOTIFIKASI) ---
+const toast = ref({
+    show: false,
+    message: '',
+    type: 'success' as 'success' | 'error'
+});
+
+let toastTimeout: any = null;
+
+const showToast = (message: string, type: 'success' | 'error' = 'success') => {
+    toast.value = { show: true, message, type };
+    
+    if (toastTimeout) clearTimeout(toastTimeout);
+    
+    toastTimeout = setTimeout(() => {
+        toast.value.show = false;
+    }, 3000); // Hilang setelah 3 detik
+};
+
 // Tabs Configuration
 const tabs = [
     { id: 'alur', label: 'Diagram Alur', icon: GitGraph },
@@ -52,30 +73,8 @@ const tabs = [
     { id: 'watermark', label: 'Watermark', icon: ShieldCheck },
 ];
 
-// --- FORM SETTINGS (Single Endpoint Update) ---
-const settingsKeyMap = {
-    alur: {
-        title: 'alur_description',
-        info: null,
-        instruction: null,
-        file: 'alur_image'
-    },
-    template: {
-        title: 'template_title',
-        info: 'template_info',
-        instruction: 'template_instruction',
-        file: 'template_file'
-    },
-    watermark: {
-        title: 'watermark_title',
-        info: 'watermark_info',
-        instruction: 'watermark_instruction',
-        file: 'watermark_image'
-    }
-} as const;
-
 const formSettings = useForm({
-    _method: 'POST', // Trick for Laravel file upload on update
+    _method: 'POST',
     alur_description: props.settings?.alur_description || '',
     alur_image: null as File | null,
 
@@ -85,18 +84,21 @@ const formSettings = useForm({
     template_file: null as File | null,
 
     watermark_title: props.settings?.watermark_title || '',
-    watermark_info: props.settings?.watermark_info || '',
+    watermark_info: props.settings?.watermark_info || 'Format PDF - Ukuran: Max 2 MB',
     watermark_instruction: props.settings?.watermark_instruction || '',
-    watermark_image: null as File | null,   
+    watermark_file: null as File | null,   
 });
 
 const submitSettings = () => {
     formSettings.post('/admin/bebas-masalah/settings', {
         preserveScroll: true,
         onSuccess: () => {
-            formSettings.reset('alur_image', 'template_file', 'watermark_image');
-            // Optional: Show toast
+            formSettings.reset('alur_image', 'template_file', 'watermark_file');
+            showToast('Pengaturan berhasil disimpan!', 'success'); // Trigger Toast Sukses
         },
+        onError: () => {
+            showToast('Gagal menyimpan pengaturan. Periksa input Anda.', 'error'); // Trigger Toast Error
+        }
     });
 };
 
@@ -124,7 +126,6 @@ const openModal = (type: 'requirement' | 'guide', mode: 'create' | 'edit', item:
         formList.sort_order = item.sort_order;
     } else {
         formList.reset();
-        // Auto increment sort order suggestion
         const list = type === 'requirement' ? props.requirements : props.guides;
         formList.sort_order = list.length + 1;
     }
@@ -137,7 +138,14 @@ const submitList = () => {
         : `/admin/bebas-masalah/${resource}/${editingId.value}`;
 
     const options = {
-        onSuccess: () => { showModal.value = false; formList.reset(); },
+        onSuccess: () => { 
+            showModal.value = false; 
+            formList.reset(); 
+            showToast('Data berhasil disimpan!', 'success'); // Trigger Toast Sukses
+        },
+        onError: () => {
+            showToast('Terjadi kesalahan saat menyimpan data.', 'error');
+        },
         preserveScroll: true
     };
 
@@ -156,14 +164,19 @@ const handleDelete = (type: 'requirement' | 'guide', item: any) => {
         onConfirm: () => {
             const resource = type === 'requirement' ? 'requirements' : 'guides';
             router.delete(`/admin/bebas-masalah/${resource}/${item.id}`, {
-                preserveScroll: true
+                preserveScroll: true,
+                onSuccess: () => {
+                     showToast('Data berhasil dihapus.', 'success'); // Trigger Toast Hapus
+                },
+                onError: () => {
+                    showToast('Gagal menghapus data.', 'error');
+                }
             });
         },
     });
 };
 
-// File Input Helper
-const handleFileChange = (field: 'alur_image' | 'template_file' | 'watermark_image', event: Event) => {
+const handleFileChange = (field: 'alur_image' | 'template_file' | 'watermark_file', event: Event) => {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (file) formSettings[field] = file;
 };
@@ -171,9 +184,28 @@ const handleFileChange = (field: 'alur_image' | 'template_file' | 'watermark_ima
 </script>
 
 <template>
-    <div class="space-y-8 font-sans text-slate-600">
+    <div class="space-y-8 font-sans text-slate-600 relative">
 
-        <!-- 1. Tabs Navigation -->
+        <transition name="toast">
+            <div v-if="toast.show" 
+                class="fixed top-24 right-5 z-[100] flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl border backdrop-blur-md transition-all duration-300 min-w-[300px]"
+                :class="toast.type === 'success' 
+                    ? 'bg-white/95 border-emerald-200 text-emerald-700' 
+                    : 'bg-white/95 border-rose-200 text-rose-700'"
+            >
+                <div class="p-1 rounded-full shrink-0" :class="toast.type === 'success' ? 'bg-emerald-100' : 'bg-rose-100'">
+                    <CheckCircle2 v-if="toast.type === 'success'" class="w-5 h-5" />
+                    <AlertCircle v-else class="w-5 h-5" />
+                </div>
+                <div class="flex-1 text-sm font-bold">
+                    {{ toast.message }}
+                </div>
+                <button @click="toast.show = false" class="p-1 rounded-lg hover:bg-slate-100 transition-colors">
+                    <X class="w-4 h-4 opacity-50" />
+                </button>
+            </div>
+        </transition>
+
         <div class="flex flex-wrap gap-2 bg-white p-2 rounded-2xl border border-slate-100 shadow-sm w-fit">
             <button
                 v-for="tab in tabs"
@@ -189,18 +221,14 @@ const handleFileChange = (field: 'alur_image' | 'template_file' | 'watermark_ima
             </button>
         </div>
 
-        <!-- 2. Content Area -->
         <div class="bg-white rounded-3xl border border-slate-100 shadow-lg shadow-slate-200/50 p-6 sm:p-8 min-h-[500px] relative overflow-hidden">
 
-            <!-- Decorative Blob -->
             <div class="absolute -top-20 -right-20 w-64 h-64 bg-[#99cc33]/5 rounded-full blur-3xl pointer-events-none"></div>
 
             <transition name="fade" mode="out-in">
 
-                <!-- TAB: ALUR -->
                 <div v-if="activeTab === 'alur'" key="alur" class="relative z-10">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                        <!-- Form -->
                         <div class="space-y-6">
                             <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-4">
                                 <GitGraph class="w-5 h-5 text-[#99cc33]" />
@@ -237,7 +265,6 @@ const handleFileChange = (field: 'alur_image' | 'template_file' | 'watermark_ima
                             </button>
                         </div>
 
-                        <!-- Preview -->
                         <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 h-full min-h-[300px] flex flex-col">
                             <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Preview Gambar Saat Ini</p>
                             <div class="flex-1 flex items-center justify-center overflow-hidden rounded-xl bg-white shadow-sm border border-slate-100 p-2">
@@ -256,7 +283,6 @@ const handleFileChange = (field: 'alur_image' | 'template_file' | 'watermark_ima
                     </div>
                 </div>
 
-                <!-- TAB: LIST (Requirements & Guides) -->
                 <div v-else-if="activeTab === 'persyaratan' || activeTab === 'panduan'" key="list" class="relative z-10">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                         <div>
@@ -270,7 +296,6 @@ const handleFileChange = (field: 'alur_image' | 'template_file' | 'watermark_ima
                         </button>
                     </div>
 
-                    <!-- Table List -->
                     <div class="overflow-hidden rounded-xl border border-slate-200 shadow-sm bg-white">
                         <table class="min-w-full divide-y divide-slate-100">
                             <thead class="bg-slate-50">
@@ -310,7 +335,6 @@ const handleFileChange = (field: 'alur_image' | 'template_file' | 'watermark_ima
                     </div>
                 </div>
 
-                <!-- TAB: FILE SETTINGS (Template/Watermark) -->
                 <div v-else key="file-settings" class="max-w-4xl mx-auto relative z-10">
                     <div class="flex items-center gap-4 mb-8 pb-6 border-b border-slate-100">
                         <div class="p-4 bg-[#99cc33]/10 rounded-2xl text-[#99cc33]">
@@ -340,31 +364,40 @@ const handleFileChange = (field: 'alur_image' | 'template_file' | 'watermark_ima
                         </div>
 
                         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-center gap-6">
-                            <!-- File Preview -->
                             <div class="shrink-0">
-                                <div v-if="activeTab === 'watermark' && settings?.watermark_image_path" class="h-24 w-24 bg-slate-100 rounded-xl flex items-center justify-center p-2 border border-slate-200">
-                                    <img :src="settings.watermark_image_path" class="max-h-full max-w-full object-contain" alt="Preview" />
+                                <div v-if="activeTab === 'watermark' && settings?.watermark_file_path" 
+                                    class="h-24 w-24 bg-slate-100 rounded-xl flex items-center justify-center text-red-500 border border-slate-200">
+                                    <FileText class="w-10 h-10" />
                                 </div>
+
                                 <div v-else class="h-24 w-24 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 border border-slate-200">
                                     <FileText class="w-10 h-10" />
                                 </div>
                             </div>
 
                             <div class="flex-1 w-full">
-                                 <div class="flex justify-between items-center mb-2">
-                                     <label class="text-sm font-bold text-slate-700">Upload File Baru</label>
-                                     <a v-if="settings?.[activeTab + (activeTab === 'template' ? '_file_path' : '_image_path')]"
-                                        :href="settings?.[activeTab + (activeTab === 'template' ? '_file_path' : '_image_path')]"
+                                <div class="flex justify-between items-end mb-2">
+                                    <label class="text-sm font-bold text-slate-700">Upload File Baru</label>
+                                    
+                                    <a 
+                                        v-if="settings?.[activeTab + (activeTab === 'alur' ? '_image_path' : '_file_path')]"
+                                        :href="settings?.[activeTab + (activeTab === 'alur' ? '_image_path' : '_file_path')]"
                                         target="_blank"
-                                        class="text-xs font-bold text-[#99cc33] hover:underline flex items-center gap-1">
-                                        <Download class="w-3 h-3" /> Download File Saat Ini
-                                     </a>
-                                 </div>
-                                 <input
+                                        class="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-lg text-xs font-bold hover:bg-emerald-100 hover:text-emerald-700 transition-colors shadow-sm"
+                                    >
+                                        <Download class="w-3 h-3" /> 
+                                        Download {{ activeTab === 'watermark' ? 'Watermark' : 'File' }}
+                                    </a>
+                                </div>
+
+                               <input
                                     type="file"
+                                    
+                                    :accept="activeTab === 'watermark' ? 'application/pdf' : (activeTab === 'template' ? '.pdf,.doc,.docx' : 'image/*')"
+                                    
                                     @change="handleFileChange(
                                         activeTab === 'template' ? 'template_file' : 
-                                        activeTab === 'watermark' ? 'watermark_image' : 'alur_image', 
+                                        activeTab === 'watermark' ? 'watermark_file' : 'alur_image', 
                                         $event
                                     )"
                                     class="block w-full text-sm text-slate-500
@@ -374,6 +407,10 @@ const handleFileChange = (field: 'alur_image' | 'template_file' | 'watermark_ima
                                     file:bg-[#99cc33]/10 file:text-[#99cc33]
                                     hover:file:bg-[#99cc33]/20 transition-all cursor-pointer"
                                 />
+                                
+                                <p class="text-[10px] text-slate-400 mt-2 italic">
+                                    *Klik tombol download di atas untuk melihat file yang sedang aktif digunakan.
+                                </p>
                             </div>
                         </div>
 
@@ -389,13 +426,11 @@ const handleFileChange = (field: 'alur_image' | 'template_file' | 'watermark_ima
         </div>
     </div>
 
-    <!-- Modal CRUD -->
     <transition name="modal">
         <div v-if="showModal" class="fixed inset-0 z-[70] flex items-center justify-center p-4">
             <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" @click="showModal = false"></div>
 
             <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg relative z-10 overflow-hidden transform transition-all">
-                <!-- Modal Header -->
                 <div class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between items-center">
                     <h3 class="text-lg font-bold text-slate-800">
                         {{ modalMode === 'create' ? 'Tambah' : 'Edit' }}
@@ -406,7 +441,6 @@ const handleFileChange = (field: 'alur_image' | 'template_file' | 'watermark_ima
                     </button>
                 </div>
 
-                <!-- Modal Form -->
                 <div class="p-6 space-y-5">
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">Nomor Urut</label>
@@ -422,7 +456,6 @@ const handleFileChange = (field: 'alur_image' | 'template_file' | 'watermark_ima
                     </div>
                 </div>
 
-                <!-- Modal Footer -->
                 <div class="bg-slate-50 px-6 py-4 flex justify-end gap-3 border-t border-slate-100">
                     <button @click="showModal = false" class="px-5 py-2.5 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-100 transition-colors shadow-sm">Batal</button>
                     <button @click="submitList" :disabled="formList.processing" class="px-6 py-2.5 bg-[#99cc33] text-white font-bold rounded-xl hover:bg-[#88b82d] shadow-lg shadow-[#99cc33]/30 transition-all">Simpan</button>
@@ -459,5 +492,16 @@ const handleFileChange = (field: 'alur_image' | 'template_file' | 'watermark_ima
 .modal-enter-from .transform,
 .modal-leave-to .transform {
     transform: scale(0.95);
+}
+
+/* Toast Transition */
+.toast-enter-active,
+.toast-leave-active {
+  transition: all 0.3s ease;
+}
+.toast-enter-from,
+.toast-leave-to {
+  opacity: 0;
+  transform: translateY(-20px);
 }
 </style>

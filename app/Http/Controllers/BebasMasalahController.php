@@ -24,45 +24,73 @@ class BebasMasalahController extends Controller
     {
         // Validasi input
         $request->validate([
-            'alur_image' => 'nullable|image|max:2048',
-            'template_file' => 'nullable|mimes:pdf,doc,docx|max:2048',
-            'watermark_image' => 'nullable|image|max:2048',
+            'alur_image'      => 'nullable|image|max:2048',
+            'template_file'   => 'nullable|mimes:pdf,doc,docx|max:2048',
+            'watermark_file'  => 'nullable|mimes:pdf|max:2048',
         ]);
 
         $settings = DB::table('bebas_masalah_settings')->first();
-        
-        // PERBAIKAN DISINI: Tambahkan '_method' ke dalam array except
+
+        // Ambil input biasa
         $dataToUpdate = $request->except([
-            'alur_image', 
-            'template_file', 
-            'watermark_image', 
-            '_token', 
+            'alur_image',
+            'template_file',
+            'watermark_file',
+            '_token',
             '_method'
         ]);
 
-        // 1. Handle Alur Image
+        /** -------------------------
+         * 1. Upload ALUR IMAGE
+         * -------------------------*/
         if ($request->hasFile('alur_image')) {
-            if ($settings && $settings->alur_image_path) Storage::delete($settings->alur_image_path);
-            $dataToUpdate['alur_image_path'] = '/storage/' . $request->file('alur_image')->store('bebas-masalah', 'public');
+
+            // hapus file lama
+            if ($settings && $settings->alur_image_path) {
+                Storage::disk('public')->delete(str_replace('/storage/', '', $settings->alur_image_path));
+            }
+
+            $dataToUpdate['alur_image_path'] =
+                '/storage/' . $request->file('alur_image')->store('bebas-masalah', 'public');
         }
 
-        // 2. Handle Template File
+        /** -------------------------
+         * 2. Upload TEMPLATE FILE
+         * -------------------------*/
         if ($request->hasFile('template_file')) {
-            if ($settings && $settings->template_file_path) Storage::delete($settings->template_file_path);
-            $dataToUpdate['template_file_path'] = '/storage/' . $request->file('template_file')->store('bebas-masalah', 'public');
+
+            if ($settings && $settings->template_file_path) {
+                Storage::disk('public')->delete(str_replace('/storage/', '', $settings->template_file_path));
+            }
+
+            $dataToUpdate['template_file_path'] =
+                '/storage/' . $request->file('template_file')->store('bebas-masalah', 'public');
         }
 
-        // 3. Handle Watermark Image
-        if ($request->hasFile('watermark_image')) {
-            if ($settings && $settings->watermark_image_path) Storage::delete($settings->watermark_image_path);
-            $dataToUpdate['watermark_image_path'] = '/storage/' . $request->file('watermark_image')->store('bebas-masalah', 'public');
+        /** -------------------------
+         * 3. Upload WATERMARK FILE (PDF)
+         * -------------------------*/
+        if ($request->hasFile('watermark_file')) {
+
+            if ($settings && $settings->watermark_file_path) {
+                Storage::disk('public')->delete(str_replace('/storage/', '', $settings->watermark_file_path));
+            }
+
+            // simpan PDF watermark
+            $dataToUpdate['watermark_file_path'] =
+                '/storage/' . $request->file('watermark_file')->store('watermark', 'public');
         }
 
-        // Update Database
-        DB::table('bebas_masalah_settings')->updateOrInsert(['id' => 1], $dataToUpdate);
+        /** -------------------------
+         * UPDATE DATABASE
+         * -------------------------*/
+        DB::table('bebas_masalah_settings')
+            ->where('id', 1)
+            ->update($dataToUpdate);
 
         return redirect()->back()->with('success', 'Pengaturan berhasil disimpan.');
     }
+
 
     // --- CRUD REQUIREMENTS (Persyaratan) ---
     public function storeRequirement(Request $request)
