@@ -25,8 +25,8 @@ class BrevoService
             ],
             'to' => [
                 [
-                    'email' => 'irvansitumorang7@gmail.com',
-                    'name'  => 'irvansitumoragng'
+                    'email' => 'maulana.ishak.tif24@polban.ac.id',
+                    'name'  => 'Maulana Ishak'
                 ]
             ],
             'subject' => $subject,

@@ -91,28 +91,30 @@ const props = defineProps({
                 </a>
             </div>
 
-            <!-- 3. CTA Section -->
+            <!-- 3. CTA Section (Fixed & Improved Style) -->
             <div
-                class="relative mt-12 w-full overflow-hidden rounded-[2rem] bg-[#99cc33] shadow-xl shadow-[#99cc33]/20"
+                class="relative mx-auto mt-8 w-full max-w-7xl overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-[#99cc33] to-[#7da929] shadow-2xl shadow-[#99cc33]/30"
             >
-                <!-- Background Pattern -->
+                <!-- Decorative Blobs (Untuk efek modern) -->
                 <div
-                    class="pointer-events-none absolute top-0 right-0 h-64 w-64 translate-x-1/2 -translate-y-1/2 rounded-full bg-white/10 blur-3xl"
+                    class="pointer-events-none absolute top-0 right-0 -mt-10 -mr-10 h-64 w-64 rounded-full bg-white/20 blur-3xl"
                 ></div>
                 <div
-                    class="pointer-events-none absolute bottom-0 left-0 h-64 w-64 -translate-x-1/2 translate-y-1/2 rounded-full bg-black/5 blur-3xl"
+                    class="pointer-events-none absolute bottom-0 left-0 -mb-10 -ml-10 h-64 w-64 rounded-full bg-black/10 blur-3xl"
                 ></div>
 
+                <!-- Content -->
                 <div
                     class="relative z-10 px-6 py-12 text-center sm:px-12 md:py-16"
                 >
                     <h2
-                        class="mb-4 text-2xl font-extrabold tracking-tight text-white drop-shadow-sm md:text-4xl"
+                        class="mb-4 text-3xl font-black tracking-tight text-white drop-shadow-sm md:text-4xl"
                     >
                         Usulkan atau Booking Buku
                     </h2>
+
                     <p
-                        class="mx-auto mb-8 max-w-2xl text-base leading-relaxed text-white/90 md:text-lg"
+                        class="mx-auto mb-10 max-w-2xl text-lg leading-relaxed font-medium text-white/90"
                     >
                         Tidak menemukan buku yang dicari? Usulkan pengadaan buku
                         baru atau booking buku yang tersedia agar tidak
@@ -122,21 +124,25 @@ const props = defineProps({
                     <div
                         class="flex flex-col items-center justify-center gap-4 sm:flex-row"
                     >
-                        <!-- Tombol Booking -->
+                        <!-- Tombol Booking (Primary White) -->
                         <a
                             href="/book-reservation"
-                            class="flex w-full items-center justify-center gap-2 rounded-xl bg-white px-6 py-3.5 text-sm font-bold text-[#99cc33] shadow-lg shadow-black/5 transition-all duration-300 hover:scale-105 hover:bg-slate-50 sm:w-auto"
+                            class="group flex w-full items-center justify-center gap-2 rounded-xl bg-white px-8 py-4 text-sm font-bold text-[#99cc33] shadow-lg shadow-black/10 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl sm:w-auto"
                         >
-                            <CalendarCheck class="h-5 w-5" />
+                            <CalendarCheck
+                                class="h-5 w-5 transition-transform group-hover:scale-110"
+                            />
                             Booking Buku
                         </a>
 
-                        <!-- Tombol Usulkan -->
+                        <!-- Tombol Usulkan (Secondary Glass/Darker) -->
                         <a
                             href="/usulan_buku"
-                            class="flex w-full items-center justify-center gap-2 rounded-xl border border-white/30 bg-[#88b82d] px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-black/5 transition-all duration-300 hover:bg-[#7da929] sm:w-auto"
+                            class="group flex w-full items-center justify-center gap-2 rounded-xl border-2 border-white/30 bg-white/10 px-8 py-4 text-sm font-bold text-white backdrop-blur-sm transition-all duration-300 hover:border-white/50 hover:bg-white/20 sm:w-auto"
                         >
-                            <BookPlus class="h-5 w-5" />
+                            <BookPlus
+                                class="h-5 w-5 transition-transform group-hover:scale-110"
+                            />
                             Usulkan Buku
                         </a>
                     </div>
