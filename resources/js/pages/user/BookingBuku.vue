@@ -186,7 +186,7 @@ const submitForm = () => {
                                                     ? 'border-green-500 focus:border-green-500 focus:ring-green-500/20 text-green-700' 
                                                     : (validation.nimNip.message ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-200 text-red-900' : 'border-slate-200 focus:border-[#99cc33] focus:ring-[#99cc33]/20')
                                             ]"
-                                            placeholder="Contoh: 211511001" required inputmode="numeric" 
+                                            placeholder="Masukkan NIM atau NIP" required inputmode="numeric" 
                                         />
 
                                         <div v-if="form.nimNip.length > 0" class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
@@ -220,7 +220,7 @@ const submitForm = () => {
                                                     ? 'border-green-500 focus:border-green-500 focus:ring-green-500/20 text-green-700' 
                                                     : (validation.whatsapp.message ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-200 text-red-900' : 'border-slate-200 focus:border-[#99cc33] focus:ring-[#99cc33]/20')
                                             ]"
-                                            placeholder="Contoh: 081234567890" required inputmode="numeric" 
+                                            placeholder="Masukkan nomor telephone" required inputmode="numeric" 
                                         />
 
                                         <div v-if="form.whatsapp.length > 0" class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
