@@ -17,6 +17,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\CoverBuku;
 use App\Http\Controllers\RencanaStrategi;
 use App\Http\Controllers\TimManajemen;
+use Inertia\Middleware;
 
 Route::post('/send-question', [QuestionController::class, 'send']);
 
@@ -213,11 +214,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::delete('renstra/delete/{id}', [RencanaStrategi::class, 'destroy'])->middleware('auth:admin')->name('renstra.destroy');
 
     // Cover Buku
-    Route::get('cover-buku', [CoverBuku::class, 'index'])->name('cover.index');
-    Route::post('cover-buku/store', [CoverBuku::class, 'store'])->name('cover.store');
+    Route::get('cover-buku', [CoverBuku::class, 'index'])->middleware('auth:admin')->name('cover.index');
+    Route::post('cover-buku/store', [CoverBuku::class, 'store'])->middleware('auth:admin')->name('cover.store');
     // Kita pakai POST untuk update file (dengan _method: PUT di frontend)
-    Route::post('cover-buku/update/{id}', [CoverBuku::class, 'update'])->name('cover.update');
-    Route::delete('cover-buku/delete/{id}', [CoverBuku::class, 'destroy'])->name('cover.destroy');
+    Route::post('cover-buku/update/{id}', [CoverBuku::class, 'update'])->middleware('auth:admin')->name('cover.update');
+    Route::delete('cover-buku/delete/{id}', [CoverBuku::class, 'destroy'])->middleware('auth:admin')->name('cover.destroy');
 
     // BebasMasalah
     Route::get('/bebas-masalah', [BebasMasalahController::class, 'index'])->middleware('auth:admin')->name('admin.bebas-masalah.index');
@@ -233,36 +234,36 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::delete('/bebas-masalah/guides/{id}', [BebasMasalahController::class, 'destroyGuide'])->middleware('auth:admin')->name('admin.bebas-masalah.guides.destroy');
 
     // ecollection
-    Route::get('/e-collections', [CollectionController::class, 'index']);
-    Route::post('/e-collections', [CollectionController::class, 'store']);
+    Route::get('/e-collections', [CollectionController::class, 'index'])->middleware('auth:admin');
+    Route::post('/e-collections', [CollectionController::class, 'store'])->middleware('auth:admin');
     // Edit pakai POST karena method spoofing
-    Route::post('/e-collections/{id}', [CollectionController::class, 'update']);
-    Route::delete('/e-collections/{id}', [CollectionController::class, 'destroy']);
+    Route::post('/e-collections/{id}', [CollectionController::class, 'update'])->middleware('auth:admin');
+    Route::delete('/e-collections/{id}', [CollectionController::class, 'destroy'])->middleware('auth:admin');
 
     // Ejournal
     // 1. GET: Menampilkan halaman (Index)
-    Route::get('/e-journals', [EJournalController::class, 'index'])
+    Route::get('/e-journals', [EJournalController::class, 'index'])->middleware('auth:admin')
         ->name('e-journals.index');
 
     // 2. POST: Menyimpan data baru (Store)
-    Route::post('/e-journals', [EJournalController::class, 'store'])
+    Route::post('/e-journals', [EJournalController::class, 'store'])->middleware('auth:admin')
         ->name('e-journals.store');
 
     // 3. PUT: Mengupdate data (Update)
     // Menggunakan {ejournal} agar otomatis mencari data berdasarkan ID
-    Route::put('/e-journals/{ejournal}', [EJournalController::class, 'update'])
+    Route::put('/e-journals/{ejournal}', [EJournalController::class, 'update'])->middleware('auth:admin')
         ->name('e-journals.update');
 
     // 4. DELETE: Menghapus data (Destroy)
-    Route::delete('/e-journals/{ejournal}', [EJournalController::class, 'destroy'])
+    Route::delete('/e-journals/{ejournal}', [EJournalController::class, 'destroy'])->middleware('auth:admin')
         ->name('e-journals.destroy');
 
     // Booking Buku
-    Route::get('booking-buku', [BookingController::class, 'indexAdmin'])->name('booking.index');
+    Route::get('booking-buku', [BookingController::class, 'indexAdmin'])->middleware('auth:admin')->name('booking.index');
     // Update Status (Setuju/Tolak/Batal)
-    Route::patch('booking-buku/{id}/status', [BookingController::class, 'updateStatus'])->name('booking.status');
+    Route::patch('booking-buku/{id}/status', [BookingController::class, 'updateStatus'])->middleware('auth:admin')->name('booking.status');
     // Hapus Data
-    Route::delete('booking-buku/{id}', [BookingController::class, 'destroy'])->name('booking.destroy');
+    Route::delete('booking-buku/{id}', [BookingController::class, 'destroy'])->middleware('auth:admin')->name('booking.destroy');
 
 });
 

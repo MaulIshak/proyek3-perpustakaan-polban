@@ -20,7 +20,7 @@ defineProps<{
 const kontak = {
     alamat: ' Perpustakaan Politeknik Negeri Bandung, Jl. Gegerkalong Hilir, Ciwaruga, Bandung Barat, Jawa Barat 40559',
     telepon: '(022) 2013788',
-    email: 'perpustakaan@polban.ac.id',
+    email: 'lib@polban.ac.id',
     jamOperasional: {
         seninJumat: '08:00 - 18:00 WIB',
         sabtu: '08:00 - 12:00 WIB',

@@ -24,20 +24,41 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
+        // 1. Validasi Backend (Security Layer)
         $request->validate([
-            'namaLengkap' => 'required|string|max:255',
-            'nimNip'      => 'required|string|max:50',
-            'email'       => 'required|email',
-            'whatsapp'    => 'required|string|max:20',
-            'judulBuku'   => 'required|string|max:255',
-            'pengarang'   => 'required|string|max:255',
+            'namaLengkap' => 'required|string|max:100|regex:/^[a-zA-Z\s\.\']+$/', // Hanya huruf, spasi, titik, petik
+            
+            'nimNip' => [
+                'required',
+                'numeric', // Wajib Angka
+                'digits_between:1,10', // Panjang minimal 5, maksimal 20 digit
+            ],
+            
+            'email' => 'required|email:dns', // Cek format email valid & domainnya eksis
+            
+            'whatsapp' => [
+                'required',
+                'numeric', // Wajib Angka
+                'starts_with:08,62', // Harus berawalan 08 atau 62 (Format Indonesia)
+                'digits_between:10,15', // Panjang wajar no HP
+            ],
+            
+            'judulBuku' => 'required|string|max:255',
+            'pengarang' => 'required|string|max:255',
+        ], [
+            // Custom Pesan Error (Opsional, agar pesan dari backend bahasa Indonesia)
+            'namaLengkap.regex' => 'Nama hanya boleh berisi huruf.',
+            'nimNip.numeric' => 'NIM/NIP harus berupa angka.',
+            'whatsapp.numeric' => 'Nomor WhatsApp harus berupa angka.',
+            'whatsapp.starts_with' => 'Nomor WhatsApp harus diawali 08 atau 62.',
         ]);
 
+        // 2. Simpan ke Database
         BookingBuku::create([
             'nama_lengkap' => $request->namaLengkap,
             'nim_nip'      => $request->nimNip,
             'email'        => $request->email,
-            'whatsapp'     => $request->whatsapp,
+            'whatsapp'     => $request->whatsapp, // Data masuk sudah pasti bersih/angka saja
             'judul_buku'   => $request->judulBuku,
             'pengarang'    => $request->pengarang,
             'status'       => 'pending'
