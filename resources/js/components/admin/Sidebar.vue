@@ -147,12 +147,6 @@ const emit = defineEmits(['toggle-sidebar']);
                     to="/admin/booking-buku"
                     :sidebar-open="sidebarOpen"
                 />
-                <SidebarLink
-                    icon="BookMarked"
-                    label="E-collections"
-                    to="/admin/e-collections"
-                    :sidebar-open="sidebarOpen"
-                />
             </div>
 
             <!-- Group 4 -->

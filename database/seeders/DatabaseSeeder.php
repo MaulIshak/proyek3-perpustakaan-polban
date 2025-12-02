@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             AdminSeeder::class,
             ArticleSeeder::class,
             BebasMasalahSeeder::class,
+            PhotoSeeder::class
         ]);
     }
 }

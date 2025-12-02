@@ -2,142 +2,214 @@
 import AdminLayout from '@/layouts/AdminLayout.vue';
 import { Link } from '@inertiajs/vue3';
 import {
-    Newspaper,
-    Megaphone,
-    Image as ImageIcon,
-    BookOpen,
-    LibraryBig,
     Activity,
+    BookOpen,
+    Calendar,
     Clock,
-    ArrowUpRight,
-    MoreHorizontal,
+    Image as ImageIcon,
+    LibraryBig,
+    Megaphone,
+    Newspaper,
     Users,
-    Calendar
 } from 'lucide-vue-next';
+import { computed } from 'vue';
 
 // Define Layout
 defineOptions({
     layout: (h: any, page: any) =>
-        h(AdminLayout, {
-            title: 'Dashboard',
-            subTitle: 'Ringkasan aktivitas dan statistik terbaru perpustakaan',
-        }, { default: () => page }),
+        h(
+            AdminLayout,
+            {
+                title: 'Selamat Datang, Pustakawan',
+                subTitle:
+                    'Ringkasan aktivitas dan statistik terbaru perpustakaan',
+            },
+            { default: () => page },
+        ),
 });
 
-// Data Statistik (Colorful Gradients)
-const stats = [
+// --- PROPS DARI CONTROLLER ---
+// PERBAIKAN: Menggunakan withDefaults agar tidak error jika props undefined
+const props = withDefaults(
+    defineProps<{
+        stats?: {
+            berita: { total: number; trend: string };
+            pengumuman: { total: number; trend: string };
+            galeri: { total: number; trend: string };
+            booking: { total: number; trend: string };
+        };
+        recentActivities?: Array<{
+            id: string | number;
+            type: string;
+            title: string;
+            status: string;
+            time_raw: string; // ISO String
+            icon_type: string; // String mapping untuk icon
+            bg_icon: string;
+        }>;
+    }>(),
+    {
+        stats: () => ({
+            berita: { total: 0, trend: '-' },
+            pengumuman: { total: 0, trend: '-' },
+            galeri: { total: 0, trend: '-' },
+            booking: { total: 0, trend: '-' },
+        }),
+        recentActivities: () => [],
+    },
+);
+
+// --- HELPER FUNCTIONS ---
+// Mapping string icon name dari backend ke komponen Lucide
+const iconMap: Record<string, any> = {
+    Newspaper,
+    Megaphone,
+    Image: ImageIcon,
+    BookOpen,
+    Users,
+};
+
+// Fungsi 'Time Ago' sederhana
+function timeAgo(dateString: string) {
+    if (!dateString) return '-'; // Guard clause
+    const date = new Date(dateString);
+    const now = new Date();
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    let interval = seconds / 31536000;
+    if (interval > 1) return Math.floor(interval) + ' tahun lalu';
+
+    interval = seconds / 2592000;
+    if (interval > 1) return Math.floor(interval) + ' bulan lalu';
+
+    interval = seconds / 86400;
+    if (interval > 1) return Math.floor(interval) + ' hari lalu';
+
+    interval = seconds / 3600;
+    if (interval > 1) return Math.floor(interval) + ' jam lalu';
+
+    interval = seconds / 60;
+    if (interval > 1) return Math.floor(interval) + ' menit lalu';
+
+    return 'Baru saja';
+}
+
+// Re-construct stats array agar cocok dengan loop di template
+// Optional chaining (?.) ditambahkan untuk keamanan ekstra
+const statsDisplay = computed(() => [
     {
         label: 'Total Berita',
-        value: '24',
-        trend: '+3 bulan ini',
+        value: props.stats?.berita?.total ?? 0,
+        trend: props.stats?.berita?.trend ?? '-',
         icon: Newspaper,
-        // Gradient Hijau Segar
         class: 'bg-gradient-to-br from-emerald-50 to-white border-emerald-100 text-emerald-800',
         iconBg: 'bg-emerald-500 text-white',
-        trendColor: 'text-emerald-600'
+        trendColor: 'text-emerald-600',
     },
     {
         label: 'Pengumuman',
-        value: '12',
-        trend: '+2 minggu ini',
+        value: props.stats?.pengumuman?.total ?? 0,
+        trend: props.stats?.pengumuman?.trend ?? '-',
         icon: Megaphone,
-        // Gradient Biru Langit
         class: 'bg-gradient-to-br from-sky-50 to-white border-sky-100 text-sky-800',
         iconBg: 'bg-sky-500 text-white',
-        trendColor: 'text-sky-600'
+        trendColor: 'text-sky-600',
     },
     {
         label: 'Foto Galeri',
-        value: '156',
-        trend: '+15 foto baru',
+        value: props.stats?.galeri?.total ?? 0,
+        trend: props.stats?.galeri?.trend ?? '-',
         icon: ImageIcon,
-        // Gradient Kuning/Amber Hangat
         class: 'bg-gradient-to-br from-amber-50 to-white border-amber-100 text-amber-800',
         iconBg: 'bg-amber-500 text-white',
-        trendColor: 'text-amber-600'
+        trendColor: 'text-amber-600',
     },
     {
-        label: 'Booking Buku',
-        value: '8',
-        trend: 'Menunggu konfirmasi',
+        label: 'Booking Pending',
+        value: props.stats?.booking?.total ?? 0,
+        trend: props.stats?.booking?.trend ?? '-',
         icon: BookOpen,
-        // Gradient Ungu/Violet
         class: 'bg-gradient-to-br from-violet-50 to-white border-violet-100 text-violet-800',
         iconBg: 'bg-violet-500 text-white',
-        trendColor: 'text-violet-600'
+        trendColor: 'text-violet-600',
     },
-];
+]);
 
-// Data Aksi Cepat (Colorful Cards)
+// Data Aksi Cepat (Tetap Static karena ini menu)
 const quickActions = [
-    { label: 'Buat Berita', href: '/admin/berita/create', icon: Newspaper, color: 'text-white', bg: 'bg-gradient-to-br from-emerald-400 to-emerald-600' },
-    { label: 'Buat Pengumuman', href: '/admin/pengumuman/create', icon: Megaphone, color: 'text-white', bg: 'bg-gradient-to-br from-sky-400 to-sky-600' },
-    { label: 'Upload Foto', href: '/admin/gallery/create', icon: ImageIcon, color: 'text-white', bg: 'bg-gradient-to-br from-amber-400 to-amber-600' },
-    { label: 'Cek Booking', href: '/admin/booking', icon: Calendar, color: 'text-white', bg: 'bg-gradient-to-br from-violet-400 to-violet-600' },
-    { label: 'Usulan Buku', href: '/admin/usulan', icon: LibraryBig, color: 'text-white', bg: 'bg-gradient-to-br from-rose-400 to-rose-600' },
-];
-
-// Data Aktivitas (Mock)
-const recentActivities = [
     {
-        type: 'Berita',
-        title: 'Workshop Literasi Digital 2024',
-        status: 'Published',
-        time: '2 jam lalu',
+        label: 'Buat Berita',
+        href: '/admin/berita/create',
         icon: Newspaper,
-        bgIcon: 'bg-emerald-100 text-emerald-600',
+        color: 'text-white',
+        bg: 'bg-gradient-to-br from-emerald-400 to-emerald-600',
     },
     {
-        type: 'Pengumuman',
-        title: 'Perpanjangan Waktu Peminjaman',
-        status: 'Published',
-        time: '5 jam lalu',
+        label: 'Buat Pengumuman',
+        href: '/admin/pengumuman/create',
         icon: Megaphone,
-        bgIcon: 'bg-sky-100 text-sky-600',
+        color: 'text-white',
+        bg: 'bg-gradient-to-br from-sky-400 to-sky-600',
     },
     {
-        type: 'Galeri',
-        title: 'Dokumentasi Kunjungan Industri',
-        status: 'Uploaded',
-        time: '1 hari lalu',
+        label: 'Upload Foto',
+        href: '/admin/galeri',
         icon: ImageIcon,
-        bgIcon: 'bg-amber-100 text-amber-600',
-    },
+        color: 'text-white',
+        bg: 'bg-gradient-to-br from-amber-400 to-amber-600',
+    }, // Fixed link
     {
-        type: 'Booking',
-        title: 'Permintaan buku "Clean Code" oleh Mahasiswa',
-        status: 'Pending',
-        time: '1 hari lalu',
-        icon: BookOpen,
-        bgIcon: 'bg-violet-100 text-violet-600',
-    },
+        label: 'Cek Booking',
+        href: '/admin/booking-buku',
+        icon: Calendar,
+        color: 'text-white',
+        bg: 'bg-gradient-to-br from-violet-400 to-violet-600',
+    }, // Fixed link
+    {
+        label: 'Usulan Buku',
+        href: '/admin/usulan-buku',
+        icon: LibraryBig,
+        color: 'text-white',
+        bg: 'bg-gradient-to-br from-rose-400 to-rose-600',
+    }, // Fixed link
 ];
 </script>
 
 <template>
     <div class="space-y-8 font-sans text-slate-600">
-
-        <!-- 1. Stats Section (Colorful Gradients) -->
+        <!-- 1. Stats Section (Dynamic) -->
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
             <div
-                v-for="(stat, index) in stats"
+                v-for="(stat, index) in statsDisplay"
                 :key="index"
                 class="group relative overflow-hidden rounded-2xl border p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
                 :class="stat.class"
             >
-                <div class="flex items-center gap-4 relative z-10">
+                <div class="relative z-10 flex items-center gap-4">
                     <!-- Icon Bubble -->
-                    <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl shadow-sm transition-transform group-hover:scale-110 group-hover:rotate-3" :class="stat.iconBg">
+                    <div
+                        class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl shadow-sm transition-transform group-hover:scale-110 group-hover:rotate-3"
+                        :class="stat.iconBg"
+                    >
                         <component :is="stat.icon" class="h-7 w-7" />
                     </div>
 
                     <!-- Text Content -->
                     <div>
-                        <p class="text-sm font-bold opacity-80 uppercase tracking-wider">{{ stat.label }}</p>
+                        <p
+                            class="text-sm font-bold tracking-wider uppercase opacity-80"
+                        >
+                            {{ stat.label }}
+                        </p>
                         <div class="flex items-baseline gap-2">
-                            <h3 class="text-3xl font-black">{{ stat.value }}</h3>
+                            <h3 class="text-3xl font-black">
+                                {{ stat.value }}
+                            </h3>
                         </div>
-                        <p class="text-xs font-medium mt-1" :class="stat.trendColor">
+                        <p
+                            class="mt-1 text-xs font-medium"
+                            :class="stat.trendColor"
+                        >
                             {{ stat.trend }}
                         </p>
                     </div>
@@ -146,29 +218,34 @@ const recentActivities = [
                 <!-- Decorative Big Icon -->
                 <component
                     :is="stat.icon"
-                    class="absolute -bottom-6 -right-6 h-32 w-32 opacity-10 transform -rotate-12 group-hover:scale-110 transition-transform duration-500"
+                    class="absolute -right-6 -bottom-6 h-32 w-32 -rotate-12 transform opacity-10 transition-transform duration-500 group-hover:scale-110"
                 />
             </div>
         </div>
 
-        <!-- 2. Quick Actions (Cards with Solid Gradients) -->
+        <!-- 2. Quick Actions (Static Menus) -->
         <div>
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                    <Activity class="w-5 h-5 text-[#99cc33]" />
+            <div class="mb-4 flex items-center justify-between">
+                <h3
+                    class="flex items-center gap-2 text-lg font-bold text-slate-800"
+                >
+                    <Activity class="h-5 w-5 text-[#99cc33]" />
                     Aksi Cepat
                 </h3>
             </div>
 
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
                 <Link
                     v-for="(action, index) in quickActions"
                     :key="index"
                     :href="action.href"
-                    class="group relative flex flex-col items-center justify-center gap-3 rounded-2xl p-6 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1 overflow-hidden"
+                    class="group relative flex flex-col items-center justify-center gap-3 overflow-hidden rounded-2xl p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
                 >
                     <!-- Background Gradient -->
-                    <div class="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity" :class="action.bg"></div>
+                    <div
+                        class="absolute inset-0 opacity-10 transition-opacity group-hover:opacity-20"
+                        :class="action.bg"
+                    ></div>
 
                     <div
                         class="flex h-12 w-12 items-center justify-center rounded-full shadow-md transition-transform duration-300 group-hover:scale-110"
@@ -176,83 +253,105 @@ const recentActivities = [
                     >
                         <component :is="action.icon" class="h-6 w-6" />
                     </div>
-                    <span class="text-sm font-bold text-slate-700 group-hover:text-slate-900 text-center z-10">
+                    <span
+                        class="z-10 text-center text-sm font-bold text-slate-700 group-hover:text-slate-900"
+                    >
                         {{ action.label }}
                     </span>
                 </Link>
             </div>
         </div>
 
-        <!-- 3. Recent Activity (Placed at Bottom) -->
+        <!-- 3. Recent Activity (Dynamic Aggregation) -->
         <div>
-            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm">
+            <div class="rounded-2xl border border-slate-100 bg-white shadow-sm">
                 <!-- Header Card -->
-                <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 rounded-t-2xl">
-                    <h3 class="font-bold text-slate-800 flex items-center gap-2">
-                        <Clock class="w-5 h-5 text-slate-400" />
+                <div
+                    class="flex items-center justify-between rounded-t-2xl border-b border-slate-100 bg-slate-50/50 p-5"
+                >
+                    <h3
+                        class="flex items-center gap-2 font-bold text-slate-800"
+                    >
+                        <Clock class="h-5 w-5 text-slate-400" />
                         Aktivitas Terkini
                     </h3>
-                    <button class="text-slate-400 hover:text-[#99cc33] transition-colors p-1 hover:bg-slate-100 rounded-full">
+                    <!-- <button class="text-slate-400 hover:text-[#99cc33] transition-colors p-1 hover:bg-slate-100 rounded-full">
                         <MoreHorizontal class="w-5 h-5" />
-                    </button>
+                    </button> -->
                 </div>
 
                 <!-- List Content -->
                 <div class="p-2">
-                    <div v-if="recentActivities.length > 0" class="divide-y divide-slate-50">
+                    <!-- Guard clause: gunakan length dari props.recentActivities yang sudah diduafultkan -->
+                    <div
+                        v-if="recentActivities && recentActivities.length > 0"
+                        class="divide-y divide-slate-50"
+                    >
                         <div
                             v-for="(activity, index) in recentActivities"
                             :key="index"
-                            class="flex items-center gap-4 p-4 hover:bg-slate-50 rounded-xl transition-all group"
+                            class="group flex items-center gap-4 rounded-xl p-4 transition-all hover:bg-slate-50"
                         >
                             <!-- Icon Indicator -->
-                            <div class="h-10 w-10 rounded-full flex items-center justify-center shrink-0" :class="activity.bgIcon">
-                                <component :is="activity.icon" class="h-5 w-5" />
+                            <div
+                                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
+                                :class="activity.bg_icon"
+                            >
+                                <component
+                                    :is="
+                                        iconMap[activity.icon_type] || Activity
+                                    "
+                                    class="h-5 w-5"
+                                />
                             </div>
 
                             <!-- Content -->
-                            <div class="flex-grow min-w-0">
-                                <div class="flex justify-between items-start mb-0.5">
-                                    <h4 class="text-sm font-bold text-slate-700 truncate pr-4 group-hover:text-[#99cc33] transition-colors">
+                            <div class="min-w-0 flex-grow">
+                                <div
+                                    class="mb-0.5 flex items-start justify-between"
+                                >
+                                    <h4
+                                        class="truncate pr-4 text-sm font-bold text-slate-700 transition-colors group-hover:text-[#99cc33]"
+                                    >
                                         {{ activity.title }}
                                     </h4>
-                                    <span class="text-xs text-slate-400 whitespace-nowrap">{{ activity.time }}</span>
-                                </div>
-                                <div class="flex items-center gap-2 text-xs text-slate-500">
-                                    <span class="font-medium">{{ activity.type }}</span>
-                                    <span class="w-1 h-1 bg-slate-300 rounded-full"></span>
                                     <span
-                                        class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide bg-slate-100 text-slate-500"
+                                        class="text-xs whitespace-nowrap text-slate-400"
+                                        >{{ timeAgo(activity.time_raw) }}</span
+                                    >
+                                </div>
+                                <div
+                                    class="flex items-center gap-2 text-xs text-slate-500"
+                                >
+                                    <span class="font-medium">{{
+                                        activity.type
+                                    }}</span>
+                                    <span
+                                        class="h-1 w-1 rounded-full bg-slate-300"
+                                    ></span>
+                                    <span
+                                        class="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold tracking-wide text-slate-500 uppercase"
                                     >
                                         {{ activity.status }}
                                     </span>
                                 </div>
                             </div>
-
-                            <!-- Arrow Action -->
-                            <div class="opacity-0 group-hover:opacity-100 transition-opacity text-slate-400">
-                                <ArrowUpRight class="w-4 h-4" />
-                            </div>
                         </div>
                     </div>
 
-                    <div v-else class="py-12 flex flex-col items-center justify-center text-center text-slate-400">
-                        <div class="bg-slate-50 p-4 rounded-full mb-3">
-                            <Activity class="w-8 h-8 opacity-50" />
+                    <div
+                        v-else
+                        class="flex flex-col items-center justify-center py-12 text-center text-slate-400"
+                    >
+                        <div class="mb-3 rounded-full bg-slate-50 p-4">
+                            <Activity class="h-8 w-8 opacity-50" />
                         </div>
-                        <p class="text-sm font-medium">Belum ada aktivitas terbaru.</p>
+                        <p class="text-sm font-medium">
+                            Belum ada aktivitas terbaru.
+                        </p>
                     </div>
-                </div>
-
-                <!-- Footer Card -->
-                <div class="p-3 border-t border-slate-100 bg-slate-50/30 rounded-b-2xl">
-                    <Link href="#" class="flex items-center justify-center gap-2 w-full py-2 text-xs font-bold text-slate-500 hover:text-[#99cc33] transition-colors group">
-                        Lihat Semua Aktivitas
-                        <ArrowUpRight class="w-3 h-3 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                    </Link>
                 </div>
             </div>
         </div>
-
     </div>
 </template>

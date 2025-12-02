@@ -139,7 +139,7 @@ onUnmounted(() => {
                         </div>
                         <div class="flex flex-col justify-center">
                             <h1
-                                class="text-[10px] leading-tight font-extrabold tracking-tight text-slate-800 transition-colors duration-300 group-hover:text-[#99cc33] sm:text-sm md:text-base lg:text-lg"
+                                class="text-[10px] leading-tight font-bold tracking-tight text-slate-800 transition-colors duration-300 group-hover:text-[#99cc33] sm:text-sm md:text-base lg:text-lg"
                             >
                                 PERPUSTAKAAN POLITEKNIK NEGERI BANDUNG
                                 <span
@@ -207,7 +207,7 @@ onUnmounted(() => {
                             >
                                 <ul
                                     v-show="openIndex === i"
-                                    class="absolute left-0 z-50 mt-2 w-56 origin-top-left rounded-2xl bg-white py-2 shadow-xl ring-1 shadow-slate-200/50 ring-slate-100 focus:outline-none"
+                                    class="absolute left-0 z-50 mt-2 w-56 origin-top-left rounded-2xl bg-white py-2 shadow-xl ring-1 ring-slate-100 focus:outline-none"
                                 >
                                     <li
                                         v-for="subItem in item.items"

@@ -25,7 +25,7 @@ interface Settings {
     watermark_title?: string;
     watermark_info?: string;
     watermark_instruction?: string;
-    watermark_image_path?: string;
+    watermark_file_path?: string;
 }
 
 interface ListItem {
@@ -53,7 +53,7 @@ const tabs = [
     { id: 'persyaratan', label: 'Persyaratan', icon: FileCheck },
     { id: 'panduan', label: 'Panduan', icon: BookOpen },
     { id: 'template', label: 'SP3 KTI', icon: FileText },
-    { id: 'watermark', label: 'Watermark', icon: Image },
+    { id: 'watermark', label: 'Watermark', icon: FileText },
 ];
 
 // --- Helper Function ---
@@ -242,35 +242,40 @@ const downloadFile = (path?: string) => {
                         <div class="overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-xl shadow-slate-200/60">
                             <div class="h-2 bg-cyan-500"></div>
                             <div class="p-8 text-center">
+                                
                                 <div class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-cyan-50">
-                                    <Image class="h-10 w-10 text-cyan-600" />
+                                    <FileText class="h-10 w-10 text-cyan-600" />
                                 </div>
+
                                 <h2 class="mb-2 text-2xl font-bold text-slate-800">
-                                    {{ settings?.watermark_title || 'Watermark Logo' }}
+                                    {{ settings?.watermark_title || 'Watermark (PDF)' }}
                                 </h2>
+
                                 <p class="mx-auto mb-8 max-w-md text-slate-500">
-                                    Logo resmi untuk ditempelkan pada halaman judul tugas akhir.
+                                    File PDF watermark resmi untuk ditempatkan pada halaman judul tugas akhir.
                                 </p>
 
                                 <div class="mb-8 space-y-2 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
                                     <div class="flex justify-center gap-4 font-medium">
-                                        <span>{{ settings?.watermark_info || 'Image File' }}</span>
+                                        <span>{{ settings?.watermark_info || 'PDF File' }}</span>
                                     </div>
                                     <p class="text-xs text-slate-400 italic">
-                                        {{ settings?.watermark_instruction || 'Instruksi: Atur posisi di tengah halaman dengan Opacity 30%.' }}
+                                        {{ settings?.watermark_instruction || 'Gunakan pada halaman judul dengan opacity 30%.' }}
                                     </p>
                                 </div>
 
                                 <button
-                                    @click="downloadFile(settings?.watermark_image_path)"
+                                    @click="downloadFile(settings?.watermark_file_path)"
                                     class="flex w-full items-center justify-center gap-2 rounded-xl bg-cyan-600 px-8 py-3 font-bold text-white shadow-lg shadow-cyan-600/30 transition-all duration-300 hover:bg-cyan-700 sm:w-auto cursor-pointer"
                                 >
                                     <Download class="h-5 w-5" />
-                                    Download Watermark
+                                    Download Watermark (PDF)
                                 </button>
+
                             </div>
                         </div>
                     </div>
+
 
                 </transition>
             </div>

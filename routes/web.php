@@ -1,6 +1,6 @@
 <?php
 
-
+use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\GaleriController;
 use App\Http\Controllers\PhotoController;
@@ -154,9 +154,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::post('logout', [LoginController::class, 'logout'])->middleware('auth:admin')->name('logout');
 
     // admin dashboard (protected)
-    Route::get('dashboard', function () {
-        return Inertia::render('admin/Dashboard');
-    })->middleware('auth:admin')->name('dashboard');
+    Route::get('dashboard', [AdminDashboardController::class, 'index'])->middleware('auth:admin')->name('dashboard');
 
     // Berita
     Route::get('berita', [ArticleController::class, 'index'])->middleware('auth:admin')->name('beritaIndex');
