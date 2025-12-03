@@ -64,7 +64,6 @@ const activeTab = ref('berita');
             class="relative min-h-[80vh] overflow-hidden px-4 pt-6 pb-16 sm:px-6 lg:px-8"
         >
             <div class="relative z-10 container mx-auto max-w-7xl">
-
                 <!-- Tabs Navigation dengan Scroll Reveal -->
                 <ScrollReveal animation="fade-up" :delay="100">
                     <div class="mb-12 flex flex-wrap justify-center gap-3">
@@ -101,7 +100,10 @@ const activeTab = ref('berita');
                             key="pengumuman"
                             class="mx-auto max-w-5xl"
                         >
-                            <ScrollReveal animation="fade-in" class="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+                            <ScrollReveal
+                                animation="fade-in"
+                                class="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end"
+                            >
                                 <div>
                                     <h2
                                         class="mb-2 text-3xl font-black tracking-tight text-slate-800"
@@ -125,8 +127,16 @@ const activeTab = ref('berita');
                             </ScrollReveal>
 
                             <div class="grid gap-6">
-                                <template v-for="(pengumuman, index) in latest_announcements" :key="pengumuman.article_id">
-                                    <ScrollReveal animation="slide-left" :delay="index * 100">
+                                <template
+                                    v-for="(
+                                        pengumuman, index
+                                    ) in latest_announcements"
+                                    :key="pengumuman.article_id"
+                                >
+                                    <ScrollReveal
+                                        animation="slide-left"
+                                        :delay="index * 100"
+                                    >
                                         <PengumumanCard
                                             :id="pengumuman.article_id"
                                             :title="pengumuman.judul"
