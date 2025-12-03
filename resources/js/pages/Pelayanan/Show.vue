@@ -8,6 +8,7 @@ import {
     FileText,
     Laptop,
     Users,
+    ShieldCheck, // Tambahan icon dekoratif jika perlu
 } from 'lucide-vue-next';
 import { computed } from 'vue';
 
@@ -15,21 +16,10 @@ const props = defineProps<{
     pelayanan: string;
 }>();
 
-// Mapping String ke Komponen Icon Lucide
-const iconMap: Record<string, any> = {
-    BookOpen,
-    Clock,
-    Users,
-    FileText,
-    Laptop,
-};
-
 const PelayananData: Record<string, any> = {
     peminjaman: {
         title: 'Peminjaman Buku',
-        icon: 'BookOpen',
-        description:
-            'Layanan sirkulasi buku cetak untuk mendukung kegiatan belajar mengajar dan penelitian civitas akademika.',
+        description: 'Layanan sirkulasi buku cetak untuk mendukung kegiatan belajar mengajar.',
         content: [
             {
                 subtitle: 'Ketentuan Peminjaman',
@@ -42,7 +32,7 @@ const PelayananData: Record<string, any> = {
                 ],
             },
             {
-                subtitle: 'Alur peminjaman Melalui selfloan',
+                subtitle: 'Alur Self-Loan',
                 items: [
                     'Cari buku yang diinginkan melalui katalog online (e-Lib)',
                     'Catat nomor panggil buku dan cari di rak koleksi',
@@ -55,9 +45,7 @@ const PelayananData: Record<string, any> = {
     },
     pengembalian: {
         title: 'Pengembalian Buku',
-        icon: 'Clock',
-        description:
-            'Prosedur pengembalian koleksi pustaka yang mudah, transparan, dan praktis.',
+        description: 'Prosedur pengembalian koleksi pustaka yang mudah dan transparan.',
         content: [
             {
                 subtitle: 'Cara Pengembalian',
@@ -72,29 +60,27 @@ const PelayananData: Record<string, any> = {
             {
                 subtitle: 'Ketentuan Denda',
                 items: [
-                    'denda keterlambatan sesuai dengan sk Direktur',
-                    'Kehilangan buku: Ganti buku yang sama atau 2x harga buku',
+                    'Denda keterlambatan sesuai dengan SK Direktur',
+                    'Kehilangan buku: Ganti buku yang sama atau 2x harga',
                     'Kerusakan ringan: Rp 25.000 - Rp 50.000',
                     'Kerusakan berat: Sesuai harga buku',
-                    'Pembayaran denda dapat dilakukan di kasir perpustakaan',
+                    'Pembayaran denda dapat dilakukan di kasir',
                 ],
             },
         ],
     },
     keanggotaan: {
         title: 'Keanggotaan',
-        icon: 'Users',
-        description:
-            'Akses penuh ke seluruh fasilitas perpustakaan melalui keanggotaan resmi civitas akademika.',
+        description: 'Akses penuh fasilitas perpustakaan untuk civitas akademika.',
         content: [
             {
                 subtitle: 'Syarat Keanggotaan',
                 items: [
-                    'Mahasiswa aktif POLBAN dengan KTM yang masih berlaku',
+                    'Mahasiswa aktif POLBAN dengan KTM berlaku',
                     'Dosen dan staff POLBAN dengan kartu pegawai',
                     'Mengisi formulir pendaftaran',
                     'Menyerahkan pas foto 3x4 sebanyak 2 lembar',
-                    'Kartu anggota berlaku selama menjadi civitas akademika POLBAN',
+                    'Kartu berlaku selama menjadi civitas akademika',
                 ],
             },
             {
@@ -103,7 +89,7 @@ const PelayananData: Record<string, any> = {
                     'Meminjam buku sesuai kuota yang ditentukan',
                     'Mengakses katalog online dan database digital',
                     'Menggunakan fasilitas ruang baca dan komputer',
-                    'Mengikuti program literasi dan pelatihan perpustakaan',
+                    'Mengikuti program literasi perpustakaan',
                     'Mendapatkan layanan referensi dan konsultasi',
                 ],
             },
@@ -111,14 +97,12 @@ const PelayananData: Record<string, any> = {
     },
     referensi: {
         title: 'Pelayanan Referensi',
-        icon: 'FileText',
-        description:
-            'Bantuan profesional dalam penelusuran informasi ilmiah dan referensi akademik.',
+        description: 'Bantuan profesional dalam penelusuran informasi ilmiah.',
         content: [
             {
-                subtitle: 'Layanan yang Tersedia',
+                subtitle: 'Layanan Tersedia',
                 items: [
-                    'Konsultasi pencarian referensi untuk tugas akhir',
+                    'Konsultasi pencarian referensi tugas akhir',
                     'Bantuan penelusuran database jurnal internasional',
                     'Bantuan sitasi dan penulisan daftar pustaka',
                 ],
@@ -127,9 +111,9 @@ const PelayananData: Record<string, any> = {
                 subtitle: 'Cara Mengakses',
                 items: [
                     'Datang langsung ke ruang referensi',
-                    "Email ke lib@polban.ac.id dengan subjek 'Layanan Referensi'",
-                    'Jadwal konsultasi: Senin-Jumat, 09.00-15.00 WIB',
-                    'Gratis untuk seluruh civitas akademika POLBAN',
+                    "Email ke lib@polban.ac.id subjek 'Layanan Referensi'",
+                    'Jadwal: Senin-Jumat, 09.00-15.00 WIB',
+                    'Gratis untuk civitas akademika POLBAN',
                     'Dapat dijadwalkan untuk konsultasi kelompok',
                 ],
             },
@@ -137,22 +121,19 @@ const PelayananData: Record<string, any> = {
     },
     ruang_komputer: {
         title: 'Ruang Komputer',
-        icon: 'Laptop',
-        description:
-            'Fasilitas komputasi modern dengan akses internet berkecepatan tinggi untuk menunjang akademik.',
+        description: 'Fasilitas komputasi modern untuk menunjang akademik.',
         content: [
             {
                 subtitle: 'Fasilitas',
                 items: [
-                    '24 unit komputer dengan spesifikasi memadai',
+                    '24 unit komputer spesifikasi memadai',
                     'Koneksi internet berkecepatan tinggi',
-                    'Microsoft Office',
-                    'Printer',
+                    'Microsoft Office & Printer',
                     'AC dan pencahayaan yang baik',
                 ],
             },
             {
-                subtitle: 'Tata Tertib Penggunaan',
+                subtitle: 'Tata Tertib',
                 items: [
                     'Wajib menunjukkan kartu anggota perpustakaan',
                     'Hanya untuk keperluan akademik',
@@ -164,8 +145,8 @@ const PelayananData: Record<string, any> = {
     },
 };
 
-// Computed property untuk mengambil data berdasarkan props
 const activeData = computed(() => PelayananData[props.pelayanan]);
+
 const breadcrumb = computed(() => [
     { label: 'Home', link: '/' },
     { label: 'Pelayanan' },
@@ -179,13 +160,12 @@ const breadcrumb = computed(() => [
         :breadcrumb="breadcrumb"
         :title="activeData?.title || 'Layanan'"
     >
-        <!-- Background decoration (Consistent Theme) -->
         <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
             <div
-                class="absolute top-0 right-0 h-[600px] w-[600px] rounded-full bg-[#99cc33]/5 blur-3xl"
+                class="absolute top-0 right-0 h-[600px] w-[600px] rounded-full bg-[#99cc33]/10 blur-3xl"
             ></div>
             <div
-                class="absolute bottom-0 left-0 h-[500px] w-[500px] rounded-full bg-gray-100 blur-3xl"
+                class="absolute bottom-0 left-0 h-[500px] w-[500px] rounded-full bg-[#99cc33]/5 blur-3xl"
             ></div>
         </div>
 
@@ -193,14 +173,7 @@ const breadcrumb = computed(() => [
             class="relative container mx-auto px-4 py-10 sm:px-6 lg:px-8"
             v-if="activeData"
         >
-            <!-- Content Grid -->
             <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                <!--
-                    IMPLEMENTASI: ScrollReveal Wrapper
-                    - Animation: fade-up (kartu naik ke atas)
-                    - Staggering: delay="index * 150" ms agar muncul berurutan
-                    - class="h-full": Agar wrapper mengisi tinggi grid cell sepenuhnya
-                -->
                 <ScrollReveal
                     v-for="(section, index) in activeData.content"
                     :key="index"
@@ -209,60 +182,72 @@ const breadcrumb = computed(() => [
                     class="h-full"
                 >
                     <div
-                        class="group flex h-full flex-col rounded-2xl border border-slate-100 bg-white p-8 shadow-lg shadow-slate-200/50 transition-all duration-300 hover:-translate-y-1 hover:border-[#99cc33]/30"
+                        class="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-xl shadow-slate-200/50 transition-all duration-300 hover:-translate-y-1 hover:border-[#99cc33]/50 hover:shadow-[#99cc33]/20"
                     >
                         <div
-                            class="mb-6 flex items-center gap-3 border-b border-slate-100 pb-4"
+                            class="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-[#99cc33]/20 blur-2xl transition-all duration-500 group-hover:bg-[#99cc33]/30"
+                        ></div>
+
+                        <div
+                            class="relative flex items-center gap-4 bg-gradient-to-br from-[#99cc33]/10 to-transparent p-6 sm:p-8"
                         >
-                            <div class="rounded-lg bg-[#99cc33]/10 p-2">
-                                <ArrowRight class="h-5 w-5 text-[#99cc33]" />
-                            </div>
-                            <h2
-                                class="text-xl font-bold text-slate-800 transition-colors group-hover:text-[#99cc33]"
+                            <div
+                                class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#99cc33] text-white shadow-lg shadow-[#99cc33]/40 transition-transform duration-300 group-hover:scale-110"
                             >
-                                {{ section.subtitle }}
-                            </h2>
+                                <ShieldCheck class="h-6 w-6" />
+                            </div>
+
+                            <div class="flex-1">
+                                <h2
+                                    class="text-xl font-bold text-slate-800 group-hover:text-[#99cc33] transition-colors"
+                                >
+                                    {{ section.subtitle }}
+                                </h2>
+                                <div
+                                    class="mt-1 h-1 w-12 rounded-full bg-[#99cc33]/40"
+                                ></div>
+                            </div>
                         </div>
 
-                        <ul class="flex-grow space-y-4">
-                            <li
-                                v-for="(item, itemIndex) in section.items"
-                                :key="itemIndex"
-                                class="group/item flex items-start gap-3"
-                            >
-                                <!-- Custom Bullet Point -->
-                                <div class="mt-1 shrink-0">
-                                    <CheckCircle2
-                                        class="h-5 w-5 text-[#99cc33]/60 transition-colors group-hover/item:text-[#99cc33]"
-                                    />
-                                </div>
-                                <span
-                                    class="text-[0.95rem] leading-relaxed text-slate-600 transition-colors group-hover/item:text-slate-800"
+                        <div class="flex-grow p-6 sm:p-8 pt-2">
+                            <ul class="space-y-4">
+                                <li
+                                    v-for="(item, itemIndex) in section.items"
+                                    :key="itemIndex"
+                                    class="group/item flex items-start gap-3 rounded-lg p-2 transition-colors hover:bg-[#99cc33]/5"
                                 >
-                                    {{ item }}
-                                </span>
-                            </li>
-                        </ul>
+                                    <div class="mt-1 shrink-0">
+                                        <CheckCircle2
+                                            class="h-5 w-5 text-[#99cc33] drop-shadow-sm transition-transform duration-300 group-hover/item:scale-110"
+                                        />
+                                    </div>
+                                    <span
+                                        class="text-[0.95rem] leading-relaxed text-slate-600 transition-colors group-hover/item:text-slate-900"
+                                    >
+                                        {{ item }}
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </ScrollReveal>
             </div>
         </div>
 
-        <!-- Empty State / Error Handling -->
         <ScrollReveal
             v-else
             animation="fade-in"
             class="container mx-auto px-4 py-20 text-center"
         >
             <div
-                class="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-slate-100"
+                class="mb-4 inline-flex h-20 w-20 items-center justify-center rounded-full bg-[#99cc33]/10"
             >
-                <FileText class="h-8 w-8 text-slate-400" />
+                <FileText class="h-10 w-10 text-[#99cc33]" />
             </div>
             <h2 class="text-xl font-bold text-slate-700">
                 Layanan Tidak Ditemukan
             </h2>
-            <p class="text-slate-500">
+            <p class="text-slate-500 mt-2">
                 Mohon maaf, informasi layanan yang Anda cari tidak tersedia.
             </p>
         </ScrollReveal>
