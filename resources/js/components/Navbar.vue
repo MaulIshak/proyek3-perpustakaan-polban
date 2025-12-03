@@ -112,22 +112,18 @@ onUnmounted(() => {
 
 <template>
     <nav
-        class="sticky top-0 z-50 w-full border-b border-slate-200 bg-white shadow-sm transition-all duration-300"
+        class="sticky top-0 z-50 w-full border-b border-slate-200 bg-white font-sans shadow-sm transition-all duration-300"
     >
-        <!-- Top Decorative Line -->
-        <div
-            class="absolute top-0 left-0 h-0.5 w-full bg-gradient-to-r from-[#99cc33] to-[#7aace5]"
-        ></div>
-
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex h-20 items-center justify-between">
+            <!-- Height disesuaikan agar elemen punya ruang napas -->
+            <div class="flex h-[72px] items-center justify-between md:h-20">
                 <!-- Logo Section -->
-                <!-- Adjusted gap for mobile -->
-                <div class="flex items-center gap-2 sm:gap-4">
+                <div class="flex items-center gap-3 sm:gap-4">
                     <Link
                         href="/"
-                        class="group flex items-center gap-2 sm:gap-4"
+                        class="group flex items-center gap-3 sm:gap-5"
                     >
+                        <!-- Logo Wrapper: Ukuran diperbaiki agar tidak sesak -->
                         <div class="relative shrink-0">
                             <div
                                 class="absolute inset-0 rounded-full bg-[#99cc33]/20 opacity-0 blur-lg transition-opacity duration-500 group-hover:opacity-100"
@@ -135,18 +131,25 @@ onUnmounted(() => {
                             <img
                                 src="/logo-polban.png"
                                 alt="Logo Politeknik Negeri Bandung"
-                                class="relative h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105 md:h-14"
+                                class="relative h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-105 sm:h-12 md:h-16"
                             />
                         </div>
+
+                        <!-- Text Container -->
                         <div class="flex flex-col justify-center">
                             <h1
-                                class="text-[10px] leading-tight font-bold tracking-tight text-slate-800 transition-colors duration-300 group-hover:text-[#99cc33] sm:text-sm md:text-base lg:text-lg"
+                                class="flex flex-col text-xs leading-[1.1] font-bold tracking-tight text-slate-800 transition-colors duration-300 group-hover:text-[#99cc33] sm:text-sm md:text-base lg:text-[15px]"
                             >
-                                PERPUSTAKAAN POLITEKNIK NEGERI BANDUNG
-                                <span
-                                    class="block text-[9px] font-semibold text-slate-500 sm:text-xs md:text-sm lg:text-base"
-                                    >NPP 321702200000001</span
+                                <span class="tracking-wide uppercase"
+                                    >Perpustakaan</span
                                 >
+                                <span class="font-medium"
+                                    >POLITEKNIK NEGERI BANDUNG</span
+                                >
+
+                                <span class="text-md mt-0.5 block">
+                                    NPP 321702200000001
+                                </span>
                             </h1>
                         </div>
                     </Link>
@@ -155,7 +158,7 @@ onUnmounted(() => {
                 <!-- Mobile Menu Button -->
                 <button
                     @click="mobileOpen = !mobileOpen"
-                    class="flex shrink-0 items-center justify-center rounded-xl p-2.5 text-slate-600 transition-colors hover:bg-[#99cc33]/10 hover:text-[#99cc33] focus:outline-none xl:hidden"
+                    class="flex shrink-0 items-center justify-center rounded-lg p-2 text-slate-600 transition-colors hover:bg-slate-100 focus:outline-none xl:hidden"
                     aria-label="Toggle menu"
                 >
                     <Menu v-if="!mobileOpen" class="h-6 w-6" />
@@ -163,13 +166,13 @@ onUnmounted(() => {
                 </button>
 
                 <!-- Desktop Nav -->
-                <div class="hidden items-center gap-2 xl:flex">
+                <div class="hidden items-center gap-1 xl:flex">
                     <template v-for="(item, i) in navItems" :key="item.name">
                         <!-- Single Link -->
                         <Link
                             v-if="!item.items"
                             :href="item.href"
-                            class="rounded-full px-4 py-2 text-sm font-semibold transition-all duration-200"
+                            class="text-md rounded-full px-4 py-2 font-semibold transition-all duration-200"
                             :class="[
                                 item.href === currentUrl
                                     ? 'bg-[#99cc33]/10 text-[#99cc33]'
@@ -183,7 +186,7 @@ onUnmounted(() => {
                         <div v-else class="navbar-dropdown group relative">
                             <button
                                 @click="toggleMenu(i)"
-                                class="flex items-center gap-1 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-200 group-hover:text-[#99cc33]"
+                                class="text-md flex items-center gap-1.5 rounded-full px-4 py-2 font-semibold transition-all duration-200 group-hover:text-[#99cc33]"
                                 :class="
                                     openIndex === i
                                         ? 'bg-[#99cc33]/5 text-[#99cc33]'
@@ -208,7 +211,7 @@ onUnmounted(() => {
                             >
                                 <ul
                                     v-show="openIndex === i"
-                                    class="absolute left-0 z-50 mt-2 w-56 origin-top-left rounded-2xl bg-white py-2 shadow-xl ring-1 ring-slate-100 focus:outline-none"
+                                    class="absolute top-full right-0 z-50 mt-2 w-56 origin-top-right rounded-xl bg-white py-2 shadow-lg ring-1 ring-slate-200/50 focus:outline-none"
                                 >
                                     <li
                                         v-for="subItem in item.items"
@@ -222,7 +225,7 @@ onUnmounted(() => {
                                             :href="subItem.href"
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            class="block px-4 py-2.5 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-[#99cc33]/5 hover:pl-6 hover:text-[#99cc33]"
+                                            class="block px-4 py-2.5 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-slate-50 hover:pl-6 hover:text-[#99cc33]"
                                             @click="closeAll"
                                         >
                                             {{ subItem.name }}
@@ -231,7 +234,7 @@ onUnmounted(() => {
                                         <Link
                                             v-else
                                             :href="subItem.href"
-                                            class="block px-4 py-2.5 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-[#99cc33]/5 hover:pl-6 hover:text-[#99cc33]"
+                                            class="block px-4 py-2.5 text-sm font-medium text-slate-600 transition-all duration-200 hover:bg-slate-50 hover:pl-6 hover:text-[#99cc33]"
                                             :class="{
                                                 'bg-[#99cc33]/5 text-[#99cc33]':
                                                     subItem.href === currentUrl,
@@ -267,22 +270,22 @@ onUnmounted(() => {
             <!-- Mobile Menu Content -->
             <transition
                 enter-active-class="transition-all duration-300 ease-out"
-                enter-from-class="-translate-y-4 opacity-0"
-                enter-to-class="translate-y-0 opacity-100"
+                enter-from-class="-translate-y-4 opacity-0 scale-95"
+                enter-to-class="translate-y-0 opacity-100 scale-100"
                 leave-active-class="transition-all duration-200 ease-in"
-                leave-from-class="translate-y-0 opacity-100"
-                leave-to-class="-translate-y-4 opacity-0"
+                leave-from-class="translate-y-0 opacity-100 scale-100"
+                leave-to-class="-translate-y-4 opacity-0 scale-95"
             >
                 <div
                     v-show="mobileOpen"
-                    class="absolute top-full right-0 left-0 z-50 mx-4 mt-2 flex max-h-[80vh] flex-col gap-2 overflow-y-auto rounded-2xl bg-white p-4 shadow-2xl ring-1 ring-slate-100 xl:hidden"
+                    class="absolute top-full right-0 left-0 z-50 mx-4 mt-2 flex max-h-[85vh] flex-col gap-1 overflow-y-auto rounded-2xl bg-white p-2 shadow-2xl ring-1 ring-slate-200 xl:hidden"
                 >
                     <template v-for="(item, i) in navItems" :key="item.name">
                         <!-- Single Link Mobile -->
                         <Link
                             v-if="!item.items"
                             :href="item.href"
-                            class="block rounded-xl px-4 py-3 text-base font-medium transition-colors"
+                            class="block rounded-xl px-4 py-3 text-sm font-semibold transition-colors"
                             :class="[
                                 item.href === currentUrl
                                     ? 'bg-[#99cc33]/10 text-[#99cc33]'
@@ -301,22 +304,23 @@ onUnmounted(() => {
                         >
                             <button
                                 @click="toggleMenu(i)"
-                                class="flex w-full items-center justify-between px-4 py-3 text-base font-medium text-slate-600 transition-colors hover:text-[#99cc33]"
-                                :class="{
-                                    'text-[#99cc33]': openIndex === i,
-                                }"
+                                class="flex w-full items-center justify-between px-4 py-3 text-sm font-semibold text-slate-600 transition-colors hover:text-[#99cc33]"
+                                :class="{ 'text-[#99cc33]': openIndex === i }"
                             >
                                 <span>{{ item.name }}</span>
                                 <ChevronDown
-                                    class="h-5 w-5 transition-transform duration-300"
-                                    :class="{ 'rotate-180': openIndex === i }"
+                                    class="h-5 w-5 text-slate-400 transition-transform duration-300"
+                                    :class="{
+                                        'rotate-180': openIndex === i,
+                                        'text-[#99cc33]': openIndex === i,
+                                    }"
                                 />
                             </button>
 
-                            <!-- Konten Dropdown -->
+                            <!-- Konten Dropdown Mobile -->
                             <div
                                 v-show="openIndex === i"
-                                class="flex flex-col gap-1 p-2 pt-0"
+                                class="flex flex-col gap-1 px-2 pb-2"
                             >
                                 <template
                                     v-for="subItem in item.items"
@@ -329,7 +333,7 @@ onUnmounted(() => {
                                         "
                                         :href="subItem.href"
                                         target="_blank"
-                                        class="block rounded-lg px-4 py-2.5 text-sm font-medium text-slate-600 transition-all hover:bg-white hover:text-[#99cc33] hover:shadow-sm"
+                                        class="block rounded-lg px-4 py-2.5 text-sm font-medium text-slate-500 transition-all hover:bg-white hover:text-[#99cc33] hover:shadow-sm"
                                         @click="closeMobileMenu"
                                     >
                                         {{ subItem.name }}
@@ -337,7 +341,7 @@ onUnmounted(() => {
                                     <Link
                                         v-else
                                         :href="subItem.href"
-                                        class="block rounded-lg px-4 py-2.5 text-sm font-medium text-slate-600 transition-all hover:bg-white hover:text-[#99cc33] hover:shadow-sm"
+                                        class="block rounded-lg px-4 py-2.5 text-sm font-medium text-slate-500 transition-all hover:bg-white hover:text-[#99cc33] hover:shadow-sm"
                                         :class="{
                                             'bg-white text-[#99cc33] shadow-sm':
                                                 subItem.href === currentUrl,

@@ -195,49 +195,65 @@ const breadcrumb = computed(() => [
         >
             <!-- Content Grid -->
             <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                <div
+                <!--
+                    IMPLEMENTASI: ScrollReveal Wrapper
+                    - Animation: fade-up (kartu naik ke atas)
+                    - Staggering: delay="index * 150" ms agar muncul berurutan
+                    - class="h-full": Agar wrapper mengisi tinggi grid cell sepenuhnya
+                -->
+                <ScrollReveal
                     v-for="(section, index) in activeData.content"
                     :key="index"
-                    class="group flex flex-col rounded-2xl border border-slate-100 bg-white p-8 shadow-lg shadow-slate-200/50 transition-all duration-300 hover:-translate-y-1 hover:border-[#99cc33]/30"
+                    animation="fade-up"
+                    :delay="index * 150"
+                    class="h-full"
                 >
                     <div
-                        class="mb-6 flex items-center gap-3 border-b border-slate-100 pb-4"
+                        class="group flex h-full flex-col rounded-2xl border border-slate-100 bg-white p-8 shadow-lg shadow-slate-200/50 transition-all duration-300 hover:-translate-y-1 hover:border-[#99cc33]/30"
                     >
-                        <div class="rounded-lg bg-[#99cc33]/10 p-2">
-                            <ArrowRight class="h-5 w-5 text-[#99cc33]" />
-                        </div>
-                        <h2
-                            class="text-xl font-bold text-slate-800 transition-colors group-hover:text-[#99cc33]"
+                        <div
+                            class="mb-6 flex items-center gap-3 border-b border-slate-100 pb-4"
                         >
-                            {{ section.subtitle }}
-                        </h2>
-                    </div>
-
-                    <ul class="flex-grow space-y-4">
-                        <li
-                            v-for="(item, itemIndex) in section.items"
-                            :key="itemIndex"
-                            class="group/item flex items-start gap-3"
-                        >
-                            <!-- Custom Bullet Point -->
-                            <div class="mt-1 shrink-0">
-                                <CheckCircle2
-                                    class="h-5 w-5 text-[#99cc33]/60 transition-colors group-hover/item:text-[#99cc33]"
-                                />
+                            <div class="rounded-lg bg-[#99cc33]/10 p-2">
+                                <ArrowRight class="h-5 w-5 text-[#99cc33]" />
                             </div>
-                            <span
-                                class="text-[0.95rem] leading-relaxed text-slate-600 transition-colors group-hover/item:text-slate-800"
+                            <h2
+                                class="text-xl font-bold text-slate-800 transition-colors group-hover:text-[#99cc33]"
                             >
-                                {{ item }}
-                            </span>
-                        </li>
-                    </ul>
-                </div>
+                                {{ section.subtitle }}
+                            </h2>
+                        </div>
+
+                        <ul class="flex-grow space-y-4">
+                            <li
+                                v-for="(item, itemIndex) in section.items"
+                                :key="itemIndex"
+                                class="group/item flex items-start gap-3"
+                            >
+                                <!-- Custom Bullet Point -->
+                                <div class="mt-1 shrink-0">
+                                    <CheckCircle2
+                                        class="h-5 w-5 text-[#99cc33]/60 transition-colors group-hover/item:text-[#99cc33]"
+                                    />
+                                </div>
+                                <span
+                                    class="text-[0.95rem] leading-relaxed text-slate-600 transition-colors group-hover/item:text-slate-800"
+                                >
+                                    {{ item }}
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </ScrollReveal>
             </div>
         </div>
 
         <!-- Empty State / Error Handling -->
-        <div v-else class="container mx-auto px-4 py-20 text-center">
+        <ScrollReveal
+            v-else
+            animation="fade-in"
+            class="container mx-auto px-4 py-20 text-center"
+        >
             <div
                 class="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-slate-100"
             >
@@ -249,6 +265,6 @@ const breadcrumb = computed(() => [
             <p class="text-slate-500">
                 Mohon maaf, informasi layanan yang Anda cari tidak tersedia.
             </p>
-        </div>
+        </ScrollReveal>
     </Layout>
 </template>

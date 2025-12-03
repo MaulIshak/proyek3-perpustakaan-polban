@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import ChatWidget from '@/components/ChatWidget.vue';
 import HeroSection from '@/components/HeroSection.vue';
+import ScrollReveal from '@/components/ScrollReveal.vue';
 import Footer from '../components/Footer.vue';
 import Navbar from '../components/Navbar.vue';
 import RemahanRoti from './RemahanRoti.vue';
@@ -30,31 +31,46 @@ defineProps<{
                 <!-- Overlay -->
                 <div class="absolute inset-0 bg-black/50"></div>
 
-                <!-- WRAPPER KONTEN: Gunakan Container standar agar sejajar dengan konten di bawah -->
-                <!-- Padding vertikal (py) diletakkan di sini, bukan di section luar -->
                 <div
                     class="relative z-10 container mx-auto px-4 py-16 sm:px-6 sm:py-20 lg:px-8"
                 >
-                    <RemahanRoti :itemRoti="breadcrumb" class="relative z-10" />
-
+                    <ScrollReveal animation="slide-left" :duration="500">
+                        <RemahanRoti
+                            :itemRoti="breadcrumb"
+                            class="relative z-10"
+                        />
+                    </ScrollReveal>
                     <div
                         class="relative z-10 mt-5 mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
                     >
                         <div class="flex items-center gap-3">
                             <!-- Aksen Garis Hijau -->
-                            <div
-                                class="h-8 w-2 shrink-0 bg-[var(--primary-green)] sm:h-10 sm:w-3"
-                            ></div>
-
+                            <ScrollReveal animation="fade-up" :duration="500">
+                                <div
+                                    class="h-8 w-2 shrink-0 bg-[var(--primary-green)] sm:h-10 sm:w-3"
+                                ></div>
+                            </ScrollReveal>
                             <div>
-                                <h2
-                                    class="text-2xl font-medium text-[var(--background-green)] sm:text-4xl"
+                                <ScrollReveal
+                                    animation="slide-left"
+                                    :duration="600"
                                 >
-                                    {{ title }}
-                                </h2>
-                                <p class="text-sm text-gray-200 sm:text-base">
-                                    {{ subtitle }}
-                                </p>
+                                    <h2
+                                        class="text-2xl font-medium text-[var(--background-green)] sm:text-4xl"
+                                    >
+                                        {{ title }}
+                                    </h2>
+                                </ScrollReveal>
+                                <ScrollReveal
+                                    animation="slide-left"
+                                    :duration="700"
+                                >
+                                    <p
+                                        class="text-sm text-gray-200 sm:text-base"
+                                    >
+                                        {{ subtitle }}
+                                    </p>
+                                </ScrollReveal>
                             </div>
                         </div>
                     </div>

@@ -111,8 +111,9 @@ const breadcrumb = [
         </div>
 
         <div class="relative container mx-auto px-4 py-10 sm:px-6 lg:px-8">
-            <!-- Alert Box -->
-            <div class="mx-auto mb-10 max-w-4xl">
+
+            <!-- IMPLEMENTASI: ScrollReveal Wrapper untuk Alert -->
+            <ScrollReveal animation="fade-up" :duration="600" class="mx-auto mb-10 max-w-4xl">
                 <div
                     class="flex items-start gap-4 rounded-2xl border border-[#99cc33]/20 bg-[#99cc33]/10 p-5 shadow-sm"
                 >
@@ -134,88 +135,100 @@ const breadcrumb = [
                         </p>
                     </div>
                 </div>
-            </div>
+            </ScrollReveal>
 
             <!-- Accordion Container -->
             <div class="mx-auto max-w-4xl space-y-4">
-                <div
-                    v-for="item in peraturanItems"
+
+                <!--
+                    IMPLEMENTASI: ScrollReveal Wrapper untuk List
+                    - animation="slide-left": Memberikan efek masuk dari kiri yang dinamis untuk list.
+                    - :delay: Memberikan efek berurutan.
+                -->
+                <ScrollReveal
+                    v-for="(item, index) in peraturanItems"
                     :key="item.value"
-                    class="group overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all duration-300 hover:border-[#99cc33]/30 hover:shadow-md"
-                    :class="{
-                        'border-[#99cc33]/40 ring-2 ring-[#99cc33]/20':
-                            activeAccordion.includes(item.value),
-                    }"
+                    animation="slide-left"
+                    :delay="index * 100"
+                    class="w-full"
                 >
-                    <!-- Tombol Accordion -->
-                    <button
-                        type="button"
-                        @click="toggleAccordion(item.value)"
-                        :aria-expanded="activeAccordion.includes(item.value)"
-                        class="flex w-full items-center justify-between px-6 py-5 text-left focus:outline-none"
+                    <div
+                        class="group overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all duration-300 hover:border-[#99cc33]/30 hover:shadow-md"
+                        :class="{
+                            'border-[#99cc33]/40 ring-2 ring-[#99cc33]/20':
+                                activeAccordion.includes(item.value),
+                        }"
                     >
-                        <div class="flex items-center gap-4">
-                            <!-- Icon Container -->
-                            <div
-                                class="rounded-xl p-2.5 transition-colors duration-300"
-                                :class="
-                                    activeAccordion.includes(item.value)
-                                        ? 'bg-[#99cc33] text-white'
-                                        : 'bg-slate-50 text-slate-500 group-hover:bg-[#99cc33]/10 group-hover:text-[#99cc33]'
-                                "
-                            >
-                                <component :is="item.icon" class="h-6 w-6" />
-                            </div>
-                            <span
-                                class="text-lg font-bold tracking-tight transition-colors duration-300"
-                                :class="
-                                    activeAccordion.includes(item.value)
-                                        ? 'text-[#99cc33]'
-                                        : 'text-slate-700 group-hover:text-slate-900'
-                                "
-                            >
-                                {{ item.trigger }}
-                            </span>
-                        </div>
-
-                        <ChevronDown
-                            class="h-5 w-5 text-slate-400 transition-transform duration-300"
-                            :class="{
-                                'rotate-180 text-[#99cc33]':
-                                    activeAccordion.includes(item.value),
-                            }"
-                        />
-                    </button>
-
-                    <!-- Konten Accordion -->
-                    <transition name="accordion">
-                        <div
-                            v-show="activeAccordion.includes(item.value)"
-                            class="overflow-hidden border-t border-slate-100 bg-slate-50/50"
+                        <!-- Tombol Accordion -->
+                        <button
+                            type="button"
+                            @click="toggleAccordion(item.value)"
+                            :aria-expanded="activeAccordion.includes(item.value)"
+                            class="flex w-full items-center justify-between px-6 py-5 text-left focus:outline-none"
                         >
-                            <div class="px-6 py-6 sm:px-8 sm:py-8">
-                                <ul class="space-y-4">
-                                    <li
-                                        v-for="(rule, index) in item.rules"
-                                        :key="index"
-                                        class="group/rule flex items-start gap-3"
-                                    >
-                                        <div class="mt-0.5 shrink-0">
-                                            <CheckCircle2
-                                                class="h-5 w-5 text-[#99cc33] opacity-60 transition-opacity group-hover/rule:opacity-100"
-                                            />
-                                        </div>
-                                        <span
-                                            class="text-justify text-[0.95rem] leading-relaxed text-slate-600 transition-colors group-hover/rule:text-slate-800"
-                                        >
-                                            {{ rule }}
-                                        </span>
-                                    </li>
-                                </ul>
+                            <div class="flex items-center gap-4">
+                                <!-- Icon Container -->
+                                <div
+                                    class="rounded-xl p-2.5 transition-colors duration-300"
+                                    :class="
+                                        activeAccordion.includes(item.value)
+                                            ? 'bg-[#99cc33] text-white'
+                                            : 'bg-slate-50 text-slate-500 group-hover:bg-[#99cc33]/10 group-hover:text-[#99cc33]'
+                                    "
+                                >
+                                    <component :is="item.icon" class="h-6 w-6" />
+                                </div>
+                                <span
+                                    class="text-lg font-bold tracking-tight transition-colors duration-300"
+                                    :class="
+                                        activeAccordion.includes(item.value)
+                                            ? 'text-[#99cc33]'
+                                            : 'text-slate-700 group-hover:text-slate-900'
+                                    "
+                                >
+                                    {{ item.trigger }}
+                                </span>
                             </div>
-                        </div>
-                    </transition>
-                </div>
+
+                            <ChevronDown
+                                class="h-5 w-5 text-slate-400 transition-transform duration-300"
+                                :class="{
+                                    'rotate-180 text-[#99cc33]':
+                                        activeAccordion.includes(item.value),
+                                }"
+                            />
+                        </button>
+
+                        <!-- Konten Accordion -->
+                        <transition name="accordion">
+                            <div
+                                v-show="activeAccordion.includes(item.value)"
+                                class="overflow-hidden border-t border-slate-100 bg-slate-50/50"
+                            >
+                                <div class="px-6 py-6 sm:px-8 sm:py-8">
+                                    <ul class="space-y-4">
+                                        <li
+                                            v-for="(rule, index) in item.rules"
+                                            :key="index"
+                                            class="group/rule flex items-start gap-3"
+                                        >
+                                            <div class="mt-0.5 shrink-0">
+                                                <CheckCircle2
+                                                    class="h-5 w-5 text-[#99cc33] opacity-60 transition-opacity group-hover/rule:opacity-100"
+                                                />
+                                            </div>
+                                            <span
+                                                class="text-justify text-[0.95rem] leading-relaxed text-slate-600 transition-colors group-hover/rule:text-slate-800"
+                                            >
+                                                {{ rule }}
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </transition>
+                    </div>
+                </ScrollReveal>
             </div>
         </div>
     </UserAppLayout>

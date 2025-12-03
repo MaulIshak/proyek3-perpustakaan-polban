@@ -27,25 +27,20 @@ const breadcrumb = [
         </div>
 
         <div class="relative container mx-auto px-4 py-10 sm:px-6 lg:px-8">
-            <!-- Header Section
-            <div class="mx-auto mb-10 max-w-3xl text-center">
-                <h1
-                    class="mb-4 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl"
-                >
-                    {{ title }}
-                </h1>
-                <p class="text-lg text-slate-600">
-                    Dokumen resmi rencana strategi pengembangan perpustakaan.
-                </p>
-                <div class="mt-6 flex justify-center">
-                    <div
-                        class="h-1.5 w-20 rounded-full bg-[#99cc33] shadow-sm shadow-[#99cc33]/50"
-                    ></div>
-                </div>
-            </div> -->
+            <!-- Header Section (Commented out in original) -->
+            <!-- <div class="mx-auto mb-10 max-w-3xl text-center"> ... </div> -->
 
             <!-- Document Viewer Container -->
-            <div class="mx-auto max-w-6xl">
+            <!--
+                IMPLEMENTASI: Mengganti div wrapper biasa menjadi ScrollReveal.
+                Duration diperlambat (800ms) untuk kesan elegan pada elemen besar.
+            -->
+            <ScrollReveal
+                animation="fade-up"
+                :duration="800"
+                :delay="200"
+                class="mx-auto max-w-6xl"
+            >
                 <div
                     class="relative flex h-[85vh] flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-2xl shadow-slate-200/60"
                 >
@@ -92,16 +87,12 @@ const breadcrumb = [
                             <!--
                                 Security Note:
                                 #toolbar=0&navpanes=0&scrollbar=0 menyembunyikan UI native browser
-                                untuk download/print, namun tidak mencegah user tech-savvy mengambil source file.
                             -->
                             <iframe
                                 :src="`${pdf_url}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`"
                                 class="h-full w-full border-0"
                                 title="PDF Viewer"
                             ></iframe>
-
-                            <!-- Transparent overlay to discourage right-click save (Optional, can be annoying) -->
-                            <!-- <div class="absolute inset-0 z-0" @contextmenu.prevent></div> -->
                         </div>
 
                         <!-- Empty State -->
@@ -143,7 +134,7 @@ const breadcrumb = [
                         </span>
                     </div>
                 </div>
-            </div>
+            </ScrollReveal>
         </div>
     </Layout>
 </template>

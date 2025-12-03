@@ -1,5 +1,6 @@
 import '../css/app.css';
 
+import ScrollReveal from '@/components/ScrollReveal.vue';
 import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import type { DefineComponent } from 'vue';
@@ -16,9 +17,13 @@ createInertiaApp({
             import.meta.glob<DefineComponent>('./pages/**/*.vue'),
         ),
     setup({ el, App, props, plugin }) {
-        createApp({ render: () => h(App, props) })
-            .use(plugin)
-            .mount(el);
+        const app = createApp({ render: () => h(App, props) });
+
+        app.use(plugin);
+
+        app.component('ScrollReveal', ScrollReveal);
+
+        app.mount(el);
     },
     progress: {
         color: '#4B5563',

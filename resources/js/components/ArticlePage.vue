@@ -19,7 +19,7 @@ const props = defineProps<{
         url_attachment?: string;
         attachment_name?: string;
         type: 'berita' | 'pengumuman';
-        author?: string; // Tambahkan properti author (opsional)
+        author?: string;
     };
     isAdmin?: boolean;
 }>();
@@ -42,18 +42,18 @@ const categoryLabel = computed(() => {
     return props.article.type === 'berita' ? 'Berita' : 'Pengumuman';
 });
 
-// Fallback author jika data kosong
 const authorName = computed(() => {
     return props.article.author;
 });
 </script>
 
 <template>
-    <div class="relative container mx-auto px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
+    <div
+        class="relative w-full sm:container sm:mx-auto sm:px-6 sm:py-10 lg:px-8"
+    >
         <div
-            class="mx-auto max-w-4xl overflow-hidden rounded-[2rem] border border-slate-100 bg-white shadow-xl shadow-slate-200/60 sm:rounded-[2.5rem]"
+            class="mx-auto max-w-4xl overflow-hidden rounded-none border-none bg-white shadow-none sm:rounded-[2rem] sm:border sm:border-slate-100 sm:shadow-xl sm:shadow-slate-200/60"
         >
-            <!-- 1. Top Navigation & Meta -->
             <div
                 class="border-b border-slate-100 p-6 sm:p-10"
                 :v-show="!props.isAdmin"
@@ -72,7 +72,6 @@ const authorName = computed(() => {
                     Kembali ke {{ categoryLabel }}
                 </Link>
 
-                <!-- Category & Date -->
                 <div class="mb-4 flex flex-wrap items-center gap-3">
                     <span
                         class="rounded-full px-3 py-1 text-[10px] font-bold tracking-wider uppercase sm:text-xs"
@@ -93,15 +92,12 @@ const authorName = computed(() => {
                     </span>
                 </div>
 
-                <!-- Title -->
-                <!-- Typography Fix: text-2xl untuk mobile, scaling up ke sm:4xl dan md:5xl -->
                 <h1
                     class="mb-6 text-2xl leading-tight font-extrabold tracking-tight text-slate-900 sm:text-4xl md:text-5xl"
                 >
                     {{ article.title }}
                 </h1>
 
-                <!-- Author Section (New Feature) -->
                 <div
                     class="flex items-center gap-3 border-t border-slate-50 pt-6"
                 >
@@ -123,9 +119,7 @@ const authorName = computed(() => {
                 </div>
             </div>
 
-            <!-- 2. Featured Image -->
             <div v-if="article.imageUrl" class="w-full">
-                <!-- LOGIC: Berita (Fixed Ratio 16:9) -->
                 <div
                     v-if="article.type === 'berita'"
                     class="relative aspect-video w-full overflow-hidden"
@@ -137,7 +131,6 @@ const authorName = computed(() => {
                     />
                 </div>
 
-                <!-- LOGIC: Pengumuman (Flexible / Poster) -->
                 <div
                     v-else
                     class="flex w-full justify-center bg-slate-100/50 p-4 sm:p-10"
@@ -150,16 +143,12 @@ const authorName = computed(() => {
                 </div>
             </div>
 
-            <!-- 3. Content Body -->
             <div class="p-6 sm:p-12">
-                <!-- Tailwind Typography (Prose) -->
-                <!-- Warning: v-html rentan XSS. Pastikan 'article.content' sudah disanitasi di backend. -->
                 <div
                     class="prose prose-base max-w-none prose-slate sm:prose-lg prose-headings:font-bold prose-headings:text-slate-800 prose-p:leading-relaxed prose-p:text-slate-600 prose-a:text-[#99cc33] prose-a:no-underline hover:prose-a:underline prose-img:rounded-xl prose-img:shadow-md"
                     v-html="article.content"
                 ></div>
 
-                <!-- 4. Attachment Section -->
                 <div
                     v-if="article.url_attachment"
                     class="mt-12 border-t border-dashed border-slate-200 pt-8"
