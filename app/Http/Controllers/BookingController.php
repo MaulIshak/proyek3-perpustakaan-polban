@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\BookingBuku;
+use App\Models\Booking;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\BookingStatusMail;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail; // PENTING: Pakai Facade Mail
+use App\Mail\BookingStatusMail;      // PENTING: Panggil Class Mailable
+use App\Models\BookingBuku;
 
 class BookingController extends Controller
 {
     // --- USER SIDE ---
-    
     public function create()
     {
         return Inertia::render('user/BookingBuku', [
@@ -22,17 +22,28 @@ class BookingController extends Controller
 
     public function store(Request $request)
     {
-        // 1. Validasi sesuai nama input di Vue (camelCase)
         $request->validate([
             'namaLengkap' => 'required|string|max:255',
-            'nimNip'      => 'required|string|max:50',
-            'email'       => 'required|email',
-            'whatsapp'    => 'required|string|max:20',
-            'judulBuku'   => 'required|string|max:255',
-            'pengarang'   => 'required|string|max:255',
+            
+            'nimNip' => [
+                'required',
+                'numeric',
+                'digits_between:9,10', // UPDATE: Sesuai request (9 sampai 10 digit)
+            ],
+            
+            'email' => 'required|email:dns',
+            
+            'whatsapp' => [
+                'required',
+                'numeric',
+                'starts_with:08,62',
+                'digits_between:10,15', // UPDATE: Sesuai request (10 sampai 15 digit)
+            ],
+            
+            'judulBuku' => 'required|string|max:255',
+            'pengarang' => 'required|string|max:255',
         ]);
 
-        // 2. Simpan ke Database (Mapping camelCase -> snake_case)
         BookingBuku::create([
             'nama_lengkap' => $request->namaLengkap,
             'nim_nip'      => $request->nimNip,
@@ -46,15 +57,10 @@ class BookingController extends Controller
         return redirect()->back()->with('success', 'Permintaan booking berhasil dikirim!');
     }
 
-
     // --- ADMIN SIDE ---
-
     public function indexAdmin()
     {
-        // Ambil data booking, urutkan dari yang terbaru
-        // Kita bisa tambahkan filter status nanti jika perlu
         $bookings = BookingBuku::latest()->get();
-
         return Inertia::render('admin/booking/Index', [
             'bookings' => $bookings
         ]);
@@ -69,7 +75,6 @@ class BookingController extends Controller
             'rejection_reason' => 'nullable|string'
         ]);
 
-        // 1. Update Data di Database
         $booking->status = $request->status;
         
         if ($request->status === 'rejected') {
@@ -80,30 +85,24 @@ class BookingController extends Controller
 
         $booking->save();
 
-        // 2. LOGIKA EMAIL & DEADLINE
+        // --- LOGIKA KIRIM EMAIL (METODE STANDARD) ---
         if ($booking->status !== 'pending') {
             
             $deadlineString = '-';
 
-            // Logika Hitung Deadline (Hanya jika Disetujui)
             if ($booking->status === 'approved') {
-                // Set Locale ke Indonesia biar hari/bulannya bahasa Indo
                 Carbon::setLocale('id');
+                $deadline = Carbon::now()->addDay();
                 
-                $deadline = Carbon::now()->addDay(); // Tambah 24 Jam
-
-                // Cek Hari Libur (Sabtu & Minggu)
                 if ($deadline->isSaturday()) {
-                    $deadline->addDays(2); // Loncat ke Senin
+                    $deadline->addDays(2);
                 } elseif ($deadline->isSunday()) {
-                    $deadline->addDay();   // Loncat ke Senin
+                    $deadline->addDay();
                 }
-
-                // Format: "Senin, 25 November 2025 Pukul 14:30"
-                $deadlineString = $deadline->translatedFormat('l, d F Y') . ' Pukul ' . $deadline->format('H:i');
+                
+                $deadlineString = $deadline->translatedFormat('l, d F Y H:i');
             }
 
-            // Data yang dikirim ke Email
             $emailData = [
                 'name'       => $booking->nama_lengkap,
                 'book_title' => $booking->judul_buku,
@@ -112,13 +111,12 @@ class BookingController extends Controller
                 'deadline'   => $deadlineString,
             ];
 
-            // Kirim Email (Gunakan Try-Catch agar app tidak crash jika internet mati/SMTP error)
             try {
-                Mail::to($booking->email)->queue(new BookingStatusMail($emailData));
+                // Mengirim menggunakan konfigurasi di .env (saat ini Mailtrap)
+                Mail::to($booking->email)->send(new BookingStatusMail($emailData));
             } catch (\Exception $e) {
-                dd($e->getMessage());
-                // Opsional: Log error jika perlu
-                // Log::error("Gagal kirim email ke " . $booking->email . ": " . $e->getMessage());
+                // Error handling silent agar app tidak crash
+                // \Log::error($e->getMessage());
             }
         }
         

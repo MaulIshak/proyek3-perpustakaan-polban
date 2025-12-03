@@ -85,7 +85,8 @@ class AdminDashboardController extends Controller
             });
 
         // Gabungkan, Sort berdasarkan waktu terbaru, dan Ambil 5-8 teratas
-        $activities = $latestArticles->merge($latestBookings)->merge($latestPhotos)
+        // Tambahkan ->toBase() pada variabel pertama
+        $activities = $latestArticles->toBase()->merge($latestBookings)->merge($latestPhotos)
             ->sortByDesc('time_raw')
             ->take(4)
             ->values(); // Reset keys agar jadi array JSON murni

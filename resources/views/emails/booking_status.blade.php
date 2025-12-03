@@ -4,7 +4,7 @@
     <title>Status Booking Buku</title>
 </head>
 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-
+    
     <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
         <h2 style="color: #2f855a;">Halo, {{ $data['name'] }}</h2>
 
@@ -12,8 +12,6 @@
         <p style="background: #f7fafc; padding: 10px; border-radius: 5px;">
             <strong>Judul Buku:</strong> {{ $data['book_title'] }}
         </p>
-
-        {{-- KONDISI STATUS --}}
 
         @if($data['status'] == 'approved')
             <div style="background-color: #f0fdf4; padding: 15px; border-left: 4px solid #16a34a; margin: 20px 0;">

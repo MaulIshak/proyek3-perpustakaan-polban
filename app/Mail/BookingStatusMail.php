@@ -20,6 +20,6 @@ class BookingStatusMail extends Mailable
     public function build()
     {
         return $this->subject('Update Status Peminjaman Buku - Perpustakaan Polban')
-                    ->view('emails.booking_status');
+                    ->view('emails.booking_status'); // Menunjuk ke file blade
     }
 }
