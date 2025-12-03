@@ -15,7 +15,7 @@ const props = defineProps<{
 
 // State untuk Lightbox
 const selectedImage = ref<string | null>(null);
-const breadcrumb = [{ label: 'Profil' }, { label: 'Galeri' }];
+const breadcrumb = [{ label: 'Home', link: '/' }, { label: 'Galeri' }];
 
 // Actions
 function openLightbox(url: string) {

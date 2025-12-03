@@ -45,7 +45,10 @@ const props = defineProps<{
 
 // --- State ---
 const activeTab = ref('alur');
-const breadcrumb = [{ label: 'Bebas Masalah' }];
+const breadcrumb = [
+    { label: 'Home', link: '/' },
+    { label: 'Bebas Masalah' },
+];
 
 // --- Data Tab Menu ---
 const tabs = [

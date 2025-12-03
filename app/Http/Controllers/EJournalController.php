@@ -20,60 +20,104 @@ class EJournalController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string|max:255',
-            'url' => 'required|url',
-            'type' => 'required|in:journal,ebook', // <--- Validasi baru
-            'logo' => 'nullable|image|max:2048',
-        ]);
+        // 1. Validasi Input
+        $rules = [
+            'name'        => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string'], // Tidak ada max:255 (Bisa paragraf panjang)
+            'url'         => ['required', 'url', 'regex:/^https?:\/\//'], // Wajib http:// atau https://
+            'type'        => ['required', 'in:journal,ebook'],
+            'logo'        => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'], // Max 5MB + Support WebP
+        ];
 
-        $data = $request->only(['name', 'description', 'url', 'type']); // <--- Ambil type
+        $messages = [
+            'required'    => ':attribute wajib diisi.',
+            'url'         => 'Format URL tidak valid.',
+            'url.regex'   => 'URL harus diawali dengan http:// atau https://',
+            'in'          => 'Pilihan tipe tidak valid.',
+            'image'       => 'File harus berupa gambar.',
+            'mimes'       => 'Format logo harus JPG, PNG, atau WEBP.',
+            'max'         => 'Ukuran file maksimal 5MB.',
+        ];
 
+        $attributes = [
+            'name'        => 'Nama Jurnal/E-Book',
+            'description' => 'Deskripsi',
+            'url'         => 'Link URL',
+            'type'        => 'Tipe Koleksi',
+            'logo'        => 'Logo/Cover',
+        ];
+
+        $request->validate($rules, $messages, $attributes);
+
+        // 2. Siapkan Data
+        $data = $request->only(['name', 'description', 'url', 'type']);
+
+        // 3. Upload Logo (Jika ada)
         if ($request->hasFile('logo')) {
             $data['logo_path'] = $request->file('logo')->store('journals', 'public');
         }
 
         EJournal::create($data);
 
-        return redirect()->back()->with('message', 'Data berhasil ditambahkan.');
+        return redirect()->back()->with('success', 'Data berhasil ditambahkan.');
     }
 
     public function update(Request $request, EJournal $ejournal)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string|max:255',
-            'url' => 'required|url',
-            'type' => 'required|in:journal,ebook', // <--- Validasi baru
-            'logo' => 'nullable|image|max:2048',
-        ]);
+        // 1. Validasi Update (Sama dengan Store)
+        $rules = [
+            'name'        => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string'],
+            'url'         => ['required', 'url', 'regex:/^https?:\/\//'],
+            'type'        => ['required', 'in:journal,ebook'],
+            'logo'        => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+        ];
 
-        $data = $request->only(['name', 'description', 'url', 'type']); // <--- Ambil type
+        $messages = [
+            'required'    => ':attribute wajib diisi.',
+            'url.regex'   => 'URL harus diawali dengan http:// atau https://',
+            'mimes'       => 'Format logo harus JPG, PNG, atau WEBP.',
+            'max'         => 'Ukuran file maksimal 5MB.',
+        ];
 
-        // ... logic upload gambar tetap sama ...
+        $attributes = [
+            'name'        => 'Nama Jurnal/E-Book',
+            'description' => 'Deskripsi',
+            'url'         => 'Link URL',
+            'type'        => 'Tipe Koleksi',
+            'logo'        => 'Logo/Cover',
+        ];
+
+        $request->validate($rules, $messages, $attributes);
+
+        $data = $request->only(['name', 'description', 'url', 'type']);
+
+        // 2. Cek Upload Logo Baru
         if ($request->hasFile('logo')) {
-            if ($ejournal->logo_path) {
+            // Hapus file lama jika ada
+            if ($ejournal->logo_path && Storage::disk('public')->exists($ejournal->logo_path)) {
                 Storage::disk('public')->delete($ejournal->logo_path);
             }
+            // Simpan file baru
             $data['logo_path'] = $request->file('logo')->store('journals', 'public');
         }
 
         $ejournal->update($data);
         
-        return redirect()->back()->with('message', 'Data berhasil diperbarui.');
+        return redirect()->back()->with('success', 'Data berhasil diperbarui.');
     }
 
     public function destroy(EJournal $ejournal)
     {
-        // Hapus file gambar dari storage sebelum hapus data DB
-        if ($ejournal->logo_path) {
+        // 1. Hapus file fisik gambar
+        if ($ejournal->logo_path && Storage::disk('public')->exists($ejournal->logo_path)) {
             Storage::disk('public')->delete($ejournal->logo_path);
         }
 
+        // 2. Hapus data di database
         $ejournal->delete();
 
-        return redirect()->back()->with('message', 'Jurnal berhasil dihapus.');
+        return redirect()->back()->with('success', 'Jurnal berhasil dihapus.');
     }
 
     public function ShowUser()
