@@ -39,7 +39,7 @@ const navItems = [
             { name: 'E-Journal & E-Book', href: '/e-journal' },
             { name: 'E-Collection', href: '/e-collection' },
             { name: 'Form Usulan Buku', href: '/usulan_buku' },
-            { name: 'Bebas Masalah', href: '/bebas_masalah' },
+            { name: 'Booking Buku', href: '/book-reservation' },
         ],
     },
     {
@@ -49,8 +49,8 @@ const navItems = [
             { name: 'Pengumuman', href: '/pengumuman' },
         ],
     },
+    { name: 'Bebas Masalah', href: '/bebas_masalah' },
     { name: 'Galeri', href: '/gallery' },
-    { name: 'Booking Buku', href: '/book-reservation' },
     { name: 'Kontak', href: '/contact' },
 ];
 
