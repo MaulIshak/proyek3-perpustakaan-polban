@@ -10,9 +10,9 @@ defineProps({
 const navItems = [
     { name: 'Home', href: '/' },
     {
-        name: 'Profil',
+        name: 'Tentang Kami',
         items: [
-            { name: 'Tentang Perpustakaan', href: '/about' },
+            { name: 'Profil', href: '/about' },
             { name: 'Fasilitas', href: '/facilities' },
             { name: 'Tim Manajemen', href: '/tim-manajemen' },
             { name: 'Peraturan Perpustakaan', href: '/peraturan' },
@@ -21,7 +21,7 @@ const navItems = [
         ],
     },
     {
-        name: 'Pelayanan',
+        name: 'Layanan',
         items: [
             { name: 'Peminjaman Buku', href: '/pelayanan/peminjaman' },
             { name: 'Pengembalian Buku', href: '/pelayanan/pengembalian' },
@@ -36,9 +36,10 @@ const navItems = [
             { name: 'Katalog Digital', href: 'https://elib.polban.ac.id/' },
             { name: 'Digilib', href: 'https://digilib.polban.ac.id/' },
             { name: 'Repositori', href: '#' },
-            { name: 'Form Usulan Buku', href: '/usulan_buku'},
             { name: 'E-Journal & E-Book', href: '/e-journal' },
             { name: 'E-Collection', href: '/e-collection' },
+            { name: 'Form Usulan Buku', href: '/usulan_buku' },
+            { name: 'Bebas Masalah', href: '/bebas_masalah' },
         ],
     },
     {
@@ -48,7 +49,6 @@ const navItems = [
             { name: 'Pengumuman', href: '/pengumuman' },
         ],
     },
-    { name: 'Bebas Masalah', href: '/bebas_masalah' },
     { name: 'Galeri', href: '/gallery' },
     { name: 'Booking Buku', href: '/book-reservation' },
     { name: 'Kontak', href: '/contact' },
