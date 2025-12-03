@@ -83,7 +83,7 @@ defineProps<{
 
             <!-- Slot Konten Utama -->
             <!-- Gunakan konfigurasi Container & Padding yang PERSIS SAMA dengan Header di atas -->
-            <div class="container mx-auto px-4 py-8 sm:px-6 lg:px-8">
+            <div class="container mx-auto px-4 pb-8 sm:px-6 lg:px-8">
                 <slot />
             </div>
         </main>

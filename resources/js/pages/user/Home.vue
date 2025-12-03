@@ -2,53 +2,43 @@
 import BeritaHighlight from '@/components/BeritaHighlight.vue';
 import BookCovers from '@/components/BookCovers.vue';
 import PengumumanCard from '@/components/PengumumanCard.vue';
-import ScrollReveal from '@/components/ScrollReveal.vue'; // Import komponen baru
+import ScrollReveal from '@/components/ScrollReveal.vue';
 import UserAppLayout from '@/layouts/UserAppLayout.vue';
-import { ArrowRight, BookOpen, Megaphone, Newspaper } from 'lucide-vue-next';
+import { BookOpen, Megaphone, Newspaper } from 'lucide-vue-next';
 import { ref } from 'vue';
 
 const breadcrumbs = [{ label: 'Home', link: '/' }];
 
 const props = defineProps({
-    book_covers: {
-        type: Array<{
-            id: Number;
-            title: string;
-            image_path: string;
-            created_at: Date;
-            updated_at: Date;
-        }>,
-        default: [],
-    },
-    latest_news: {
-        type: Array<{
-            article_id: string;
-            url_thumbnail: string | null;
-            judul: string;
-            content: string;
-            created_date: string;
-        }>,
-        default: [],
-    },
-    latest_announcements: {
-        type: Array<{
-            article_id: string;
-            judul: string;
-            content: string;
-            created_date: string;
-        }>,
-        default: [],
-    },
+    book_covers: { type: Array<any>, default: [] },
+    latest_news: { type: Array<any>, default: [] },
+    latest_announcements: { type: Array<any>, default: [] },
 });
 
-// Konfigurasi Tab
 const tabs = [
-    { key: 'berita', label: 'Berita Terbaru', icon: Newspaper },
-    { key: 'pengumuman', label: 'Pengumuman', icon: Megaphone },
-    { key: 'buku', label: 'Koleksi Terbaru', icon: BookOpen },
+    {
+        key: 'berita',
+        labelTop: 'Berita',
+        labelBottom: 'Terbaru',
+        fullLabel: 'Berita Terbaru',
+        icon: Newspaper,
+    },
+    {
+        key: 'pengumuman',
+        labelTop: 'Pengumuman',
+        labelBottom: 'Terbaru',
+        fullLabel: 'Pengumuman',
+        icon: Megaphone,
+    },
+    {
+        key: 'buku',
+        labelTop: 'Koleksi',
+        labelBottom: 'Terbaru',
+        fullLabel: 'Koleksi Terbaru',
+        icon: BookOpen,
+    },
 ];
 
-// State
 const activeTab = ref('berita');
 </script>
 
@@ -59,42 +49,68 @@ const activeTab = ref('berita');
         subtitle=""
         :breadcrumb="breadcrumbs"
     >
-        <!-- 2. Main Content Section -->
         <section
-            class="relative min-h-[80vh] overflow-hidden px-4 pt-6 pb-16 sm:px-6 lg:px-8"
+            class="relative min-h-[85vh] overflow-hidden px-4 pt-6 pb-24 sm:px-6 lg:px-8"
         >
             <div class="relative z-10 container mx-auto max-w-7xl">
-                <!-- Tabs Navigation dengan Scroll Reveal -->
                 <ScrollReveal animation="fade-up" :delay="100">
-                    <div class="mb-12 flex flex-wrap justify-center gap-3">
-                        <button
-                            v-for="tab in tabs"
-                            :key="tab.key"
-                            @click="activeTab = tab.key"
-                            class="flex items-center gap-2 rounded-full border px-6 py-3 font-bold shadow-sm transition-all duration-300"
-                            :class="
-                                activeTab === tab.key
-                                    ? 'scale-105 border-[#99cc33] bg-[#99cc33] text-white shadow-lg shadow-[#99cc33]/30'
-                                    : 'border-slate-200 bg-white text-slate-600 hover:border-[#99cc33]/50 hover:bg-[#99cc33]/5 hover:text-[#99cc33]'
-                            "
+                    <div class="mb-10">
+                        <div
+                            class="grid grid-cols-3 gap-2 md:flex md:flex-wrap md:justify-center md:gap-3"
                         >
-                            <component :is="tab.icon" class="h-5 w-5" />
-                            {{ tab.label }}
-                        </button>
+                            <button
+                                v-for="tab in tabs"
+                                :key="tab.key"
+                                @click="activeTab = tab.key"
+                                class="group relative overflow-hidden transition-all duration-300"
+                                :class="[
+                                    // === STYLE MOBILE (Kotak Vertikal) ===
+                                    'flex h-20 flex-col items-center justify-center rounded-xl border px-1 py-3 shadow-sm',
+
+                                    // === STYLE DESKTOP (Pil Horizontal - Override Mobile) ===
+                                    'md:h-auto md:flex-row md:gap-2 md:rounded-full md:px-6 md:py-3 md:shadow-sm',
+
+                                    // === LOGIKA WARNA (Active / Inactive) ===
+                                    activeTab === tab.key
+                                        ? 'border-[#99cc33] bg-[#99cc33] text-white shadow-lg shadow-[#99cc33]/30' // Aktif: Hijau Solid
+                                        : 'border-slate-200 bg-white text-slate-500 hover:border-[#99cc33] hover:text-[#99cc33]', // Tidak Aktif
+                                ]"
+                            >
+                                <component
+                                    :is="tab.icon"
+                                    class="mb-1 h-5 w-5 md:mb-0 md:h-5 md:w-5"
+                                />
+
+                                <div class="text-center leading-[1.1]">
+                                    <div
+                                        class="block text-[11px] font-bold md:hidden"
+                                    >
+                                        {{ tab.labelTop }}
+                                        <div
+                                            v-if="tab.labelBottom"
+                                            class="block"
+                                        >
+                                            {{ tab.labelBottom }}
+                                        </div>
+                                    </div>
+
+                                    <div class="hidden font-bold md:block">
+                                        {{ tab.fullLabel }}
+                                    </div>
+                                </div>
+                            </button>
+                        </div>
                     </div>
                 </ScrollReveal>
 
-                <!-- Tab Content Area with Transition -->
                 <div class="min-h-[400px]">
                     <transition name="fade-slide" mode="out-in">
-                        <!-- CONTENT: BERITA -->
                         <div v-if="activeTab === 'berita'" key="berita">
                             <ScrollReveal animation="fade-up" :duration="500">
                                 <BeritaHighlight :articles="latest_news" />
                             </ScrollReveal>
                         </div>
 
-                        <!-- CONTENT: PENGUMUMAN -->
                         <div
                             v-else-if="activeTab === 'pengumuman'"
                             key="pengumuman"
@@ -102,31 +118,21 @@ const activeTab = ref('berita');
                         >
                             <ScrollReveal
                                 animation="fade-in"
-                                class="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end"
+                                class="mb-6 flex items-center justify-between border-b border-slate-100 pb-4"
                             >
-                                <div>
-                                    <h2
-                                        class="mb-2 text-3xl font-black tracking-tight text-slate-800"
-                                    >
-                                        Pengumuman Terbaru
-                                    </h2>
-                                    <div
-                                        class="h-1.5 w-20 rounded-full bg-[#99cc33]"
-                                    ></div>
-                                </div>
-
+                                <h2
+                                    class="text-xl font-bold text-slate-800 md:text-2xl"
+                                >
+                                    Pengumuman
+                                </h2>
                                 <a
                                     href="/pengumuman"
-                                    class="group flex items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 shadow-sm transition-all hover:border-[#99cc33] hover:text-[#99cc33]"
+                                    class="text-sm font-semibold text-[#99cc33] hover:underline"
                                 >
-                                    Lihat Semua
-                                    <ArrowRight
-                                        class="h-4 w-4 transition-transform group-hover:translate-x-1"
-                                    />
+                                    Lihat Semua &rarr;
                                 </a>
                             </ScrollReveal>
-
-                            <div class="grid gap-6">
+                            <div class="grid gap-4">
                                 <template
                                     v-for="(
                                         pengumuman, index
@@ -134,7 +140,7 @@ const activeTab = ref('berita');
                                     :key="pengumuman.article_id"
                                 >
                                     <ScrollReveal
-                                        animation="slide-left"
+                                        animation="fade-up"
                                         :delay="index * 100"
                                     >
                                         <PengumumanCard
@@ -142,14 +148,13 @@ const activeTab = ref('berita');
                                             :title="pengumuman.judul"
                                             :content="pengumuman.content"
                                             :date="pengumuman.created_date"
-                                            class="transform border-slate-200 bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                                            class="transition-shadow duration-300 hover:shadow-lg"
                                         />
                                     </ScrollReveal>
                                 </template>
                             </div>
                         </div>
 
-                        <!-- CONTENT: BUKU -->
                         <div v-else-if="activeTab === 'buku'" key="buku">
                             <ScrollReveal animation="zoom-in" :duration="600">
                                 <BookCovers :data="book_covers" />
@@ -163,19 +168,16 @@ const activeTab = ref('berita');
 </template>
 
 <style scoped>
-/* Animasi transisi custom yang lebih modern */
 .fade-slide-enter-active,
 .fade-slide-leave-active {
-    transition: all 0.3s ease-out;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
 .fade-slide-enter-from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(15px);
 }
-
 .fade-slide-leave-to {
     opacity: 0;
-    transform: translateY(-20px);
+    transform: translateY(-15px);
 }
 </style>
