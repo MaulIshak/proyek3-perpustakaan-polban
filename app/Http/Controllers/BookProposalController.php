@@ -54,19 +54,79 @@ class BookProposalController extends Controller
 
     public function store(Request $request)
     {
-        // Validasi Input (PENTING)
-        $validated = $request->validate([
-            'nama_pengusul' => 'required|string|max:255',
-            'nim'           => 'required|string|max:20',
-            'prodi'         => 'required|string|max:100',
-            'title'         => 'required|string|max:255',
-            'author'        => 'required|string|max:255',
-            'isbn'          => 'required|string|max:50',
-            'publisher'     => 'required|string|max:255',
-            'year'          => 'required|integer|min:1900|max:' . (date('Y') + 1),
-            'price'         => 'nullable|numeric|min:0',
-            'reason'        => 'nullable|string',
-        ]);
+        // 1. Definisikan Aturan Validasi
+        $rules = [
+            'nama_pengusul' => ['required', 'string', 'max:255'],
+            
+            // NIM: Wajib, Maksimal 20, Hanya Angka (Regex)
+            'nim' => ['required', 'string', 'max:20', 'regex:/^[0-9]+$/'], 
+            
+            'prodi' => ['required', 'string', 'max:100'],
+            
+            // ISBN: Minimal 10 (asumsi standar ISBN-10/13), Maksimal 50
+            'isbn' => ['required', 'string', 'min:10', 'max:50'], 
+
+            'publisher' => ['required', 'string', 'max:255'],
+            'year' => ['required', 'integer', 'min:1900', 'max:' . (date('Y') + 1)],
+            'price' => ['nullable', 'numeric', 'min:0'],
+            'author' => ['required', 'string', 'max:255'],
+            'reason' => ['nullable', 'string'],
+
+            // TITLE + Cek Duplikasi (Spam Prevention)
+            'title' => [
+                'required', 
+                'string', 
+                'max:255',
+                // Custom Validation Logic untuk Cek Duplikasi
+                function ($attribute, $value, $fail) use ($request) {
+                    // Cek di database: 
+                    // Apakah ada data dengan NIM ini DAN Status 'pending'
+                    // DAN (Judulnya sama ATAU ISBN-nya sama)
+                    $isDuplicate = BookProposal::where('nim', $request->nim)
+                        ->where('status', 'pending')
+                        ->where(function($q) use ($value, $request) {
+                            $q->where('title', $value) // Judul sama
+                              ->orWhere('isbn', $request->isbn); // Atau ISBN sama
+                        })
+                        ->exists();
+
+                    if ($isDuplicate) {
+                        $fail('Anda sudah mengusulkan buku ini (berdasarkan Judul atau ISBN) dan statusnya masih menunggu proses.');
+                    }
+                },
+            ],
+        ];
+
+        // 2. Custom Pesan Error (Bahasa Indonesia)
+        $messages = [
+            'required' => ':attribute wajib diisi.',
+            'string' => ':attribute harus berupa teks.',
+            'integer' => ':attribute harus berupa angka bulat.',
+            'numeric' => ':attribute harus berupa angka.',
+            'min' => ':attribute minimal berisi :min karakter/angka.',
+            'max' => ':attribute maksimal berisi :max karakter/angka.',
+            'nim.regex' => 'NIM hanya boleh berisi angka tanpa spasi atau huruf.',
+            'year.max' => 'Tahun terbit tidak boleh melebihi tahun depan.',
+            'price.min' => 'Harga tidak boleh negatif.',
+        ];
+
+        // 3. Custom Nama Atribut (Agar pesan error lebih enak dibaca)
+        $attributes = [
+            'nama_pengusul' => 'Nama Pengusul',
+            'nim' => 'NIM',
+            'prodi' => 'Program Studi',
+            'title' => 'Judul Buku',
+            'author' => 'Nama Pengarang',
+            'isbn' => 'ISBN',
+            'publisher' => 'Penerbit',
+            'year' => 'Tahun Terbit',
+            'price' => 'Perkiraan Harga',
+            'reason' => 'Alasan Usulan',
+        ];
+
+        // Jalankan Validasi
+        // Jika gagal, Laravel otomatis redirect back + kirim error ke Vue
+        $validated = $request->validate($rules, $messages, $attributes);
 
         // Tambahkan status default
         $validated['status'] = 'pending';
@@ -74,7 +134,7 @@ class BookProposalController extends Controller
         // Simpan ke Database
         BookProposal::create($validated);
 
-        // Redirect kembali (Vue akan menangkap ini sebagai onSuccess)
+        // Redirect kembali
         return redirect()->back()->with('success', 'Usulan buku berhasil dikirim!');
     }
 

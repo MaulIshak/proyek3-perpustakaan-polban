@@ -11,7 +11,12 @@ import {
     UserPlus,
 } from 'lucide-vue-next';
 
-const breadcrumb = [{ label: 'Layanan' }, { label: 'E-Collection' }];
+const breadcrumb = [
+    { label: 'Home', link: '/' },
+    { label: 'Layanan' },
+    { label: 'E-Collection' },
+];
+
 </script>
 
 <template>

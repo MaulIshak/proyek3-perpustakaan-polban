@@ -11,8 +11,8 @@ use Inertia\Inertia;
 
 class PhotoController extends Controller
 {
-    public function index(Request $request){
-        // paginate, cari berdasarkan tipe atau q (opsional)
+    public function index(Request $request)
+    {
         $query = Photo::query();
 
         if ($request->filled('q')) {
@@ -33,16 +33,35 @@ class PhotoController extends Controller
 
     public function store(Request $request)
     {
+        // 1. Validasi Input
         $request->validate([
-            'foto' => 'required|image|max:5240', // max 5MB
-            'tipe' => 'required|in:galeri,cover_buku',
+            'foto' => [
+                'required',
+                'image',                    // Pastikan file gambar
+                'mimes:jpg,jpeg,png,webp',       // Format HANYA jpg/png (sesuai request)
+                'max:5120',                 // Maksimal 5MB (Best Practice)
+            ],
+            'tipe' => [
+                'required', 
+                'in:galeri,cover_buku'
+            ],
+        ], [
+            // Custom Error Messages
+            'foto.required' => 'File foto wajib diunggah.',
+            'foto.image'    => 'File harus berupa gambar.',
+            'foto.mimes'    => 'Format foto harus JPG atau PNG atau webp',
+            'foto.max'      => 'Ukuran foto maksimal 5MB.',
+            'foto.uploaded' => 'Gagal upload. Ukuran file melebihi batas server (cek php.ini).',
+            'tipe.required' => 'Tipe foto wajib dipilih.',
+            'tipe.in'       => 'Pilihan tipe tidak valid.',
         ]);
 
-        $uuid = (string) Str::uuid();
-        $fileData = $this->handleFileUpload($request->file('foto'), $uuid);
+        // 2. Upload File dengan Nama Asli
+        $fileData = $this->handleFileUpload($request->file('foto'));
 
+        // 3. Simpan ke Database
         Photo::create([
-            'foto_id' => $uuid,
+            'foto_id' => (string) Str::uuid(), // ID Database tetap UUID
             'url_foto' => $fileData['url'],
             'size' => $fileData['size'],
             'tipe' => $request->tipe,
@@ -56,17 +75,23 @@ class PhotoController extends Controller
         $photo = Photo::findOrFail($foto_id);
 
         $request->validate([
-            'foto' => 'nullable|image|max:5120',
-            'tipe' => 'required|in:galeri,cover_buku',
+            'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'tipe' => ['required', 'in:galeri,cover_buku'],
+        ], [
+            'foto.image'    => 'File harus berupa gambar.',
+            'foto.mimes'    => 'Format foto harus JPG atau PNG atau webp',
+            'foto.max'      => 'Ukuran foto maksimal 5MB.',
+            'foto.uploaded' => 'Gagal upload. Ukuran file melebihi batas server.',
         ]);
 
+        // Cek jika ada upload foto baru
         if ($request->hasFile('foto')) {
-            // hapus file lama
-            if ($photo->url_foto) {
-                Storage::delete('public/photos/' . basename($photo->url_foto));
-            }
+            // Hapus file lama fisik dari storage
+            $this->deleteFile($photo->url_foto);
 
-            $fileData = $this->handleFileUpload($request->file('foto'), $photo->foto_id);
+            // Upload file baru (Nama Asli)
+            $fileData = $this->handleFileUpload($request->file('foto'));
+            
             $photo->url_foto = $fileData['url'];
             $photo->size = $fileData['size'];
         }
@@ -77,25 +102,57 @@ class PhotoController extends Controller
         return redirect()->back()->with('success', 'Foto berhasil diperbarui.');
     }
 
-    public function destroy($id){
+    public function destroy($id)
+    {
         $photo = Photo::findOrFail($id);
-        if ($photo->url_foto) {
-            Storage::delete('public/photos/' . basename($photo->url_foto));
-        }
-        $photo->delete(); // soft delete -> deleted_date
+        
+        // Hapus file fisik
+        $this->deleteFile($photo->url_foto);
+        
+        $photo->delete();
 
         return redirect()->back()->with('success', 'Foto dihapus.');
     }
 
-    private function handleFileUpload(UploadedFile $file, $name)
+    // --- Private Helper Functions ---
+
+    /**
+     * Handle upload logic keeping original filename
+     */
+    private function handleFileUpload(UploadedFile $file)
     {
-        $path = $file->storeAs('photos', $name . '.' . $file->getClientOriginalExtension(), 'public');
-        $url = Storage::url($path);
-        $sizeKb = (int) round($file->getSize() / 1024);
+        // Ambil nama asli file (tanpa ekstensi)
+        $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        
+        // Bersihkan nama file (Slugify) agar aman untuk URL
+        // Contoh: "Screenshot (279).jpg" -> "screenshot-279"
+        $safeName = Str::slug($originalName);
+        
+        // Tambahkan Timestamp agar unik (mencegah overwrite jika nama sama)
+        // Contoh hasil: "screenshot-279-17092344.jpg"
+        $fileName = $safeName . '-' . time() . '.' . $file->getClientOriginalExtension();
+
+        // Simpan ke folder 'photos' di disk 'public'
+        $path = $file->storeAs('photos', $fileName, 'public');
 
         return [
-            'url' => $url,
-            'size' => $sizeKb,
+            'url' => Storage::url($path),             // URL untuk frontend (/storage/photos/...)
+            'size' => (int) round($file->getSize() / 1024), // Size dalam KB
         ];
+    }
+
+    /**
+     * Handle delete logic dealing with storage path
+     */
+    private function deleteFile($url)
+    {
+        if ($url) {
+            // Ubah URL publik (/storage/...) menjadi path relatif (public/...)
+            $path = str_replace('/storage/', 'public/', $url);
+            
+            if (Storage::exists($path)) {
+                Storage::delete($path);
+            }
+        }
     }
 }

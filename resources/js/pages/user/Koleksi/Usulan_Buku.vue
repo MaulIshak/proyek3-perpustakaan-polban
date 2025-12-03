@@ -19,7 +19,11 @@ import {
 } from 'lucide-vue-next';
 import { nextTick, ref } from 'vue';
 
-const breadcrumb = [{ label: 'Pelayanan' }, { label: 'Form Usulan Buku' }];
+const breadcrumb = [
+    { label: 'Home', link: '/' },
+    { label: 'Koleksi' },
+    { label: 'Form Usulan Buku' },
+];
 
 const showMessage = ref(false);
 const messageRef = ref<HTMLElement | null>(null);

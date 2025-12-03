@@ -34,6 +34,7 @@ const searchQuery = ref('');
 
 // -- BREADCRUMB --
 const breadcrumb = [
+    { label: 'Home', link: '/' },
     { label: 'Koleksi' },
     { label: 'Referensi Digital' },
 ];
@@ -60,9 +61,9 @@ const switchTab = (tab: 'journal' | 'ebook') => {
 </script>
 
 <template>
-    <Head title="E-Journal & Database" />
+    <Head title="E-Journal & E-Book" />
 
-    <Layout :page="true" :breadcrumb="breadcrumb" title="E-Journal & Database">
+    <Layout :page="true" :breadcrumb="breadcrumb" title="E-Journal & E-Book">
 
         <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none bg-slate-50">
             <div class="absolute top-[-10%] right-[-5%] w-[800px] h-[800px] bg-gradient-to-br from-[#99cc33]/15 to-emerald-200/20 rounded-full blur-3xl opacity-70 mix-blend-multiply animate-pulse-slow"></div>
@@ -119,7 +120,7 @@ const switchTab = (tab: 'journal' | 'ebook') => {
                         Koleksi {{ activeTab === 'journal' ? 'E-Journal' : 'E-Book' }}
                     </h2>
                     <span class="text-sm font-medium px-4 py-1.5 rounded-full bg-white border border-slate-200 text-slate-500">
-                        {{ filteredItems.length }} Database Tersedia
+                        {{ filteredItems.length }} referensi Tersedia
                     </span>
                 </div>
 
@@ -192,7 +193,7 @@ const switchTab = (tab: 'journal' | 'ebook') => {
                                         ? 'bg-[#99cc33] hover:bg-[#8ebf2f] shadow-[#99cc33]/20' 
                                         : 'bg-blue-600 hover:bg-blue-700 shadow-blue-600/20'"
                                 >
-                                    Buka Database
+                                    Buka Referensi
                                     <ArrowRight class="w-4 h-4" />
                                 </a>
                             </div>

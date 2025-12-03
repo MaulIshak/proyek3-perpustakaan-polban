@@ -181,20 +181,19 @@ const exportUrl = computed(() => {
     <Head title="Manajemen Usulan Buku" />
 
     <div class="space-y-8 font-sans text-slate-600">
-        <!-- 1. Stats Section -->
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
             <div
                 class="group relative overflow-hidden rounded-2xl border border-slate-100 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
             >
                 <div class="flex items-center gap-4">
                     <div
-                        class="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-600 transition-transform group-hover:scale-110"
+                        class="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#99cc33]/10 text-[#99cc33] transition-transform group-hover:scale-110"
                     >
                         <FileText class="h-7 w-7" />
                     </div>
                     <div>
                         <p
-                            class="text-xs font-bold tracking-wider text-slate-400 uppercase"
+                            class="text-xs font-bold tracking-wider text-[#99cc33] uppercase opacity-80"
                         >
                             Total Usulan
                         </p>
@@ -272,13 +271,10 @@ const exportUrl = computed(() => {
             </div>
         </div>
 
-        <!-- 2. Toolbar: Search, Filter, Export -->
         <div
             class="flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm md:flex-row"
         >
-            <!-- Search & Filter -->
             <div class="flex w-full flex-col gap-3 sm:flex-row md:w-auto">
-                <!-- Search -->
                 <div class="group relative w-full sm:w-80">
                     <div
                         class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 transition-colors group-focus-within:text-[#99cc33]"
@@ -293,7 +289,6 @@ const exportUrl = computed(() => {
                     />
                 </div>
 
-                <!-- Filter -->
                 <div class="group relative w-full sm:w-48">
                     <div
                         class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 group-focus-within:text-[#99cc33]"
@@ -317,18 +312,16 @@ const exportUrl = computed(() => {
                 </div>
             </div>
 
-            <!-- Export Button -->
             <a
                 :href="exportUrl"
                 target="_blank"
-                class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-transparent bg-[#00637b] px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-[#0f3800] active:translate-y-0 sm:w-auto"
+                class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-transparent bg-[#99cc33] px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#99cc33]/30 transition-all hover:-translate-y-0.5 hover:bg-[#88b82d] active:translate-y-0 sm:w-auto"
             >
                 <Download class="h-4 w-4" />
                 Export Excel
             </a>
         </div>
 
-        <!-- 3. Data Table -->
         <div
             class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
         >
@@ -369,7 +362,6 @@ const exportUrl = computed(() => {
                             :key="proposal.id"
                             class="group transition-colors hover:bg-[#f3fff3]/50"
                         >
-                            <!-- Pengusul -->
                             <td class="px-6 py-4">
                                 <div class="flex flex-col">
                                     <span
@@ -393,11 +385,10 @@ const exportUrl = computed(() => {
                                 </div>
                             </td>
 
-                            <!-- Info Buku -->
                             <td class="px-6 py-4">
                                 <div class="flex max-w-[250px] flex-col">
                                     <span
-                                        class="truncate text-sm font-bold text-[#00637b]"
+                                        class="truncate text-sm font-bold text-[#99cc33]"
                                         :title="proposal.title"
                                     >
                                         {{ proposal.title }}
@@ -421,7 +412,6 @@ const exportUrl = computed(() => {
                                 </div>
                             </td>
 
-                            <!-- Tanggal -->
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span
                                     class="rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600"
@@ -430,7 +420,6 @@ const exportUrl = computed(() => {
                                 </span>
                             </td>
 
-                            <!-- Status (Dropdown Action) -->
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="relative w-36">
                                     <select
@@ -470,7 +459,6 @@ const exportUrl = computed(() => {
                                 </div>
                             </td>
 
-                            <!-- Aksi -->
                             <td class="px-6 py-4 text-right whitespace-nowrap">
                                 <div class="flex justify-end gap-2">
                                     <button
@@ -491,7 +479,6 @@ const exportUrl = computed(() => {
                             </td>
                         </tr>
 
-                        <!-- Empty State -->
                         <tr v-if="proposals.data.length === 0">
                             <td colspan="5" class="px-6 py-16 text-center">
                                 <div
@@ -505,12 +492,18 @@ const exportUrl = computed(() => {
                                         />
                                     </div>
                                     <p class="font-medium text-slate-500">
-                                        Tidak ada data usulan buku yang
-                                        ditemukan.
+                                        {{
+                                            search
+                                                ? 'Tidak ada data yang cocok.'
+                                                : 'Belum ada usulan buku baru.'
+                                        }}
                                     </p>
-                                    <p class="mt-1 text-xs text-slate-400">
-                                        Coba ubah filter atau kata kunci
-                                        pencarian.
+                                    <p
+                                        v-if="search"
+                                        class="mt-1 cursor-pointer text-xs font-bold text-[#99cc33] hover:underline"
+                                        @click="search = ''"
+                                    >
+                                        Reset Pencarian
                                     </p>
                                 </div>
                             </td>
@@ -519,7 +512,6 @@ const exportUrl = computed(() => {
                 </table>
             </div>
 
-            <!-- Pagination -->
             <div
                 class="flex flex-col items-center justify-between gap-4 border-t border-slate-100 bg-slate-50 px-6 py-4 sm:flex-row"
             >
@@ -542,7 +534,6 @@ const exportUrl = computed(() => {
             </div>
         </div>
 
-        <!-- MODAL DETAIL -->
         <transition name="modal">
             <div
                 v-if="isDetailModalOpen && selectedProposal"
@@ -556,7 +547,6 @@ const exportUrl = computed(() => {
                 <div
                     class="relative z-10 w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all"
                 >
-                    <!-- Header -->
                     <div
                         class="flex items-center justify-between border-b border-[#99cc33]/20 bg-[#f3fff3] px-6 py-4"
                     >
@@ -574,14 +564,12 @@ const exportUrl = computed(() => {
                         </button>
                     </div>
 
-                    <!-- Content -->
                     <div class="space-y-6 p-6">
-                        <!-- Section 1: Pengusul -->
                         <div
                             class="rounded-xl border border-slate-100 bg-slate-50 p-4"
                         >
                             <h4
-                                class="mb-3 border-b border-slate-200 pb-2 text-xs font-bold tracking-wider text-[#00637b] uppercase"
+                                class="mb-3 border-b border-slate-200 pb-2 text-xs font-bold tracking-wider text-[#99cc33] uppercase"
                             >
                                 Informasi Pengusul
                             </h4>
@@ -613,10 +601,9 @@ const exportUrl = computed(() => {
                             </div>
                         </div>
 
-                        <!-- Section 2: Buku -->
                         <div>
                             <h4
-                                class="mb-3 border-b border-slate-100 pb-2 text-xs font-bold tracking-wider text-[#00637b] uppercase"
+                                class="mb-3 border-b border-slate-100 pb-2 text-xs font-bold tracking-wider text-[#99cc33] uppercase"
                             >
                                 Detail Buku
                             </h4>
@@ -662,7 +649,7 @@ const exportUrl = computed(() => {
                                     <p class="mb-1 text-xs text-slate-400">
                                         Estimasi Harga
                                     </p>
-                                    <p class="font-bold text-[#00637b]">
+                                    <p class="font-bold text-[#99cc33]">
                                         {{
                                             formatRupiah(selectedProposal.price)
                                         }}
@@ -685,7 +672,6 @@ const exportUrl = computed(() => {
                         </div>
                     </div>
 
-                    <!-- Footer -->
                     <div
                         class="flex justify-end border-t border-slate-100 bg-slate-50 px-6 py-4"
                     >
@@ -700,7 +686,6 @@ const exportUrl = computed(() => {
             </div>
         </transition>
 
-        <!-- Confirm Modal -->
         <ConfirmModal />
     </div>
 </template>
