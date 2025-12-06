@@ -52,7 +52,7 @@ const authorName = computed(() => {
         class="relative w-full sm:container sm:mx-auto sm:px-6 sm:py-10 lg:px-8"
     >
         <div
-            class="mx-auto max-w-4xl overflow-hidden rounded-none border-none bg-white shadow-none sm:rounded-[2rem] sm:border sm:border-slate-100 sm:shadow-xl sm:shadow-slate-200/60"
+            class="mx-auto max-w-5xl overflow-hidden rounded-none border-none bg-white shadow-none sm:rounded sm:border sm:border-slate-100 sm:shadow-xl sm:shadow-slate-200/60"
         >
             <div
                 class="border-b border-slate-100 p-6 sm:p-10"
@@ -93,7 +93,7 @@ const authorName = computed(() => {
                 </div>
 
                 <h1
-                    class="mb-6 text-2xl leading-tight font-extrabold tracking-tight text-slate-900 sm:text-4xl md:text-5xl"
+                    class="mb-6 text-2xl leading-tight font-bold tracking-tight text-slate-900 sm:text-4xl md:text-5xl"
                 >
                     {{ article.title }}
                 </h1>
@@ -127,7 +127,7 @@ const authorName = computed(() => {
                     <img
                         :src="article.imageUrl"
                         :alt="article.title"
-                        class="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
+                        class="h-full w-full object-cover transition-transform duration-700"
                     />
                 </div>
 

@@ -92,24 +92,6 @@ const socialMedia = [
                             </li>
                         </ul>
                     </div>
-
-                    <!-- Socials
-                    <div>
-                        <h3 class="mb-4 text-sm font-bold text-slate-900">
-                            Ikuti Kami
-                        </h3>
-                        <div class="flex items-center gap-3">
-                            <a
-                                v-for="(social, idx) in socialMedia"
-                                :key="idx"
-                                :href="social.url"
-                                target="_blank"
-                                class="flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-600 shadow-sm ring-1 ring-slate-100 transition-all hover:-translate-y-1 hover:bg-[#99cc33] hover:text-white hover:shadow-md"
-                            >
-                                <component :is="social.icon" class="h-5 w-5" />
-                            </a>
-                        </div>
-                    </div> -->
                 </div>
 
                 <!-- COL 4: CONTACT (Lebar: 3/12) -->

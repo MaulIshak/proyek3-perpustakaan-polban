@@ -17,7 +17,7 @@ const navItems = [
             { name: 'Tim Manajemen', href: '/tim-manajemen' },
             { name: 'Peraturan Perpustakaan', href: '/peraturan' },
             { name: 'Jam Layanan', href: '/jam-layanan' },
-            { name: 'Rencana Strategi', href: '/renstra' },
+            { name: 'Renstra', href: '/renstra' },
         ],
     },
     {
@@ -39,7 +39,7 @@ const navItems = [
             { name: 'E-Journal & E-Book', href: '/e-journal' },
             { name: 'E-Collection', href: '/e-collection' },
             { name: 'Form Usulan Buku', href: '/usulan_buku' },
-            { name: 'Booking Buku', href: '/book-reservation' },
+            { name: 'Form Booking Buku', href: '/book-reservation' },
         ],
     },
     {

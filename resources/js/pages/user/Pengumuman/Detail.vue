@@ -1,6 +1,10 @@
-
 <template>
-    <UserAppLayout :page="true" :breadcrumb="breadcrumb" title="Berita">
+    <UserAppLayout
+        :page="true"
+        :breadcrumb="breadcrumb"
+        title="Berita"
+        :no-header="true"
+    >
         <ArticlePage :article="article" />
     </UserAppLayout>
 </template>

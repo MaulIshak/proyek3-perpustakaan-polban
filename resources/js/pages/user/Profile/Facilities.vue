@@ -93,14 +93,14 @@ const breadcrumb = [
                                 {{ facility.description }}
                             </div>
 
-                            <!-- Decorative bottom line -->
+                            <!-- Decorative bottom line
                             <div
                                 class="mt-6 h-1 w-full overflow-hidden rounded-full bg-slate-100"
                             >
                                 <div
                                     class="h-full w-0 bg-[#99cc33] transition-all duration-500 ease-out group-hover:w-full"
                                 ></div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </ScrollReveal>

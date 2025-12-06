@@ -1,5 +1,5 @@
 <template>
-    <UserAppLayout :page="true" :breadcrumb="breadcrumb" title="Detail Berita">
+    <UserAppLayout :page="true" :breadcrumb="breadcrumb" title="Detail Berita" :no-header="true">
         <ArticlePage :article="article" />
     </UserAppLayout>
 </template>

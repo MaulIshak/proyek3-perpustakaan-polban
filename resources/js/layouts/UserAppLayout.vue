@@ -11,6 +11,7 @@ defineProps<{
     subtitle?: string;
     breadcrumb: { label: string; link?: string }[];
     page?: boolean;
+    noHeader?: boolean;
 }>();
 </script>
 
@@ -20,69 +21,68 @@ defineProps<{
         <Navbar class="fixed top-0 left-0 z-50 w-full shadow" />
 
         <!-- Main Content -->
-        <!-- Tambahkan pt-20 (atau sesuaikan tinggi navbar) agar konten tidak tertutup navbar fixed -->
         <main class="flex-grow bg-gray-50">
-            <!-- Header Halaman (Breadcrumb & Title) -->
-            <section
-                v-if="page"
-                class="relative w-full bg-cover bg-center bg-no-repeat text-white"
-                :style="{ backgroundImage: `url('/hero-bg.jpg')` }"
-            >
-                <!-- Overlay -->
-                <div class="absolute inset-0 bg-black/50"></div>
-
-                <div
-                    class="relative z-10 container mx-auto px-4 py-16 sm:px-6 sm:py-20 lg:px-8"
+            <div v-if="!noHeader">
+                <section
+                    v-if="page"
+                    class="relative w-full bg-cover bg-center bg-no-repeat text-white"
+                    :style="{ backgroundImage: `url('/hero-bg.jpg')` }"
                 >
-                    <ScrollReveal animation="slide-left" :duration="500">
-                        <RemahanRoti
-                            :itemRoti="breadcrumb"
-                            class="relative z-10"
-                        />
-                    </ScrollReveal>
+                    <!-- Overlay -->
+                    <div class="absolute inset-0 bg-black/50"></div>
+
                     <div
-                        class="relative z-10 mt-5 mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+                        class="relative z-10 container mx-auto px-4 py-16 sm:px-6 sm:py-20 lg:px-8"
                     >
-                        <div class="flex items-center gap-3">
-                            <!-- Aksen Garis Hijau -->
-                            <ScrollReveal animation="fade-up" :duration="500">
-                                <div
-                                    class="h-8 w-2 shrink-0 bg-[var(--primary-green)] sm:h-10 sm:w-3"
-                                ></div>
-                            </ScrollReveal>
-                            <div>
+                        <ScrollReveal animation="slide-left" :duration="500">
+                            <RemahanRoti
+                                :itemRoti="breadcrumb"
+                                class="relative z-10"
+                            />
+                        </ScrollReveal>
+                        <div
+                            class="relative z-10 mt-5 mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+                        >
+                            <div class="flex items-center gap-3">
+                                <!-- Aksen Garis Hijau -->
                                 <ScrollReveal
-                                    animation="slide-left"
-                                    :duration="600"
+                                    animation="fade-up"
+                                    :duration="500"
                                 >
-                                    <h2
-                                        class="text-2xl font-medium text-[var(--background-green)] sm:text-4xl"
-                                    >
-                                        {{ title }}
-                                    </h2>
+                                    <div
+                                        class="h-8 w-2 shrink-0 bg-[var(--primary-green)] sm:h-10 sm:w-3"
+                                    ></div>
                                 </ScrollReveal>
-                                <ScrollReveal
-                                    animation="slide-left"
-                                    :duration="700"
-                                >
-                                    <p
-                                        class="text-sm text-gray-200 sm:text-base"
+                                <div>
+                                    <ScrollReveal
+                                        animation="slide-left"
+                                        :duration="600"
                                     >
-                                        {{ subtitle }}
-                                    </p>
-                                </ScrollReveal>
+                                        <h2
+                                            class="text-2xl font-medium text-[var(--background-green)] sm:text-4xl"
+                                        >
+                                            {{ title }}
+                                        </h2>
+                                    </ScrollReveal>
+                                    <ScrollReveal
+                                        animation="slide-left"
+                                        :duration="700"
+                                    >
+                                        <p
+                                            class="text-sm text-gray-200 sm:text-base"
+                                        >
+                                            {{ subtitle }}
+                                        </p>
+                                    </ScrollReveal>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            <!-- Hero Section untuk Halaman Depan -->
-            <!-- Pastikan komponen HeroSection Anda juga menggunakan 'container mx-auto' di dalamnya jika ingin sejajar -->
-            <HeroSection v-else />
+                <HeroSection v-else />
+            </div>
 
-            <!-- Slot Konten Utama -->
-            <!-- Gunakan konfigurasi Container & Padding yang PERSIS SAMA dengan Header di atas -->
             <div class="container mx-auto px-4 pb-8 sm:px-6 lg:px-8">
                 <slot />
             </div>

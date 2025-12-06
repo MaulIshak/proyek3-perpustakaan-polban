@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ScrollReveal from '@/components/ScrollReveal.vue';
 import Layout from '@/layouts/UserAppLayout.vue';
 import { Image as ImageIcon, X, ZoomIn } from 'lucide-vue-next';
 import { ref } from 'vue';
@@ -45,60 +46,61 @@ function closeLightbox() {
             class="relative container mx-auto min-h-[60vh] px-4 py-10 sm:px-6 lg:px-8"
         >
             <!-- Grid Galeri -->
-            <div
-                v-if="photos && photos.length > 0"
-                class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-            >
+            <ScrollReveal animation="fade-up" :duration="500">
                 <div
-                    v-for="item in photos"
-                    :key="item.foto_id"
-                    class="group relative aspect-[4/3] cursor-pointer overflow-hidden rounded-2xl bg-slate-200 shadow-md transition-all duration-500 hover:shadow-xl hover:shadow-[#99cc33]/20"
-                    @click="openLightbox(item.url_foto)"
+                    v-if="photos && photos.length > 0"
+                    class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
                 >
-                    <!-- Image -->
-                    <img
-                        :src="item.url_foto"
-                        :alt="'Galeri Foto ' + item.foto_id"
-                        class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        loading="lazy"
-                    />
-
-                    <!-- Overlay Gradient -->
                     <div
-                        class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                    ></div>
-
-                    <!-- Content Overlay (Center Icon) -->
-                    <div
-                        class="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity delay-75 duration-300 group-hover:opacity-100"
+                        v-for="item in photos"
+                        :key="item.foto_id"
+                        class="group relative aspect-[4/3] cursor-pointer overflow-hidden rounded-2xl bg-slate-200 shadow-md transition-all duration-500 hover:shadow-xl hover:shadow-[#99cc33]/20"
+                        @click="openLightbox(item.url_foto)"
                     >
+                        <!-- Image -->
+                        <img
+                            :src="item.url_foto"
+                            :alt="'Galeri Foto ' + item.foto_id"
+                            class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            loading="lazy"
+                        />
+
+                        <!-- Overlay Gradient -->
                         <div
-                            class="rounded-full border border-white/30 bg-white/20 p-3 text-white backdrop-blur-sm"
+                            class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                        ></div>
+
+                        <!-- Content Overlay (Center Icon) -->
+                        <div
+                            class="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity delay-75 duration-300 group-hover:opacity-100"
                         >
-                            <ZoomIn class="h-6 w-6" />
+                            <div
+                                class="rounded-full border border-white/30 bg-white/20 p-3 text-white backdrop-blur-sm"
+                            >
+                                <ZoomIn class="h-6 w-6" />
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Empty State -->
-            <div
-                v-else
-                class="flex flex-col items-center justify-center py-24 text-center"
-            >
+                <!-- Empty State -->
                 <div
-                    class="mb-4 inline-flex h-20 w-20 items-center justify-center rounded-full bg-slate-100 text-slate-400"
+                    v-else
+                    class="flex flex-col items-center justify-center py-24 text-center"
                 >
-                    <ImageIcon class="h-10 w-10" />
+                    <div
+                        class="mb-4 inline-flex h-20 w-20 items-center justify-center rounded-full bg-slate-100 text-slate-400"
+                    >
+                        <ImageIcon class="h-10 w-10" />
+                    </div>
+                    <h3 class="mb-2 text-xl font-bold text-slate-700">
+                        Belum Ada Foto
+                    </h3>
+                    <p class="max-w-md text-slate-500">
+                        Saat ini belum ada foto yang diunggah ke dalam galeri.
+                        Silakan kembali lagi nanti.
+                    </p>
                 </div>
-                <h3 class="mb-2 text-xl font-bold text-slate-700">
-                    Belum Ada Foto
-                </h3>
-                <p class="max-w-md text-slate-500">
-                    Saat ini belum ada foto yang diunggah ke dalam galeri.
-                    Silakan kembali lagi nanti.
-                </p>
-            </div>
+            </ScrollReveal> 
 
             <!-- Modern Lightbox -->
             <transition

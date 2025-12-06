@@ -18,12 +18,13 @@ defineProps<{
 
 // --- Data Informasi Kontak ---
 const kontak = {
-    alamat: ' Perpustakaan Politeknik Negeri Bandung, Jl. Gegerkalong Hilir, Ciwaruga, Bandung Barat, Jawa Barat 40559',
+    alamat: 'Gedung H, Lantai 1, Jl. Gegerkalong Hilir, Ds. Ciwaruga Bandung Barat, Jawa Barat 40559',
     telepon: '(022) 2013788',
+    fax: '(022) 2013789',
     email: 'lib@polban.ac.id',
     jamOperasional: {
-        seninJumat: '08:00 - 18:00 WIB',
-        sabtu: '08:00 - 12:00 WIB',
+        seninJumat: '08:00 - 16:00 WIB',
+        istirahatJumat: '12:00 - 13:00 WIB',
     },
 };
 
@@ -81,16 +82,6 @@ const breadcrumb = [{ label: 'Home', link: '/' }, { label: 'Kontak' }];
         <div
             class="relative container mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8"
         >
-            <!-- Header Section -->
-            <!-- <div class="mb-10 text-center max-w-3xl mx-auto">
-                <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-4">
-                    {{ title }}
-                </h1>
-                <div class="flex justify-center mt-4">
-                    <div class="h-1.5 w-20 bg-[#99cc33] rounded-full shadow-sm shadow-[#99cc33]/50"></div>
-                </div>
-            </div> -->
-
             <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
                 <!-- Kolom Kiri: Informasi Kontak & Sosmed -->
                 <div class="space-y-8">
@@ -146,6 +137,25 @@ const breadcrumb = [{ label: 'Home', link: '/' }, { label: 'Kontak' }];
                                 </div>
                             </div>
 
+                            <!-- Fax -->
+                            <div class="flex items-start gap-4">
+                                <div
+                                    class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#99cc33]/10 text-[#99cc33]"
+                                >
+                                    <Phone class="h-6 w-6" />
+                                </div>
+                                <div>
+                                    <h4 class="mb-1 font-bold text-slate-800">
+                                        Fax
+                                    </h4>
+                                    <p
+                                        class="text-sm font-medium text-slate-600"
+                                    >
+                                        {{ kontak.fax }}
+                                    </p>
+                                </div>
+                            </div>
+
                             <div class="flex items-start gap-4">
                                 <div
                                     class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#99cc33]/10 text-[#99cc33]"
@@ -192,18 +202,19 @@ const breadcrumb = [{ label: 'Home', link: '/' }, { label: 'Kontak' }];
                                             >
                                         </div>
                                         <div class="flex justify-between gap-8">
-                                            <span>Sabtu</span>
+                                            <span>Istirahat Jumat</span>
                                             <span
                                                 class="font-semibold text-slate-800"
                                                 >{{
-                                                    kontak.jamOperasional.sabtu
+                                                    kontak.jamOperasional
+                                                        .istirahatJumat
                                                 }}</span
                                             >
                                         </div>
                                         <div
                                             class="mt-1 flex justify-between gap-8 text-xs font-medium text-red-500"
                                         >
-                                            <span>Minggu / Libur</span>
+                                            <span>Sabtu, Minggu / Libur</span>
                                             <span>Tutup</span>
                                         </div>
                                     </div>
@@ -262,7 +273,7 @@ const breadcrumb = [{ label: 'Home', link: '/' }, { label: 'Kontak' }];
                         <iframe
                             title="Lokasi Perpustakaan Polban"
                             class="h-full w-full border-0 grayscale-[20%] transition-all duration-700 hover:grayscale-0"
-                            src="https://maps.google.com/maps?width=100%&height=100%&hl=en&q=Politeknik%20Negeri%20Bandung&t=&z=15&ie=UTF8&iwloc=B&output=embed"
+                            src="https://maps.google.com/maps?width=100%&height=100%&hl=en&q=perpustakaan%20politeknik%20negeri%20bandung&t=&z=15&ie=UTF8&iwloc=B&output=embed"
                             allowfullscreen
                             loading="lazy"
                         ></iframe>
