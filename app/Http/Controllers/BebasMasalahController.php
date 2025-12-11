@@ -46,7 +46,7 @@ class BebasMasalahController extends Controller
         ]);
 
         // 2. Siapkan Data untuk Update (Ambil semua input kecuali file)
-        $dataToUpdate = $request->except([
+        $inputs = $request->except([
             '_method',
             'alur_image',
             'requirement_file',
@@ -54,9 +54,17 @@ class BebasMasalahController extends Controller
             'template_file',
             'watermark_file'
         ]);
+
+        $dataToUpdate = array_filter($inputs, function ($value) {
+            return !is_null($value);
+        });
         
         // Cek data lama untuk menghapus file lama jika ada update
         $settings = DB::table('bebas_masalah_settings')->first();
+        if (!$settings) {
+            $id = DB::table('bebas_masalah_settings')->insertGetId(['created_at' => now()]);
+            $settings = DB::table('bebas_masalah_settings')->where('id', $id)->first();
+        }
         
         // Jika belum ada row sama sekali di database, buat baru
         if (!$settings) {
