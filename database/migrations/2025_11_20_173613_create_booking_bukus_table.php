@@ -16,16 +16,16 @@ return new class extends Migration
             $table->string('nama_lengkap');
             $table->string('nim_nip');
             $table->string('email');
-            $table->string('whatsapp');    
+            $table->string('whatsapp');
             $table->string('judul_buku');
             $table->string('pengarang');
             
             // Status: pending, approved, rejected, cancelled
-            $table->string('status')->default('pending'); 
+            $table->string('status')->default('pending');
             
             // Alasan jika ditolak (nullable karena tidak semua ditolak)
-            $table->text('rejection_reason')->nullable(); 
-            
+            $table->text('rejection_reason')->nullable();
+            $table->dateTime('deadline')->nullable();
             $table->timestamps();
         });
     }

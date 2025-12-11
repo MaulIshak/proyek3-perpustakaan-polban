@@ -32,14 +32,18 @@ class CoverBuku extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'image' => 'required|image|mimes:jpeg,png,jpg|max:2048', // Max 2MB
+            // Validasi URL (nullable = boleh kosong)
+            'link_buku' => 'nullable|url|max:255', 
+            'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        ], [
+            'link_buku.url' => 'Format link tidak valid (harus diawali http:// atau https://)'
         ]);
 
-        // Simpan gambar
         $path = $request->file('image')->store('covers', 'public');
 
         BookCover::create([
-            'title' => $request->title,
+            'title'      => $request->title,
+            'link_buku'  => $request->link_buku, // Simpan Link
             'image_path' => $path,
         ]);
 
@@ -52,18 +56,19 @@ class CoverBuku extends Controller
 
         $request->validate([
             'title' => 'required|string|max:255',
+            'link_buku' => 'nullable|url|max:255', // Validasi Update
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $data = ['title' => $request->title];
+        $data = [
+            'title'     => $request->title,
+            'link_buku' => $request->link_buku // Update Link
+        ];
 
-        // Cek jika ada upload gambar baru
         if ($request->hasFile('image')) {
-            // Hapus gambar lama
             if ($cover->image_path && Storage::disk('public')->exists($cover->image_path)) {
                 Storage::disk('public')->delete($cover->image_path);
             }
-            // Upload gambar baru
             $data['image_path'] = $request->file('image')->store('covers', 'public');
         }
 

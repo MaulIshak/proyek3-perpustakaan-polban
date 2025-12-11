@@ -10,7 +10,7 @@ class QuestionController extends Controller
 {
     public function send(Request $request, BrevoService $brevo)
     {
-        // 1. Rate Limiting (TETAP SAMA)
+        // 1. Rate Limiting
         $key = 'tanya-pustakawan:' . $request->ip();
         if (RateLimiter::tooManyAttempts($key, 3)) {
             $seconds = RateLimiter::availableIn($key);
@@ -34,24 +34,29 @@ class QuestionController extends Controller
         // Hitung limit (Increment)
         RateLimiter::hit($key, 3600); // Reset dalam 3600 detik (1 jam)
 
-        // 3. Sanitasi Input (Mencegah HTML Injection)
-        // Gunakan e() atau htmlspecialchars() agar input user dianggap teks biasa
+        // 3. Sanitasi Input
         $safeNama = e($validated['nama']);
-        $safeEmail = e($validated['email']);
-        
-        // nl2br() agar enter/baris baru dari user tetap terbaca di email
+        $safeEmail = e($validated['email']); // Email Mahasiswa
         $safePertanyaan = nl2br(e($validated['pertanyaan']));
 
+        // Render View ke HTML String
         $emailContent = view('emails.tanya-pustakawan', [
             'nama' => $safeNama,
             'email' => $safeEmail,
             'pertanyaan' => $safePertanyaan
         ])->render();
 
-        // Kirim hasil render ke BrevoService
+        // 4. Kirim Email Menggunakan Service
+        // Format: sendEmail($toEmail, $toName, $subject, $message, $replyTo)
+        
+        $adminEmail = 'faliqazzaki@gmail.com'; // Email Admin Tujuan
+
         $brevo->sendEmail(
-            'TANYA PUSTAKAWAN : Pertanyaan Baru dari ' . $safeNama, // Subject
-            $emailContent // Body HTML yang sudah cantik
+            $adminEmail,                            // Ke: Admin
+            'Admin Perpustakaan',                   // Nama Penerima
+            'TANYA PUSTAKAWAN : Dari ' . $safeNama, // Subject
+            $emailContent,                          // Isi Pesan (HTML)
+            $safeEmail                              // Reply-To: Langsung ke email mahasiswa jika admin klik 'Balas'
         );
 
         return response()->json(['success' => true, 'message' => 'Pertanyaan berhasil dikirim!']);

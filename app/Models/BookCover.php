@@ -8,7 +8,8 @@ class BookCover extends Model
 {
     // Izinkan kolom ini untuk diisi
     protected $fillable = [
-        'title', 
-        'image_path'
+        'title',
+        'image_path',
+        'link_buku'
     ];
 }
