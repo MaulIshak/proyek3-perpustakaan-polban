@@ -3,7 +3,6 @@
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\GaleriController;
-use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\BookProposalController;
 use App\Http\Controllers\BebasMasalahController;
 use App\Http\Controllers\CollectionController;
@@ -27,9 +26,10 @@ Route::get('/pelayanan/{slug}', function (string $slug) {
     ]);
 });
 
-Route::get('/bebas_masalah', [BebasMasalahController::class, 'ViewUser']);
+Route::get('/bebas-masalah', [BebasMasalahController::class, 'ViewUser'])
+        ->name('bebas-masalah.user');
 
-Route::get('/gallery', [GaleriController::class, 'index']);
+Route::get('/gallery', [GaleriController::class, 'UserView']);
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/about', function () {
@@ -189,10 +189,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::delete('berita/delete/{id}', [ArticleController::class, 'destroyBerita'])->middleware('auth:admin');
 
     // galeri
-    Route::get('galeri/', [PhotoController::class, 'index'])->middleware('auth:admin')->name('index');
-    Route::post('galeri/store', [PhotoController::class, 'store'])->middleware('auth:admin')->name('store');
-    Route::put('galeri/{foto_id}', [PhotoController::class, 'update'])->middleware('auth:admin')->name('update');
-    Route::delete('galeri/{foto_id}', [PhotoController::class, 'destroy'])->middleware('auth:admin')->name('delete');
+    Route::get('galeri/', [GaleriController::class, 'index'])->middleware('auth:admin')->name('index');
+    Route::post('galeri/store', [GaleriController::class, 'store'])->middleware('auth:admin')->name('store');
+    Route::put('galeri/{foto_id}', [GaleriController::class, 'update'])->middleware('auth:admin')->name('update');
+    Route::delete('galeri/{foto_id}', [GaleriController::class, 'destroy'])->middleware('auth:admin')->name('delete');
 
     // usulan
     Route::get('usulan-buku', [BookProposalController::class, 'index'])->middleware('auth:admin')->name('book-proposals.index');
@@ -224,14 +224,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/bebas-masalah', [BebasMasalahController::class, 'index'])->middleware('auth:admin')->name('admin.bebas-masalah.index');
     // (Alur, Template, Watermark)
     Route::post('/bebas-masalah/settings', [BebasMasalahController::class, 'updateSettings'])->middleware('auth:admin')->name('admin.bebas-masalah.settings.update');
-    // Persyaratan
-    Route::post('/bebas-masalah/requirements', [BebasMasalahController::class, 'storeRequirement'])->middleware('auth:admin')->name('admin.bebas-masalah.requirements.store');
-    Route::put('/bebas-masalah/requirements/{id}', [BebasMasalahController::class, 'updateRequirement'])->middleware('auth:admin')->name('admin.bebas-masalah.requirements.update');
-    Route::delete('/bebas-masalah/requirements/{id}', [BebasMasalahController::class, 'destroyRequirement'])->middleware('auth:admin')->name('admin.bebas-masalah.requirements.destroy');
-    // Panduan
-    Route::post('/bebas-masalah/guides', [BebasMasalahController::class, 'storeGuide'])->middleware('auth:admin')->name('admin.bebas-masalah.guides.store');
-    Route::put('/bebas-masalah/guides/{id}', [BebasMasalahController::class, 'updateGuide'])->middleware('auth:admin')->name('admin.bebas-masalah.guides.update');
-    Route::delete('/bebas-masalah/guides/{id}', [BebasMasalahController::class, 'destroyGuide'])->middleware('auth:admin')->name('admin.bebas-masalah.guides.destroy');
 
     // ecollection
     Route::get('/e-collections', [CollectionController::class, 'index'])->middleware('auth:admin');

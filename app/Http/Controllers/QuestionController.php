@@ -10,8 +10,7 @@ class QuestionController extends Controller
 {
     public function send(Request $request, BrevoService $brevo)
     {
-        // 1. Rate Limiting (Mencegah Spam)
-        // Maksimal 3 pertanyaan per 1 jam per IP
+        // 1. Rate Limiting (TETAP SAMA)
         $key = 'tanya-pustakawan:' . $request->ip();
         if (RateLimiter::tooManyAttempts($key, 3)) {
             $seconds = RateLimiter::availableIn($key);
@@ -22,11 +21,10 @@ class QuestionController extends Controller
 
         // 2. Validasi Input Ketat
         $validated = $request->validate([
-            'nama'       => ['required', 'string', 'max:100', 'min:3'], // Nama jangan kepanjangan
-            'email'      => ['required', 'email:dns', 'max:255'],       // Cek DNS domain
-            'pertanyaan' => ['required', 'string', 'max:3000', 'min:10'], // Min 10 char agar pertanyaannya jelas
+            'nama'       => ['required', 'string', 'max:100', 'min:3'],
+            'email'      => ['required', 'email:dns', 'max:255'],
+            'pertanyaan' => ['required', 'string', 'max:3000', 'min:10'],
         ], [
-            // Pesan Error Indonesia
             'nama.required' => 'Nama wajib diisi.',
             'email.email'   => 'Format email tidak valid.',
             'pertanyaan.min'=> 'Pertanyaan terlalu pendek, mohon jelaskan lebih detail.',
@@ -42,18 +40,18 @@ class QuestionController extends Controller
         $safeEmail = e($validated['email']);
         
         // nl2br() agar enter/baris baru dari user tetap terbaca di email
-        $safePertanyaan = nl2br(e($validated['pertanyaan'])); 
+        $safePertanyaan = nl2br(e($validated['pertanyaan']));
 
+        $emailContent = view('emails.tanya-pustakawan', [
+            'nama' => $safeNama,
+            'email' => $safeEmail,
+            'pertanyaan' => $safePertanyaan
+        ])->render();
+
+        // Kirim hasil render ke BrevoService
         $brevo->sendEmail(
-            'Pertanyaan Baru dari ' . $safeNama,
-            "<div style='font-family: sans-serif;'>
-                <h3>Pesan Baru Tanya Pustakawan</h3>
-                <p><strong>Nama:</strong> {$safeNama}</p>
-                <p><strong>Email:</strong> {$safeEmail}</p>
-                <hr>
-                <p><strong>Pertanyaan:</strong></p>
-                <p>{$safePertanyaan}</p>
-             </div>"
+            'TANYA PUSTAKAWAN : Pertanyaan Baru dari ' . $safeNama, // Subject
+            $emailContent // Body HTML yang sudah cantik
         );
 
         return response()->json(['success' => true, 'message' => 'Pertanyaan berhasil dikirim!']);

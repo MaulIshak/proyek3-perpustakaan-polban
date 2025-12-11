@@ -14,6 +14,7 @@ class EJournal extends Model
     protected $fillable = [
         'name',
         'url',
+        'gdrive_url',
         'description',
         'logo_path',
         'type',

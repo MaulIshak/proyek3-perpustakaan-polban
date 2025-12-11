@@ -10,15 +10,18 @@ import {
     Library,
     Info,
     ArrowRight,
-    Sparkles
+    Sparkles,
+    HardDrive // Icon untuk Google Drive
 } from 'lucide-vue-next';
 
 // -- TYPES --
+// [UPDATE 1] Tambahkan gdrive_url ke interface
 interface LibraryItem {
     id: number;
     name: string;       
     description: string;
     url: string;        
+    gdrive_url?: string | null; // Kolom baru
     type: 'journal' | 'ebook';
     img_url: string | null; 
 }
@@ -159,7 +162,7 @@ const switchTab = (tab: 'journal' | 'ebook') => {
                         <div class="flex-1 flex flex-col h-full min-h-[128px]">
                             
                             <div class="flex-1">
-                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                                     <h3 class="text-xl font-bold text-slate-800 group-hover:text-[#99cc33] transition-colors">
                                         {{ item.name }}
                                     </h3>
@@ -172,9 +175,28 @@ const switchTab = (tab: 'journal' | 'ebook') => {
                                 </div>
 
                                 <div class="mb-5">
-                                    <p class="text-slate-600 text-base leading-relaxed">
+                                    <ul v-if="item.description.includes('\n')" class="list-outside list-disc pl-5 space-y-1.5 text-slate-600 text-base leading-relaxed marker:text-[#99cc33]">
+                                        <li v-for="(line, idx) in item.description.split('\n')" :key="idx">
+                                            {{ line }}
+                                        </li>
+                                    </ul>
+                                    <p v-else class="text-slate-600 text-base leading-relaxed">
                                         {{ item.description }}
                                     </p>
+                                </div>
+
+                                <div v-if="item.gdrive_url" class="mb-6">
+                                    <a 
+                                        :href="item.gdrive_url" 
+                                        target="_blank" 
+                                        class="inline-flex items-center gap-3 px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 text-sm font-bold hover:bg-[#99cc33]/10 hover:border-[#99cc33]/50 hover:text-[#7da62b] transition-all group/gdrive"
+                                    >
+                                        <div class="p-1.5 bg-white rounded-lg border border-slate-200 shadow-sm group-hover/gdrive:border-[#99cc33]/30">
+                                            <HardDrive class="w-4 h-4" />
+                                        </div>
+                                        <span>Buka via Google Drive / Backup Link</span>
+                                        <ExternalLink class="w-3.5 h-3.5 opacity-50" />
+                                    </a>
                                 </div>
                             </div>
 

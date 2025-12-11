@@ -49,7 +49,7 @@ const navItems = [
             { name: 'Pengumuman', href: '/pengumuman' },
         ],
     },
-    { name: 'Bebas Masalah', href: '/bebas_masalah' },
+    { name: 'Bebas Masalah', href: '/bebas-masalah' },
     { name: 'Galeri', href: '/gallery' },
     { name: 'Kontak', href: '/contact' },
 ];

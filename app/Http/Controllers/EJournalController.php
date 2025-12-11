@@ -23,10 +23,12 @@ class EJournalController extends Controller
         // 1. Validasi Input
         $rules = [
             'name'        => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'], // Tidak ada max:255 (Bisa paragraf panjang)
+            'description' => ['required', 'string'], 
             'url'         => ['required', 'url', 'regex:/^https?:\/\//'], // Wajib http:// atau https://
+            // [UPDATE] Validasi GDrive (Nullable / Opsional)
+            'gdrive_url'  => ['nullable', 'url', 'regex:/^https?:\/\//'], 
             'type'        => ['required', 'in:journal,ebook'],
-            'logo'        => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'], // Max 5MB + Support WebP
+            'logo'        => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'], 
         ];
 
         $messages = [
@@ -43,6 +45,7 @@ class EJournalController extends Controller
             'name'        => 'Nama Jurnal/E-Book',
             'description' => 'Deskripsi',
             'url'         => 'Link URL',
+            'gdrive_url'  => 'Link Google Drive', // [UPDATE] Label Error
             'type'        => 'Tipe Koleksi',
             'logo'        => 'Logo/Cover',
         ];
@@ -50,7 +53,8 @@ class EJournalController extends Controller
         $request->validate($rules, $messages, $attributes);
 
         // 2. Siapkan Data
-        $data = $request->only(['name', 'description', 'url', 'type']);
+        // [UPDATE] Tambahkan 'gdrive_url' agar ikut tersimpan
+        $data = $request->only(['name', 'description', 'url', 'gdrive_url', 'type']);
 
         // 3. Upload Logo (Jika ada)
         if ($request->hasFile('logo')) {
@@ -64,11 +68,13 @@ class EJournalController extends Controller
 
     public function update(Request $request, EJournal $ejournal)
     {
-        // 1. Validasi Update (Sama dengan Store)
+        // 1. Validasi Update
         $rules = [
             'name'        => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
             'url'         => ['required', 'url', 'regex:/^https?:\/\//'],
+            // [UPDATE] Validasi GDrive
+            'gdrive_url'  => ['nullable', 'url', 'regex:/^https?:\/\//'],
             'type'        => ['required', 'in:journal,ebook'],
             'logo'        => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ];
@@ -84,13 +90,15 @@ class EJournalController extends Controller
             'name'        => 'Nama Jurnal/E-Book',
             'description' => 'Deskripsi',
             'url'         => 'Link URL',
+            'gdrive_url'  => 'Link Google Drive', // [UPDATE] Label Error
             'type'        => 'Tipe Koleksi',
             'logo'        => 'Logo/Cover',
         ];
 
         $request->validate($rules, $messages, $attributes);
 
-        $data = $request->only(['name', 'description', 'url', 'type']);
+        // [UPDATE] Tambahkan 'gdrive_url'
+        $data = $request->only(['name', 'description', 'url', 'gdrive_url', 'type']);
 
         // 2. Cek Upload Logo Baru
         if ($request->hasFile('logo')) {
