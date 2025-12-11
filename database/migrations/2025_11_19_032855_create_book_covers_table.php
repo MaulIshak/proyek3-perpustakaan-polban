@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('title');      // Untuk menyimpan Judul Buku
             $table->string('image_path'); // Untuk menyimpan lokasi file gambar
             $table->timestamps();         // created_at & updated_at
+            $table->string('link_buku')->nullable();
         });
     }
 

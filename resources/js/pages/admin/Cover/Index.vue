@@ -5,6 +5,7 @@ import {
     AlertCircle,
     Book,
     Image as ImageIcon,
+    Link as LinkIcon, // Icon baru
     Plus,
     RotateCcw,
     Save,
@@ -14,11 +15,9 @@ import {
 } from 'lucide-vue-next';
 import { ref } from 'vue';
 
-// Import ConfirmModal
 import ConfirmModal from '@/components/admin/ConfirmModal.vue';
 import { useConfirmModal } from '@/composables/userConfirmModal';
 
-// --- LAYOUT ---
 defineOptions({
     layout: (h: any, page: any) =>
         h(
@@ -31,33 +30,32 @@ defineOptions({
         ),
 });
 
-// --- TYPES & PROPS ---
 interface Cover {
     id: number;
     title: string;
     image_path: string;
+    link_buku?: string; // Tambahkan tipe data optional
 }
 
 const props = defineProps<{
     covers: Cover[];
 }>();
 
-const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+const MAX_FILE_SIZE = 2 * 1024 * 1024;
 
-// --- STATE ---
 const showModal = ref(false);
 const fileInputRef = ref<HTMLInputElement | null>(null);
 const previewImage = ref<string | null>(null);
 const { open } = useConfirmModal();
 
-// --- FORM ---
+// --- UPDATE FORM ---
 const form = useForm({
     title: '',
+    link_buku: '', // Tambahkan field link
     image: null as File | null,
     _method: 'POST',
 });
 
-// --- ACTIONS ---
 const openAddModal = () => {
     form.reset();
     form.clearErrors();
@@ -104,9 +102,8 @@ const submit = () => {
 const handleDelete = (cover: Cover) => {
     open({
         title: 'Hapus Cover Buku?',
-        message: `Apakah Anda yakin ingin menghapus cover "${cover.title}"? Gambar akan hilang permanen dari server.`,
+        message: `Apakah Anda yakin ingin menghapus cover "${cover.title}"?`,
         actionLabel: 'Hapus',
-        // confirmClass: 'bg-rose-600 hover:bg-rose-700 text-white',
         onConfirm: () => {
             router.delete(`/admin/cover-buku/delete/${cover.id}`, {
                 preserveScroll: true,
@@ -120,21 +117,14 @@ const handleDelete = (cover: Cover) => {
     <Head title="Cover Buku" />
 
     <div class="space-y-8 font-sans text-slate-600">
-        <!-- 1. Toolbar -->
-        <div
-            class="flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:flex-row"
-        >
+        <div class="flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:flex-row">
             <div class="flex items-center gap-3">
                 <div class="rounded-xl bg-[#99cc33]/10 p-2 text-[#99cc33]">
                     <Book class="h-6 w-6" />
                 </div>
                 <div>
-                    <h2 class="text-lg font-bold text-slate-800">
-                        Galeri Cover
-                    </h2>
-                    <p class="text-xs font-medium text-slate-500">
-                        Total {{ props.covers.length }} cover buku
-                    </p>
+                    <h2 class="text-lg font-bold text-slate-800">Galeri Cover</h2>
+                    <p class="text-xs font-medium text-slate-500">Total {{ props.covers.length }} cover buku</p>
                 </div>
             </div>
 
@@ -147,31 +137,12 @@ const handleDelete = (cover: Cover) => {
             </button>
         </div>
 
-        <!-- 2. Grid Covers -->
-        <div
-            v-if="covers.length > 0"
-            class="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
-        >
-            <div
-                v-for="cover in covers"
-                :key="cover.id"
-                class="group relative flex flex-col"
-            >
-                <!-- Image Container -->
-                <div
-                    class="relative aspect-[2/3] w-full cursor-pointer overflow-hidden rounded-xl border border-slate-200 bg-slate-100 shadow-md transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl group-hover:shadow-[#99cc33]/20"
-                >
-                    <img
-                        :src="`/storage/${cover.image_path}`"
-                        :alt="cover.title"
-                        class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        loading="lazy"
-                    />
+        <div v-if="covers.length > 0" class="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+            <div v-for="cover in covers" :key="cover.id" class="group relative flex flex-col">
+                <div class="relative aspect-[2/3] w-full cursor-pointer overflow-hidden rounded-xl border border-slate-200 bg-slate-100 shadow-md transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl group-hover:shadow-[#99cc33]/20">
+                    <img :src="`/storage/${cover.image_path}`" :alt="cover.title" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
 
-                    <!-- Overlay Actions -->
-                    <div
-                        class="absolute inset-0 z-10 flex items-center justify-center bg-slate-900/40 opacity-0 backdrop-blur-[1px] transition-all duration-300 group-hover:opacity-100"
-                    >
+                    <div class="absolute inset-0 z-10 flex items-center justify-center bg-slate-900/40 opacity-0 backdrop-blur-[1px] transition-all duration-300 group-hover:opacity-100">
                         <button
                             @click="handleDelete(cover)"
                             class="transform rounded-full border border-white/30 bg-white/20 p-3 text-white shadow-lg backdrop-blur-md transition-all hover:scale-110 hover:border-rose-500 hover:bg-rose-500"
@@ -182,202 +153,111 @@ const handleDelete = (cover: Cover) => {
                     </div>
                 </div>
 
-                <!-- Title -->
                 <div class="mt-3 px-1 text-center">
-                    <h3
-                        class="line-clamp-2 text-xs leading-tight font-bold text-slate-700 transition-colors group-hover:text-[#99cc33]"
-                    >
+                    <h3 class="line-clamp-2 text-xs leading-tight font-bold text-slate-700 transition-colors group-hover:text-[#99cc33]">
                         {{ cover.title }}
                     </h3>
+                    <a v-if="cover.link_buku" :href="cover.link_buku" target="_blank" class="mt-1 inline-flex items-center gap-1 text-[10px] text-blue-500 hover:underline">
+                        <LinkIcon class="h-3 w-3" /> Link Tersedia
+                    </a>
                 </div>
             </div>
         </div>
 
-        <!-- 3. Empty State -->
-        <div
-            v-else
-            class="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-white py-24 text-center"
-        >
-            <div
-                class="mb-4 flex h-20 w-20 animate-pulse items-center justify-center rounded-full bg-slate-50"
-            >
+        <div v-else class="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-white py-24 text-center">
+            <div class="mb-4 flex h-20 w-20 animate-pulse items-center justify-center rounded-full bg-slate-50">
                 <ImageIcon class="h-10 w-10 text-slate-400" />
             </div>
-            <h3 class="mb-2 text-xl font-bold text-slate-800">
-                Belum Ada Cover
-            </h3>
+            <h3 class="mb-2 text-xl font-bold text-slate-800">Belum Ada Cover</h3>
             <p class="max-w-md text-sm leading-relaxed text-slate-500">
-                Koleksi cover buku masih kosong. Silakan tambahkan cover buku
-                baru untuk mempercantik katalog.
+                Koleksi cover buku masih kosong. Silakan tambahkan cover buku baru.
             </p>
-            <button
-                @click="openAddModal"
-                class="mt-6 text-sm font-bold text-[#99cc33] hover:text-[#88b82d] hover:underline"
-            >
+            <button @click="openAddModal" class="mt-6 text-sm font-bold text-[#99cc33] hover:text-[#88b82d] hover:underline">
                 Tambah Cover Sekarang
             </button>
         </div>
 
-        <!-- MODAL FORM -->
-        <Transition
-            enter-active-class="transition duration-300 ease-out"
-            enter-from-class="opacity-0 scale-95"
-            enter-to-class="opacity-100 scale-100"
-            leave-active-class="transition duration-200 ease-in"
-            leave-from-class="opacity-100 scale-100"
-            leave-to-class="opacity-0 scale-95"
-        >
-            <div
-                v-if="showModal"
-                class="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-6"
-            >
-                <div
-                    @click="closeModal"
-                    class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity"
-                ></div>
+        <Transition enter-active-class="transition duration-300 ease-out" enter-from-class="opacity-0 scale-95" enter-to-class="opacity-100 scale-100" leave-active-class="transition duration-200 ease-in" leave-from-class="opacity-100 scale-100" leave-to-class="opacity-0 scale-95">
+            <div v-if="showModal" class="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-6">
+                <div @click="closeModal" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity"></div>
 
-                <div
-                    class="relative z-10 flex max-h-[90vh] w-full max-w-md transform flex-col overflow-hidden rounded-2xl bg-white shadow-2xl transition-all"
-                >
-                    <!-- Modal Header -->
-                    <div
-                        class="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-4"
-                    >
-                        <h2 class="text-lg font-bold text-slate-800">
-                            Tambah Cover Buku
-                        </h2>
-                        <button
-                            @click="closeModal"
-                            class="rounded-full p-1 text-slate-400 transition-colors hover:bg-slate-200 hover:text-slate-600"
-                        >
+                <div class="relative z-10 flex max-h-[90vh] w-full max-w-md transform flex-col overflow-hidden rounded-2xl bg-white shadow-2xl transition-all">
+                    <div class="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-4">
+                        <h2 class="text-lg font-bold text-slate-800">Tambah Cover Buku</h2>
+                        <button @click="closeModal" class="rounded-full p-1 text-slate-400 transition-colors hover:bg-slate-200 hover:text-slate-600">
                             <X class="h-5 w-5" />
                         </button>
                     </div>
 
-                    <!-- Modal Body -->
                     <div class="space-y-6 overflow-y-auto bg-white p-6">
-                        <form
-                            @submit.prevent="submit"
-                            id="createForm"
-                            class="space-y-5"
-                        >
-                            <!-- Judul Buku -->
+                        <form @submit.prevent="submit" id="createForm" class="space-y-5">
+                            
                             <div class="space-y-1.5">
-                                <label class="text-sm font-bold text-slate-700"
-                                    >Judul Buku
-                                    <span class="text-red-500">*</span></label
-                                >
+                                <label class="text-sm font-bold text-slate-700">Judul Buku <span class="text-red-500">*</span></label>
                                 <input
                                     v-model="form.title"
                                     type="text"
-                                    class="w-full rounded-xl border-slate-200 transition-all placeholder:text-slate-400 focus:border-[#99cc33] focus:ring-4 focus:ring-[#99cc33]/10"
+                                    class="w-full rounded-xl border-slate-200 transition-all placeholder:text-slate-400 focus:border-[#99cc33] focus:ring-4 focus:ring-[#99cc33]/10 p-3"
                                     placeholder="Contoh: Algoritma Pemrograman"
                                 />
-                                <p
-                                    v-if="form.errors.title"
-                                    class="mt-1 text-xs font-medium text-rose-500"
-                                >
-                                    {{ form.errors.title }}
-                                </p>
+                                <p v-if="form.errors.title" class="mt-1 text-xs font-medium text-rose-500">{{ form.errors.title }}</p>
                             </div>
 
-                            <!-- Image Upload Dropzone -->
+                            <div class="space-y-1.5">
+                                <label class="text-sm font-bold text-slate-700 flex items-center gap-1">
+                                    Link Buku <span class="text-xs font-normal text-slate-400"></span>
+                                </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+                                        <LinkIcon class="h-4 w-4" />
+                                    </div>
+                                    <input
+                                        v-model="form.link_buku"
+                                        type="url"
+                                        class="w-full rounded-xl border-slate-200 pl-10 transition-all placeholder:text-slate-400 focus:border-[#99cc33] focus:ring-4 focus:ring-[#99cc33]/10 p-3"
+                                        placeholder="https://perpustakaan.polban.ac.id/..."
+                                    />
+                                </div>
+                                <p v-if="form.errors.link_buku" class="mt-1 text-xs font-medium text-rose-500">{{ form.errors.link_buku }}</p>
+                            </div>
+
                             <div class="space-y-2">
-                                <label
-                                    class="block text-sm font-bold text-slate-700"
-                                    >File Cover</label
-                                >
+                                <label class="block text-sm font-bold text-slate-700">File Cover</label>
                                 <div
                                     @click="triggerFileInput"
                                     class="group relative flex h-64 w-full cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border-2 border-dashed bg-slate-50 text-center transition-all"
                                     :class="[
-                                        form.errors.image
-                                            ? 'border-red-300 bg-red-50'
-                                            : 'border-slate-300 hover:border-[#99cc33] hover:bg-[#99cc33]/5',
+                                        form.errors.image ? 'border-red-300 bg-red-50' : 'border-slate-300 hover:border-[#99cc33] hover:bg-[#99cc33]/5',
                                         previewImage ? 'border-solid' : '',
                                     ]"
                                 >
-                                    <!-- Case 1: Ada Preview Image -->
                                     <template v-if="previewImage">
-                                        <img
-                                            :src="previewImage"
-                                            class="h-full w-full object-contain p-2"
-                                        />
-                                        <!-- Overlay Hover -->
-                                        <div
-                                            class="absolute inset-0 flex flex-col items-center justify-center bg-black/60 text-white opacity-0 backdrop-blur-[1px] transition-opacity group-hover:opacity-100"
-                                        >
+                                        <img :src="previewImage" class="h-full w-full object-contain p-2" />
+                                        <div class="absolute inset-0 flex flex-col items-center justify-center bg-black/60 text-white opacity-0 backdrop-blur-[1px] transition-opacity group-hover:opacity-100">
                                             <RotateCcw class="mb-2 h-8 w-8" />
-                                            <span class="text-sm font-bold"
-                                                >Ganti Gambar</span
-                                            >
+                                            <span class="text-sm font-bold">Ganti Gambar</span>
                                         </div>
                                     </template>
-
-                                    <!-- Case 2: Belum Ada Image -->
-                                    <div
-                                        v-else
-                                        class="flex flex-col items-center justify-center p-6 transition-transform duration-300 group-hover:scale-105"
-                                    >
-                                        <div
-                                            class="mb-3 rounded-full bg-white p-4 shadow-sm group-hover:shadow-md"
-                                        >
-                                            <UploadCloud
-                                                class="h-8 w-8 text-[#99cc33]"
-                                            />
+                                    <div v-else class="flex flex-col items-center justify-center p-6 transition-transform duration-300 group-hover:scale-105">
+                                        <div class="mb-3 rounded-full bg-white p-4 shadow-sm group-hover:shadow-md">
+                                            <UploadCloud class="h-8 w-8 text-[#99cc33]" />
                                         </div>
-                                        <p
-                                            class="text-sm font-bold text-slate-700 transition-colors group-hover:text-[#99cc33]"
-                                        >
-                                            Klik untuk pilih file
-                                        </p>
-                                        <p
-                                            class="mt-1 text-xs font-medium text-slate-400"
-                                        >
-                                            JPG, PNG (Max 2MB)
-                                        </p>
+                                        <p class="text-sm font-bold text-slate-700 transition-colors group-hover:text-[#99cc33]">Klik untuk pilih file</p>
+                                        <p class="mt-1 text-xs font-medium text-slate-400">JPG, PNG (Max 2MB)</p>
                                     </div>
-
-                                    <input
-                                        ref="fileInputRef"
-                                        type="file"
-                                        @change="handleFileChange"
-                                        accept="image/*"
-                                        class="hidden"
-                                    />
+                                    <input ref="fileInputRef" type="file" @change="handleFileChange" accept="image/*" class="hidden" />
                                 </div>
-                                <p
-                                    v-if="form.errors.image"
-                                    class="mt-2 flex animate-pulse items-center text-xs font-medium text-red-500"
-                                >
-                                    <AlertCircle class="mr-1 h-3 w-3" />
-                                    {{ form.errors.image }}
+                                <p v-if="form.errors.image" class="mt-2 flex animate-pulse items-center text-xs font-medium text-red-500">
+                                    <AlertCircle class="mr-1 h-3 w-3" /> {{ form.errors.image }}
                                 </p>
                             </div>
                         </form>
                     </div>
 
-                    <!-- Footer -->
-                    <div
-                        class="flex items-center justify-end gap-3 border-t border-slate-100 bg-slate-50 p-6"
-                    >
-                        <button
-                            @click="closeModal"
-                            type="button"
-                            class="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-bold text-slate-600 shadow-sm transition-colors hover:bg-slate-100"
-                        >
-                            Batal
-                        </button>
-                        <button
-                            type="submit"
-                            form="createForm"
-                            :disabled="form.processing"
-                            class="flex items-center gap-2 rounded-xl bg-[#99cc33] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#99cc33]/30 transition-all hover:-translate-y-0.5 hover:bg-[#88b82d] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-70"
-                        >
-                            <span
-                                v-if="form.processing"
-                                class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
-                            ></span>
+                    <div class="flex items-center justify-end gap-3 border-t border-slate-100 bg-slate-50 p-6">
+                        <button @click="closeModal" type="button" class="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-bold text-slate-600 shadow-sm transition-colors hover:bg-slate-100">Batal</button>
+                        <button type="submit" form="createForm" :disabled="form.processing" class="flex items-center gap-2 rounded-xl bg-[#99cc33] px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#99cc33]/30 transition-all hover:-translate-y-0.5 hover:bg-[#88b82d] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-70">
+                            <span v-if="form.processing" class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
                             <Save v-else class="h-4 w-4" />
                             {{ form.processing ? 'Menyimpan...' : 'Simpan' }}
                         </button>
@@ -386,7 +266,6 @@ const handleDelete = (cover: Cover) => {
             </div>
         </Transition>
 
-        <!-- Confirm Modal -->
         <ConfirmModal />
     </div>
 </template>

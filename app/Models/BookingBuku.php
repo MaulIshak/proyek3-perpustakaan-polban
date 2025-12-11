@@ -16,6 +16,7 @@ class BookingBuku extends Model
         'judul_buku',
         'pengarang',
         'status',
-        'rejection_reason'
+        'rejection_reason',
+        'deadline'
     ];
 }
