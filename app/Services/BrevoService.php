@@ -5,7 +5,9 @@ namespace App\Services;
 use Brevo\Client\Api\TransactionalEmailsApi;
 use Brevo\Client\Configuration;
 use Brevo\Client\Model\SendSmtpEmail;
-use GuzzleHttp\Client; // <--- JANGAN LUPA IMPORT INI
+use GuzzleHttp\Client; 
+use Exception;
+use Illuminate\Support\Facades\Log;
 
 class BrevoService
 {
@@ -13,23 +15,29 @@ class BrevoService
 
     public function __construct()
     {
-        // Konfigurasi API Key
-        $config = Configuration::getDefaultConfiguration()->setApiKey('api-key', env('BREVO_API_KEY'));
+        // [PERBAIKAN 1] Gunakan config(), JANGAN env() di dalam class
+        // env() seringkali NULL di production karena config caching
+        $apiKey = config('services.brevo.key');
 
-        // --- BAGIAN INI YANG DIUBAH ---
-        // Kita buat Client Guzzle sendiri dengan opsi 'verify' => false
-        // Ini akan mematikan pengecekan SSL (Aman untuk localhost, JANGAN DIPAKAI SAAT SUDAH ONLINE/HOSTING)
+        // Debugging jika API Key masih tidak terbaca
+        if (empty($apiKey)) {
+            Log::critical('BREVO ERROR: API Key kosong! Pastikan file config/services.php sudah dikonfigurasi.');
+        }
+
+        $config = Configuration::getDefaultConfiguration()->setApiKey('api-key', $apiKey);
+
+        // Opsi verify => false (Untuk mengatasi error SSL cURL 60)
+        // Jika di hosting nanti sudah aman, baris ini bisa dihapus agar lebih secure.
         $client = new Client(['verify' => false]);
 
-        // Masukkan client tersebut ke dalam constructor API Brevo
         $this->apiInstance = new TransactionalEmailsApi($client, $config);
     }
 
     public function sendEmail($subject, $message)
     {
-        // Pastikan ENV tidak kosong untuk menghindari error
-        $senderEmail = env('BREVO_SENDER_EMAIL', 'no-reply@perpustakaan.com');
-        $senderName  = env('BREVO_SENDER_NAME', 'Sistem Perpustakaan');
+        // [PERBAIKAN 2] Ambil data sender dari config
+        $senderEmail = config('services.brevo.sender_email', 'no-reply@polban.ac.id');
+        $senderName  = config('services.brevo.sender_name', 'Sistem Perpustakaan');
 
         $emailData = new SendSmtpEmail([
             'sender' => [
@@ -38,7 +46,7 @@ class BrevoService
             ],
             'to' => [
                 [
-                    'email' => 'irvan',
+                    'email' => 'maulana.ishak.tif24@polban.ac.id', // Email Admin
                     'name'  => 'Maulana Ishak'
                 ]
             ],
@@ -48,9 +56,9 @@ class BrevoService
 
         try {
             return $this->apiInstance->sendTransacEmail($emailData);
-        } catch (\Exception $e) {
-            // Log error biar bisa dibaca di laravel.log
-            \Illuminate\Support\Facades\Log::error('Brevo Error: ' . $e->getMessage());
+        } catch (Exception $e) {
+            // Log error agar terekam di storage/logs/laravel.log
+            Log::error('Brevo Error: ' . $e->getMessage());
             throw $e;
         }
     }
