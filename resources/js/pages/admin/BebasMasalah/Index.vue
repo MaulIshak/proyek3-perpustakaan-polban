@@ -107,15 +107,46 @@ const submitSettings = () => {
     });
 };
 
+const MAX_FILE_SIZE_MB = 5; 
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+
 const handleFileChange = (field: string, event: Event) => {
-    const file = (event.target as HTMLInputElement).files?.[0];
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+
     if (file) {
+        // 1. Validasi Ukuran File (Client Side)
+        if (file.size > MAX_FILE_SIZE_BYTES) {
+            // Tampilkan Toast Error
+            showToast(`Gagal! Ukuran file terlalu besar. Maksimal ${MAX_FILE_SIZE_MB} MB.`, 'error');
+            
+            // Reset input file agar user harus pilih ulang
+            target.value = ''; 
+            
+            // Jangan masukkan ke form
+            return;
+        }
+
+        // 2. Validasi Tipe File (Optional, tapi bagus untuk UX)
+        const isImage = field === 'alur_image';
+        if (isImage && !file.type.startsWith('image/')) {
+             showToast('File harus berupa gambar (JPG/PNG).', 'error');
+             target.value = '';
+             return;
+        }
+        
+        if (!isImage && file.type !== 'application/pdf' && !file.name.match(/\.(doc|docx)$/i)) {
+             // Validasi sederhana untuk PDF/Doc
+             showToast('Format file tidak didukung.', 'error');
+             target.value = '';
+             return;
+        }
+
         (form as any)[field] = file;
     }
 };
 
 // --- HELPER UNTUK PREVIEW ---
-
 const getCurrentFilePath = () => {
     if (activeTab.value === 'alur') return props.settings?.alur_image_path;
     if (activeTab.value === 'persyaratan') return props.settings?.requirement_file_path;
