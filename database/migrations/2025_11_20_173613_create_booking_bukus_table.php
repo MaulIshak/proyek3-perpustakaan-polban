@@ -25,7 +25,6 @@ return new class extends Migration
             
             // Alasan jika ditolak (nullable karena tidak semua ditolak)
             $table->text('rejection_reason')->nullable();
-            $table->dateTime('deadline')->nullable();
             $table->timestamps();
         });
     }

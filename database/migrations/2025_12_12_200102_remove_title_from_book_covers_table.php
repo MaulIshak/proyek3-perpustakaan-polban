@@ -11,11 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('book_covers', function (Blueprint $table) {
-            $table->id();
-            $table->string('title');      // Untuk menyimpan Judul Buku
-            $table->string('image_path'); // Untuk menyimpan lokasi file gambar
-            $table->timestamps();         // created_at & updated_at
+        Schema::table('book_covers', function (Blueprint $table) {
+            // Perintah untuk menghapus kolom 'title'
+            $table->dropColumn('title');
         });
     }
 
@@ -24,6 +22,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('book_covers');
+        Schema::table('book_covers', function (Blueprint $table) {
+            // Mengembalikan kolom 'title' jika migrasi di-rollback
+            $table->string('title')->nullable();
+        });
     }
 };

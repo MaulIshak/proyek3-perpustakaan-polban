@@ -5,7 +5,7 @@ import {
     AlertCircle,
     Book,
     Image as ImageIcon,
-    Link as LinkIcon, // Icon baru
+    Link as LinkIcon,
     Plus,
     RotateCcw,
     Save,
@@ -32,9 +32,8 @@ defineOptions({
 
 interface Cover {
     id: number;
-    title: string;
     image_path: string;
-    link_buku?: string; // Tambahkan tipe data optional
+    link_buku: string; // Sekarang wajib string (bukan optional ?)
 }
 
 const props = defineProps<{
@@ -48,10 +47,8 @@ const fileInputRef = ref<HTMLInputElement | null>(null);
 const previewImage = ref<string | null>(null);
 const { open } = useConfirmModal();
 
-// --- UPDATE FORM ---
 const form = useForm({
-    title: '',
-    link_buku: '', // Tambahkan field link
+    link_buku: '', 
     image: null as File | null,
     _method: 'POST',
 });
@@ -102,7 +99,7 @@ const submit = () => {
 const handleDelete = (cover: Cover) => {
     open({
         title: 'Hapus Cover Buku?',
-        message: `Apakah Anda yakin ingin menghapus cover "${cover.title}"?`,
+        message: `Apakah Anda yakin ingin menghapus cover ini?`,
         actionLabel: 'Hapus',
         onConfirm: () => {
             router.delete(`/admin/cover-buku/delete/${cover.id}`, {
@@ -139,8 +136,9 @@ const handleDelete = (cover: Cover) => {
 
         <div v-if="covers.length > 0" class="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
             <div v-for="cover in covers" :key="cover.id" class="group relative flex flex-col">
+                
                 <div class="relative aspect-[2/3] w-full cursor-pointer overflow-hidden rounded-xl border border-slate-200 bg-slate-100 shadow-md transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl group-hover:shadow-[#99cc33]/20">
-                    <img :src="`/storage/${cover.image_path}`" :alt="cover.title" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
+                    <img :src="`/storage/${cover.image_path}`" alt="Book Cover" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
 
                     <div class="absolute inset-0 z-10 flex items-center justify-center bg-slate-900/40 opacity-0 backdrop-blur-[1px] transition-all duration-300 group-hover:opacity-100">
                         <button
@@ -153,12 +151,9 @@ const handleDelete = (cover: Cover) => {
                     </div>
                 </div>
 
-                <div class="mt-3 px-1 text-center">
-                    <h3 class="line-clamp-2 text-xs leading-tight font-bold text-slate-700 transition-colors group-hover:text-[#99cc33]">
-                        {{ cover.title }}
-                    </h3>
-                    <a v-if="cover.link_buku" :href="cover.link_buku" target="_blank" class="mt-1 inline-flex items-center gap-1 text-[10px] text-blue-500 hover:underline">
-                        <LinkIcon class="h-3 w-3" /> Link Tersedia
+                <div class="mt-3 px-1 text-center min-h-[20px]">
+                    <a :href="cover.link_buku" target="_blank" class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-500 hover:text-blue-600 hover:underline transition-colors">
+                        <LinkIcon class="h-3 w-3" /> Link Buku
                     </a>
                 </div>
             </div>
@@ -193,19 +188,8 @@ const handleDelete = (cover: Cover) => {
                         <form @submit.prevent="submit" id="createForm" class="space-y-5">
                             
                             <div class="space-y-1.5">
-                                <label class="text-sm font-bold text-slate-700">Judul Buku <span class="text-red-500">*</span></label>
-                                <input
-                                    v-model="form.title"
-                                    type="text"
-                                    class="w-full rounded-xl border-slate-200 transition-all placeholder:text-slate-400 focus:border-[#99cc33] focus:ring-4 focus:ring-[#99cc33]/10 p-3"
-                                    placeholder="Contoh: Algoritma Pemrograman"
-                                />
-                                <p v-if="form.errors.title" class="mt-1 text-xs font-medium text-rose-500">{{ form.errors.title }}</p>
-                            </div>
-
-                            <div class="space-y-1.5">
                                 <label class="text-sm font-bold text-slate-700 flex items-center gap-1">
-                                    Link Buku <span class="text-xs font-normal text-slate-400"></span>
+                                    Link Buku <span class="text-red-500">*</span>
                                 </label>
                                 <div class="relative">
                                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
@@ -216,6 +200,7 @@ const handleDelete = (cover: Cover) => {
                                         type="url"
                                         class="w-full rounded-xl border-slate-200 pl-10 transition-all placeholder:text-slate-400 focus:border-[#99cc33] focus:ring-4 focus:ring-[#99cc33]/10 p-3"
                                         placeholder="https://perpustakaan.polban.ac.id/..."
+                                        required
                                     />
                                 </div>
                                 <p v-if="form.errors.link_buku" class="mt-1 text-xs font-medium text-rose-500">{{ form.errors.link_buku }}</p>

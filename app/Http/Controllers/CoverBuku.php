@@ -11,18 +11,16 @@ class CoverBuku extends Controller
 {
     public function index()
     {
-        // Ambil data terbaru
         $covers = BookCover::latest()->get();
 
         return Inertia::render('admin/Cover/Index', [
             'covers' => $covers
         ]);
     }
+
     public function show()
     {
-        // Ambil data terbaru
         $covers = BookCover::latest()->limit(6)->get();
-
         return Inertia::render('user/Home', [
             'covers' => $covers
         ]);
@@ -31,19 +29,18 @@ class CoverBuku extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required|string|max:255',
-            // Validasi URL (nullable = boleh kosong)
-            'link_buku' => 'nullable|url|max:255', 
-            'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            // [PERUBAHAN] Ubah nullable menjadi required
+            'link_buku' => 'required|url|max:255', 
+            'image'     => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ], [
-            'link_buku.url' => 'Format link tidak valid (harus diawali http:// atau https://)'
+            'link_buku.required' => 'Link buku wajib diisi.',
+            'link_buku.url'      => 'Format link tidak valid (harus diawali http:// atau https://)'
         ]);
 
         $path = $request->file('image')->store('covers', 'public');
 
         BookCover::create([
-            'title'      => $request->title,
-            'link_buku'  => $request->link_buku, // Simpan Link
+            'link_buku'  => $request->link_buku,
             'image_path' => $path,
         ]);
 
@@ -55,14 +52,16 @@ class CoverBuku extends Controller
         $cover = BookCover::findOrFail($id);
 
         $request->validate([
-            'title' => 'required|string|max:255',
-            'link_buku' => 'nullable|url|max:255', // Validasi Update
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            // [PERUBAHAN] Ubah nullable menjadi required
+            'link_buku' => 'required|url|max:255',
+            'image'     => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ], [
+            'link_buku.required' => 'Link buku wajib diisi.',
+            'link_buku.url'      => 'Format link tidak valid.'
         ]);
 
         $data = [
-            'title'     => $request->title,
-            'link_buku' => $request->link_buku // Update Link
+            'link_buku' => $request->link_buku
         ];
 
         if ($request->hasFile('image')) {
@@ -81,7 +80,6 @@ class CoverBuku extends Controller
     {
         $cover = BookCover::findOrFail($id);
 
-        // Hapus file fisik
         if ($cover->image_path && Storage::disk('public')->exists($cover->image_path)) {
             Storage::disk('public')->delete($cover->image_path);
         }
