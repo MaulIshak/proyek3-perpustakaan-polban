@@ -23,7 +23,6 @@ const handleSubmit = async (e: Event) => {
     e.preventDefault();
 
     try {
-        // Ambil token dengan aman (handle jika null)
         const csrfElement = document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement;
         const csrfToken = csrfElement ? csrfElement.content : '';
 
@@ -31,28 +30,34 @@ const handleSubmit = async (e: Event) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Accept': 'application/json', // Tambahkan ini agar server tau kita minta JSON
+                'Accept': 'application/json', 
                 'X-CSRF-TOKEN': csrfToken,
             },
             body: JSON.stringify(formData.value)
         });
 
-        // JIKA ERROR DARI SERVER
+        const data = await res.json().catch(() => null);
+
+        // --- PERBAIKAN HANDLING ERROR 422 DISINI ---
         if (!res.ok) {
-            // Coba ambil pesan error dari server
-            const errorData = await res.json().catch(() => null); 
-            console.error("Detail Error Server:", errorData); // Lihat ini di Console
-            
-            throw new Error(`Server menolak: ${res.status} ${res.statusText}`);
+            // Jika error validasi Laravel (422)
+            if (res.status === 422 && data?.errors) {
+                // Gabungkan semua pesan error menjadi satu string
+                const errorMessages = Object.values(data.errors).flat().join('\n');
+                throw new Error(errorMessages); 
+            }
+
+            // Error lain (Limit rate, Server error, dll)
+            throw new Error(data?.message || `Server Error: ${res.status}`);
         }
 
         // Jika sukses
         isSent.value = true;
 
     } catch (err) {
-        console.error("Error Catch:", err);
-        // Tampilkan pesan error spesifik jika ada
-        alert("Gagal mengirim: " + (err instanceof Error ? err.message : "Kesalahan jaringan"));
+        console.error("Gagal mengirim:", err);
+        // Tampilkan pesan error yang spesifik (misal: "Nama wajib diisi")
+        alert(err instanceof Error ? err.message : "Terjadi kesalahan jaringan.");
     }
 };
 

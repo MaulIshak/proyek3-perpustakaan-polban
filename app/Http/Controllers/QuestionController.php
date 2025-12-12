@@ -22,13 +22,15 @@ class QuestionController extends Controller
         // 2. Validasi Input Ketat
         $validated = $request->validate([
             'nama'       => ['required', 'string', 'max:100', 'min:3'],
-            'email'      => ['required', 'email:dns', 'max:255'],
+            // [UBAH] Gunakan 'email' saja agar lebih aman di localhost/testing
+            'email'      => ['required', 'email', 'max:255'], 
             'pertanyaan' => ['required', 'string', 'max:3000', 'min:10'],
         ], [
             'nama.required' => 'Nama wajib diisi.',
-            'email.email'   => 'Format email tidak valid.',
-            'pertanyaan.min'=> 'Pertanyaan terlalu pendek, mohon jelaskan lebih detail.',
-            'pertanyaan.max'=> 'Pertanyaan terlalu panjang (maks 3000 karakter).',
+            'nama.min'      => 'Nama terlalu pendek (min 3 huruf).', // Tambahan pesan
+            'email.email'   => 'Format email tidak valid (gunakan @polban.ac.id atau gmail).',
+            'pertanyaan.min'=> 'Pertanyaan terlalu pendek (min 10 karakter).',
+            'pertanyaan.max'=> 'Pertanyaan terlalu panjang.',
         ]);
 
         // Hitung limit (Increment)
@@ -49,7 +51,7 @@ class QuestionController extends Controller
         // 4. Kirim Email Menggunakan Service
         // Format: sendEmail($toEmail, $toName, $subject, $message, $replyTo)
         
-        $adminEmail = 'faliqazzaki@gmail.com'; // Email Admin Tujuan
+        $adminEmail = 'maulana.ishak.tif24@polban.ac.id'; // Email Admin Tujuan
 
         $brevo->sendEmail(
             $adminEmail,                            // Ke: Admin

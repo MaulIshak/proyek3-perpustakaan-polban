@@ -13,7 +13,7 @@ import {
 
 const breadcrumb = [
     { label: 'Home', link: '/' },
-    { label: 'Layanan' },
+    { label: 'Koleksi' },
     { label: 'E-Collection' },
 ];
 

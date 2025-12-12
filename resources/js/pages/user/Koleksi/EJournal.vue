@@ -5,25 +5,34 @@ import { Head } from '@inertiajs/vue3';
 import {
     Search,
     ExternalLink,
-    Globe,
     Book,
     Library,
     Info,
     ArrowRight,
     Sparkles,
-    HardDrive // Icon untuk Google Drive
+    Link2 
 } from 'lucide-vue-next';
 
 // -- TYPES --
-// [UPDATE 1] Tambahkan gdrive_url ke interface
+interface AdditionalLink {
+    label: string;
+    url: string;
+}
+
 interface LibraryItem {
     id: number;
     name: string;       
     description: string;
-    url: string;        
-    gdrive_url?: string | null; // Kolom baru
+    url: string; 
+    additional_links: AdditionalLink[] | null; 
     type: 'journal' | 'ebook';
     img_url: string | null; 
+}
+
+// [FIX] Tambahkan Interface untuk blok deskripsi
+interface DescriptionBlock {
+    type: 'list' | 'p';
+    content: string;
 }
 
 // -- PROPS --
@@ -60,6 +69,24 @@ const filteredItems = computed(() => {
 const switchTab = (tab: 'journal' | 'ebook') => {
     activeTab.value = tab;
     searchQuery.value = ''; 
+};
+
+// -- HELPER: PARSE DESKRIPSI [UPDATED] --
+// Kita tambahkan return type explicit ": DescriptionBlock[]"
+// dan filter type predicate ": item is DescriptionBlock"
+const parseDescription = (text: string): DescriptionBlock[] => {
+    if (!text) return [];
+    
+    return text.split('\n').map((line): DescriptionBlock | null => {
+        const trimmed = line.trim();
+        if (!trimmed) return null;
+        
+        if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+            return { type: 'list', content: trimmed.substring(2) };
+        }
+        return { type: 'p', content: trimmed };
+    })
+    .filter((item): item is DescriptionBlock => item !== null); 
 };
 </script>
 
@@ -174,29 +201,33 @@ const switchTab = (tab: 'journal' | 'ebook') => {
                                     </span>
                                 </div>
 
-                                <div class="mb-5">
-                                    <ul v-if="item.description.includes('\n')" class="list-outside list-disc pl-5 space-y-1.5 text-slate-600 text-base leading-relaxed marker:text-[#99cc33]">
-                                        <li v-for="(line, idx) in item.description.split('\n')" :key="idx">
-                                            {{ line }}
-                                        </li>
-                                    </ul>
-                                    <p v-else class="text-slate-600 text-base leading-relaxed">
-                                        {{ item.description }}
-                                    </p>
+                                <div class="mb-5 text-slate-600 text-base leading-relaxed space-y-2">
+                                    <template v-for="(block, idx) in parseDescription(item.description)" :key="idx">
+                                        <div v-if="block.type === 'list'" class="flex items-start gap-2 pl-2">
+                                            <span class="mt-2 w-1.5 h-1.5 rounded-full shrink-0" 
+                                                  :class="activeTab === 'journal' ? 'bg-[#99cc33]' : 'bg-blue-500'">
+                                            </span>
+                                            <span>{{ block.content }}</span>
+                                        </div>
+                                        <p v-else>{{ block.content }}</p>
+                                    </template>
                                 </div>
 
-                                <div v-if="item.gdrive_url" class="mb-6">
-                                    <a 
-                                        :href="item.gdrive_url" 
-                                        target="_blank" 
-                                        class="inline-flex items-center gap-3 px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 text-sm font-bold hover:bg-[#99cc33]/10 hover:border-[#99cc33]/50 hover:text-[#7da62b] transition-all group/gdrive"
-                                    >
-                                        <div class="p-1.5 bg-white rounded-lg border border-slate-200 shadow-sm group-hover/gdrive:border-[#99cc33]/30">
-                                            <HardDrive class="w-4 h-4" />
-                                        </div>
-                                        <span>Buka via Google Drive / Backup Link</span>
-                                        <ExternalLink class="w-3.5 h-3.5 opacity-50" />
-                                    </a>
+                                <div v-if="item.additional_links && item.additional_links.length > 0" class="mb-6 pt-3 border-t border-dashed border-slate-100">
+                                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Link Terkait:</p>
+                                    <div class="flex flex-wrap gap-3">
+                                        <a 
+                                            v-for="(link, lIdx) in item.additional_links" 
+                                            :key="lIdx"
+                                            :href="link.url" 
+                                            target="_blank" 
+                                            class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 text-sm font-bold hover:bg-[#99cc33]/10 hover:border-[#99cc33]/50 hover:text-[#7da62b] transition-all group/link"
+                                        >
+                                            <Link2 class="w-3.5 h-3.5 opacity-50 group-hover/link:opacity-100" />
+                                            {{ link.label }}
+                                            <ExternalLink class="w-3 h-3 opacity-30 group-hover/link:opacity-100" />
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
 
@@ -215,7 +246,7 @@ const switchTab = (tab: 'journal' | 'ebook') => {
                                         ? 'bg-[#99cc33] hover:bg-[#8ebf2f] shadow-[#99cc33]/20' 
                                         : 'bg-blue-600 hover:bg-blue-700 shadow-blue-600/20'"
                                 >
-                                    Buka Referensi
+                                    Buka Referensi Utama
                                     <ArrowRight class="w-4 h-4" />
                                 </a>
                             </div>
