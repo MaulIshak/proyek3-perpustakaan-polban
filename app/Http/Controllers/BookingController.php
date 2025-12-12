@@ -44,11 +44,28 @@ class BookingController extends Controller
     }
 
     // --- ADMIN SIDE ---
-    public function indexAdmin()
+    public function indexAdmin(Request $request)
     {
-        $bookings = BookingBuku::latest()->get();
+        // Query Dasar
+        $query = BookingBuku::query();
+
+        // 1. Logika Search (Jika ada input 'search')
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('nama_lengkap', 'ilike', "%{$search}%") // Gunakan 'ilike' utk PostgreSQL (case-insensitive)
+                  ->orWhere('nim_nip', 'like', "%{$search}%")
+                  ->orWhere('judul_buku', 'ilike', "%{$search}%");
+            });
+        }
+
+        // 2. Pagination (Ganti get() jadi paginate())
+        // withQueryString() berguna agar saat pindah halaman, search tidak hilang
+        $bookings = $query->latest()->paginate(2)->withQueryString();
+
         return Inertia::render('admin/booking/Index', [
-            'bookings' => $bookings
+            'bookings' => $bookings,
+            'filters'  => $request->only(['search']), // Kirim balik input search ke frontend
         ]);
     }
 
