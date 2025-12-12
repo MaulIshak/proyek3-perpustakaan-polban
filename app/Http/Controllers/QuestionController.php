@@ -49,7 +49,7 @@ class QuestionController extends Controller
         // 4. Kirim Email Menggunakan Service
         // Format: sendEmail($toEmail, $toName, $subject, $message, $replyTo)
         
-        $adminEmail = 'faliqazzaki@gmail.com'; // Email Admin Tujuan
+        $adminEmail = 'maulana.ishak.tif24@polban.ac.id'; // Email Admin Tujuan
 
         $brevo->sendEmail(
             $adminEmail,                            // Ke: Admin
