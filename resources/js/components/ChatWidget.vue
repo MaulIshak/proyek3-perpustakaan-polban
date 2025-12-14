@@ -30,7 +30,7 @@ const handleSubmit = async (e: Event) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Accept': 'application/json', 
+                'Accept': 'application/json',
                 'X-CSRF-TOKEN': csrfToken,
             },
             body: JSON.stringify(formData.value)
@@ -44,7 +44,7 @@ const handleSubmit = async (e: Event) => {
             if (res.status === 422 && data?.errors) {
                 // Gabungkan semua pesan error menjadi satu string
                 const errorMessages = Object.values(data.errors).flat().join('\n');
-                throw new Error(errorMessages); 
+                throw new Error(errorMessages);
             }
 
             // Error lain (Limit rate, Server error, dll)
@@ -77,7 +77,7 @@ const resetChat = () => {
         <transition name="fade">
             <div
                 v-if="isOpen"
-                class="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm sm:hidden"
+                class="fixed inset-0 z-40 bg-black/20  sm:hidden"
                 @click="isOpen = false"
             ></div>
         </transition>
@@ -120,7 +120,7 @@ const resetChat = () => {
                 >
                     <div class="flex items-center gap-4">
                         <div
-                            class="flex h-12 w-12 items-center justify-center rounded-full border border-white/30 bg-white/20 backdrop-blur-md"
+                            class="flex h-12 w-12 items-center justify-center rounded-full border border-white/30 bg-white/20"
                         >
                             <MessageCircle class="h-6 w-6 text-white" />
                         </div>
