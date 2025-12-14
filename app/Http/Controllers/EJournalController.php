@@ -10,25 +10,47 @@ use Illuminate\Support\Facades\Storage;
 
 class EJournalController extends Controller
 {
-    public function index()
+    /**
+     * Menampilkan daftar jurnal untuk Admin
+     */
+    public function index(Request $request)
     {
-        // Ambil data, paginate 10 per halaman
+        $query = EJournal::query();
+
+        // 1. Filter Search (Pencarian)
+        if ($request->filled('search')) {
+            $query->where(function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                ->orWhere('description', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        // 2. Filter Type (Journal/Ebook) - INI YANG HILANG SEBELUMNYA
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
         return Inertia::render('admin/EJournal/Index', [
-            'journals' => EJournal::latest()->paginate(10)
+            // Gunakan withQueryString agar filter tidak hilang saat klik halaman 2
+            'journals' => $query->latest()->paginate(3)->withQueryString(),
+            'filters'  => $request->only(['search', 'type']), // Kirim balik state filter ke Vue
         ]);
     }
 
+    /**
+     * Menyimpan data baru
+     */
     public function store(Request $request)
     {
         $request->validate([
-            'name'          => 'required|string|max:255',
-            'description'   => 'required|string',
-            'url'           => 'required|url|regex:/^https?:\/\//', // URL Utama
-            'type'          => 'required|in:journal,ebook',
-            'logo'          => 'nullable|image|max:5120',
+            'name'                   => 'required|string|max:255',
+            'description'            => 'required|string',
+            'url'                    => 'required|url', // regex https opsional, 'url' bawaan laravel sudah cukup aman
+            'type'                   => 'required|in:journal,ebook',
+            'logo'                   => 'nullable|image|max:5120', // Max 5MB
             
-            // Validasi Link Tambahan (Array) - Boleh kosong (nullable)
-            'additional_links'         => 'nullable|array',
+            // Validasi Link Tambahan
+            'additional_links'       => 'nullable|array',
             'additional_links.*.label' => 'required_with:additional_links|string',
             'additional_links.*.url'   => 'required_with:additional_links|url',
         ]);
@@ -40,19 +62,23 @@ class EJournalController extends Controller
         }
 
         EJournal::create($data);
+        
         return redirect()->back()->with('success', 'Data berhasil ditambahkan.');
     }
 
+    /**
+     * Mengupdate data
+     */
     public function update(Request $request, EJournal $ejournal)
     {
         $request->validate([
-            'name'          => 'required|string|max:255',
-            'description'   => 'required|string',
-            'url'           => 'required|url|regex:/^https?:\/\//',
-            'type'          => 'required|in:journal,ebook',
-            'logo'          => 'nullable|image|max:5120',
+            'name'                   => 'required|string|max:255',
+            'description'            => 'required|string',
+            'url'                    => 'required|url',
+            'type'                   => 'required|in:journal,ebook',
+            'logo'                   => 'nullable|image|max:5120',
             
-            'additional_links'         => 'nullable|array',
+            'additional_links'       => 'nullable|array',
             'additional_links.*.label' => 'required_with:additional_links|string',
             'additional_links.*.url'   => 'required_with:additional_links|url',
         ]);
@@ -60,34 +86,67 @@ class EJournalController extends Controller
         $data = $request->only(['name', 'description', 'url', 'additional_links', 'type']);
 
         if ($request->hasFile('logo')) {
-            if ($ejournal->logo_path) \Illuminate\Support\Facades\Storage::disk('public')->delete($ejournal->logo_path);
+            // Hapus logo lama jika ada
+            if ($ejournal->logo_path && Storage::disk('public')->exists($ejournal->logo_path)) {
+                Storage::disk('public')->delete($ejournal->logo_path);
+            }
             $data['logo_path'] = $request->file('logo')->store('journals', 'public');
         }
 
         $ejournal->update($data);
+
         return redirect()->back()->with('success', 'Data berhasil diperbarui.');
     }
 
+    /**
+     * Menghapus data
+     */
     public function destroy(EJournal $ejournal)
     {
-        // 1. Hapus file fisik gambar
+        // Hapus file fisik gambar
         if ($ejournal->logo_path && Storage::disk('public')->exists($ejournal->logo_path)) {
             Storage::disk('public')->delete($ejournal->logo_path);
         }
 
-        // 2. Hapus data di database
+        // Hapus data di database
         $ejournal->delete();
 
         return redirect()->back()->with('success', 'Jurnal berhasil dihapus.');
     }
 
-    public function ShowUser()
+    /**
+     * Menampilkan halaman User (Frontend)
+     * FIX: Menggunakan Paginate agar sinkron dengan Vue Component
+     */
+    public function ShowUser(Request $request)
     {
-        // Mengambil semua data jurnal, diurutkan dari yang terbaru
-        $journals = EJournal::latest()->get();
+        $query = EJournal::query();
+
+        // 1. Filter Pencarian (Nama atau Deskripsi)
+        if ($request->filled('search')) {
+            $query->where(function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                  ->orWhere('description', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        // 2. Filter Tipe (Journal atau Ebook)
+        // Default ke 'journal' jika tidak ada tipe yang dipilih
+        if ($request->has('type')) {
+            $query->where('type', $request->type);
+        } else {
+            $query->where('type', 'journal');
+        }
+
+        // 3. Paginate & Query String
+        // paginate(12) agar layout grid (3 atau 4 kolom) terlihat rapi
+        $journals = $query->latest()
+                          ->paginate(3)
+                          ->withQueryString(); 
 
         return Inertia::render('user/Koleksi/EJournal', [
-            'journals' => $journals
+            'journals' => $journals, // Data ini sekarang memiliki struktur { data: [], links: [], ... }
+            'filters'  => $request->only(['search', 'type']), // Kirim state filter balik ke Vue
         ]);
     }
 }
