@@ -17,6 +17,7 @@ class GaleriController extends Controller
 
         if ($request->filled('q')) {
             $q = $request->q;
+            // Cari berdasarkan URL foto (atau field lain jika ada)
             $query->where('url_foto', 'like', "%{$q}%");
         }
 
@@ -24,10 +25,13 @@ class GaleriController extends Controller
             $query->where('tipe', $request->tipe);
         }
 
-        $photos = $query->orderBy('created_date', 'desc')->paginate(12)->withQueryString();
+        $photos = $query->orderBy('created_date', 'desc')
+                        ->paginate(12) // Menggunakan paginate
+                        ->withQueryString();
 
         return Inertia::render('admin/AdminGaleri', [
             'photos' => $photos,
+            'filters' => $request->only(['q', 'tipe']), // Kirim filter balik
         ]);
     }
 
@@ -158,7 +162,12 @@ class GaleriController extends Controller
 
     public function UserView()
     {
-        $photos = Photo::where('tipe', 'galeri')->orderBy('created_date', 'desc')->get();
+        // Ubah get() menjadi paginate(12)
+        // Angka 12 dipilih agar pas dengan layout grid (bisa dibagi 2, 3, dan 4 kolom)
+        $photos = Photo::where('tipe', 'galeri')
+                        ->orderBy('created_date', 'desc')
+                        ->paginate(12); 
+
         return Inertia::render('Galeri/Galeri', [
             'photos' => $photos,
         ]);

@@ -37,7 +37,7 @@ class BookProposalController extends Controller
         ];
 
         // Ambil data dengan pagination
-        $proposals = $query->latest()->paginate(10)->withQueryString();
+        $proposals = $query->latest()->paginate(5)->withQueryString();
 
         return Inertia::render('admin/usulan/Index', [
             'proposals' => $proposals,
@@ -164,17 +164,17 @@ class BookProposalController extends Controller
         return back()->with('success', 'Usulan berhasil dihapus.');
     }
 
-public function export(Request $request)
-{
-    // Ambil parameter filter dari request URL
-    $search = $request->input('search');
-    $status = $request->input('status');
+    public function export(Request $request)
+    {
+        // Ambil parameter filter dari request URL
+        $search = $request->input('search');
+        $status = $request->input('status');
 
-    // Generate nama file dengan timestamp
-    $fileName = 'usulan-buku-' . date('Y-m-d_H-i') . '.xlsx';
+        // Generate nama file dengan timestamp
+        $fileName = 'usulan-buku-' . date('Y-m-d_H-i') . '.xlsx';
 
-    return Excel::download(new BookProposalsExport($search, $status), $fileName);
-}
+        return Excel::download(new BookProposalsExport($search, $status), $fileName);
+    }
 
 
 }

@@ -1,10 +1,12 @@
-<script setup lang="ts">
+<script setup>
 import AdminLayout from '@/layouts/AdminLayout.vue';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { router, useForm } from '@inertiajs/vue3';
+import { debounce } from 'lodash';
 import {
   UploadCloud, Trash2, Edit, Plus, X, Image as ImageIcon,
-  FileImage, Save, RotateCcw, AlertCircle
+  FileImage, Save, RotateCcw, AlertCircle, Search, ChevronLeft, ChevronRight,
+  Filter
 } from 'lucide-vue-next';
 
 // Import ConfirmModal dan Composables
@@ -13,7 +15,7 @@ import { useConfirmModal } from '@/composables/userConfirmModal';
 
 // Layout Definition
 defineOptions({
-  layout: (h: any, page: any) =>
+  layout: (h, page) =>
     h(
       AdminLayout,
       {
@@ -24,44 +26,58 @@ defineOptions({
     ),
 });
 
-// Props
-const props = defineProps<{
-  photos: {
-    data: any[];
-    links: any[];
-    // ... pagination props lainnya
-  };
-}>();
+// Props (Menerima pagination object & filters)
+const props = defineProps({
+  photos: Object, // Struktur: { data: [], links: [], ... }
+  filters: Object, // State filter dari server
+});
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 // State
 const showCreateModal = ref(false);
 const showEditModal = ref(false);
-const editItem = ref<any>(null);
-const previewImage = ref<string | null>(null);
-const fileInputRef = ref<HTMLInputElement | null>(null);
+const editItem = ref(null);
+const previewImage = ref(null);
+const fileInputRef = ref(null);
+
+// State Filter (Server Side)
+const search = ref(props.filters?.q || '');
+const typeFilter = ref(props.filters?.tipe || ''); // '' = Semua
 
 // Use Confirm Modal
 const { open } = useConfirmModal();
 
+// Watcher untuk Search & Filter
+watch(
+    [search, typeFilter],
+    debounce(([newSearch, newType]) => {
+        router.get('/admin/galeri', {
+            q: newSearch,
+            tipe: newType
+        }, {
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+        });
+    }, 300)
+);
+
 // Forms
 const createForm = useForm({
-    foto: null as File | null,
-    judul: '',
-    tipe: 'galeri'
+    foto: null,
+    tipe: 'galeri' // Default
 });
 
 const editForm = useForm({
-    foto: null as File | null,
-    judul: '',
+    foto: null,
     tipe: 'galeri',
     _method: 'put'
 });
 
 // Helper: Handle File Change & Preview
-const handleFileChange = (e: Event, formType: 'create' | 'edit') => {
-  const target = e.target as HTMLInputElement;
+const handleFileChange = (e, formType) => {
+  const target = e.target;
   const file = target.files?.[0] ?? null;
   const targetForm = formType === 'create' ? createForm : editForm;
 
@@ -101,10 +117,10 @@ function submitCreate() {
   });
 }
 
-function openEdit(photo: any) {
+function openEdit(photo) {
   editItem.value = photo;
   editForm.reset();
-  editForm.judul = photo.judul || '';
+  editForm.tipe = photo.tipe || 'galeri';
   previewImage.value = photo.url_foto;
   editForm.foto = null;
   showEditModal.value = true;
@@ -122,13 +138,11 @@ function submitEdit() {
   });
 }
 
-// Menggunakan ConfirmModal
-function remove(photo: any) {
+function remove(photo) {
   open({
       title: 'Hapus Foto Galeri?',
       message: 'Apakah Anda yakin ingin menghapus foto ini secara permanen? Tindakan ini tidak dapat dibatalkan.',
       actionLabel: 'Hapus',
-    //   confirmClass: 'bg-rose-600 hover:bg-rose-700 text-white',
       onConfirm: () => {
           router.delete(`/admin/galeri/${photo.foto_id}`, {
               preserveScroll: true
@@ -136,40 +150,55 @@ function remove(photo: any) {
       },
   });
 }
+
+// Helper Label Pagination
+const getLabel = (label) => {
+    if (label.includes('Previous')) return 'Prev';
+    if (label.includes('Next')) return 'Next';
+    return label;
+};
 </script>
 
 <template>
   <div class="space-y-8 font-sans">
 
-    <!-- 1. Toolbar -->
-    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
-      <div class="flex items-center gap-3">
-        <div class="p-2 bg-[#99cc33]/10 rounded-xl text-[#99cc33]">
-          <ImageIcon class="w-6 h-6" />
-        </div>
-        <div>
-            <h2 class="text-lg font-bold text-slate-800">Daftar Foto</h2>
-            <p class="text-xs text-slate-500 font-medium">Total {{ props.photos.data.length }} item</p>
-        </div>
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+      <div class="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+          <div class="flex rounded-xl border border-slate-200 bg-slate-50/50 p-1">
+              <button @click="typeFilter = ''" class="rounded-lg px-3 py-2 text-xs font-bold transition-all" :class="typeFilter === '' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'">Semua</button>
+              <button @click="typeFilter = 'galeri'" class="rounded-lg px-3 py-2 text-xs font-bold transition-all" :class="typeFilter === 'galeri' ? 'bg-white text-[#99cc33] shadow-sm' : 'text-slate-500 hover:text-slate-700'">Galeri</button>
+              <button @click="typeFilter = 'cover_buku'" class="rounded-lg px-3 py-2 text-xs font-bold transition-all" :class="typeFilter === 'cover_buku' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'">Cover</button>
+          </div>
+
+          <div class="relative w-full sm:w-64">
+              <Search class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <input 
+                  v-model="search" 
+                  type="text" 
+                  placeholder="Cari foto..." 
+                  class="h-10 w-full rounded-xl border border-slate-200 bg-white pl-9 pr-4 text-sm font-medium outline-none focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
+              >
+          </div>
       </div>
 
-      <button
-        @click="openCreate"
-        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-transparent text-sm font-bold rounded-xl text-white bg-[#99cc33] hover:bg-[#88b82d] shadow-lg shadow-[#99cc33]/30 transition-all hover:-translate-y-0.5 active:translate-y-0"
-      >
-        <Plus class="w-5 h-5" />
-        Upload Foto Baru
-      </button>
+      <div class="flex items-center gap-4 w-full lg:w-auto justify-between lg:justify-end">
+          <p class="text-xs text-slate-500 font-medium hidden sm:block">Total {{ props.photos.total }} item</p>
+          <button
+            @click="openCreate"
+            class="inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-transparent text-sm font-bold rounded-xl text-white bg-[#99cc33] hover:bg-[#88b82d] shadow-lg shadow-[#99cc33]/30 transition-all hover:-translate-y-0.5 active:translate-y-0"
+          >
+            <Plus class="w-5 h-5" />
+            Upload Foto
+          </button>
+      </div>
     </div>
 
-    <!-- 2. Grid Gallery -->
     <div v-if="props.photos.data.length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
       <div
         v-for="item in props.photos.data"
         :key="item?.foto_id"
         class="group relative bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-[#99cc33]/50 transition-all duration-300 overflow-hidden flex flex-col"
       >
-        <!-- Image Area -->
         <div class="aspect-[4/3] overflow-hidden bg-slate-100 relative">
           <img
             :src="item.url_foto"
@@ -178,7 +207,6 @@ function remove(photo: any) {
             loading="lazy"
           />
 
-          <!-- Overlay Actions -->
           <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-3">
             <button
               @click="openEdit(item)"
@@ -197,34 +225,61 @@ function remove(photo: any) {
           </div>
         </div>
 
-        <!-- Meta Footer -->
         <div class="p-3 bg-white border-t border-slate-100 flex justify-between items-center">
-            <span class="px-2 py-0.5 rounded-md bg-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
-                {{ item.tipe || 'GALERI' }}
+            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border"
+                  :class="item.tipe === 'galeri' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-blue-50 text-blue-600 border-blue-100'">
+                {{ item.tipe === 'galeri' ? 'GALERI' : 'COVER BUKU' }}
             </span>
             <span class="text-xs text-slate-400 font-medium">{{ item.size || '0' }} KB</span>
         </div>
       </div>
     </div>
 
-    <!-- 3. Empty State -->
     <div v-else class="flex flex-col items-center justify-center py-24 bg-white rounded-3xl border border-dashed border-slate-200 text-center">
-        <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4 animate-pulse">
-            <FileImage class="w-10 h-10 text-slate-400" />
+        <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+            <Search class="w-10 h-10 text-slate-300" />
         </div>
-        <h3 class="text-xl font-bold text-slate-800 mb-2">Galeri Kosong</h3>
+        <h3 class="text-xl font-bold text-slate-800 mb-2">Tidak Ditemukan</h3>
         <p class="text-slate-500 text-sm max-w-md leading-relaxed">
-            Belum ada foto yang diunggah. Mulai dokumentasikan kegiatan perpustakaan dengan mengunggah foto pertama Anda.
+            Tidak ada foto yang cocok dengan pencarian atau filter Anda.
         </p>
         <button
-            @click="openCreate"
+            @click="search = ''; typeFilter = ''"
             class="mt-6 text-sm font-bold text-[#99cc33] hover:text-[#88b82d] hover:underline"
         >
-            Upload Foto Sekarang
+            Reset Filter
         </button>
     </div>
 
-    <!-- MODAL CREATE -->
+    <div v-if="props.photos.data.length > 0" class="flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-6 sm:flex-row">
+        <p class="text-sm text-slate-500">
+            Menampilkan <span class="font-bold text-slate-700">{{ props.photos.from }}</span> - <span class="font-bold text-slate-700">{{ props.photos.to }}</span> dari <span class="font-bold text-slate-700">{{ props.photos.total }}</span> foto
+        </p>
+        
+        <div class="flex items-center gap-1">
+            <template v-for="(link, k) in props.photos.links" :key="k">
+                <div v-if="link.url === null" 
+                        class="flex h-9 min-w-[36px] items-center justify-center rounded-lg border border-transparent px-3 text-sm text-slate-300"
+                        v-html="getLabel(link.label)">
+                </div>
+                
+                <component 
+                    :is="link.url ? 'button' : 'span'" 
+                    v-else
+                    @click="link.url && router.get(link.url, {}, { preserveState: true, preserveScroll: true })"
+                    class="flex h-9 min-w-[36px] items-center justify-center rounded-lg px-3 text-sm font-bold transition-all border"
+                    :class="link.active 
+                        ? 'bg-[#99cc33] text-white border-[#99cc33] shadow-md shadow-[#99cc33]/20' 
+                        : 'bg-white text-slate-600 border-slate-200 hover:border-[#99cc33] hover:text-[#99cc33]'"
+                >
+                    <span v-if="link.label.includes('Previous')"><ChevronLeft class="h-4 w-4" /></span>
+                    <span v-else-if="link.label.includes('Next')"><ChevronRight class="h-4 w-4" /></span>
+                    <span v-else v-html="link.label"></span>
+                </component>
+            </template>
+        </div>
+    </div>
+
     <transition name="modal">
       <div v-if="showCreateModal" class="fixed inset-0 z-[70] flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" @click="showCreateModal = false"></div>
@@ -238,34 +293,38 @@ function remove(photo: any) {
           </div>
 
           <div class="p-6 space-y-6">
-            <!-- Upload Area -->
+            <div class="space-y-2">
+                <label class="block text-sm font-bold text-slate-700">Tipe Foto</label>
+                <div class="grid grid-cols-2 gap-4">
+                    <label class="flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition-all hover:bg-slate-50" :class="createForm.tipe === 'galeri' ? 'border-[#99cc33] bg-[#99cc33]/5 ring-1 ring-[#99cc33]' : 'border-slate-200'">
+                        <input type="radio" v-model="createForm.tipe" value="galeri" class="accent-[#99cc33]" />
+                        <span class="text-sm font-bold" :class="createForm.tipe === 'galeri' ? 'text-[#99cc33]' : 'text-slate-600'">Galeri</span>
+                    </label>
+                    <label class="flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition-all hover:bg-slate-50" :class="createForm.tipe === 'cover_buku' ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500' : 'border-slate-200'">
+                        <input type="radio" v-model="createForm.tipe" value="cover_buku" class="accent-blue-500" />
+                        <span class="text-sm font-bold" :class="createForm.tipe === 'cover_buku' ? 'text-blue-600' : 'text-slate-600'">Cover Buku</span>
+                    </label>
+                </div>
+            </div>
+
             <div class="space-y-2">
                 <label class="block text-sm font-bold text-slate-700 mb-2">File Foto</label>
-
-                <!-- PERBAIKAN: Dropzone Area -->
                 <div
                     @click="triggerFileInput"
-                    class="group relative w-full h-64 border-2 border-dashed rounded-2xl cursor-pointer transition-all flex flex-col items-center justify-center text-center overflow-hidden bg-slate-50"
+                    class="group relative w-full h-56 border-2 border-dashed rounded-2xl cursor-pointer transition-all flex flex-col items-center justify-center text-center overflow-hidden bg-slate-50"
                     :class="[
                         createForm.errors.foto ? 'border-red-300 bg-red-50' : 'border-slate-300 hover:border-[#99cc33] hover:bg-[#99cc33]/5',
                         previewImage ? 'border-solid' : ''
                     ]"
                 >
-                    <!-- Case 1: Ada Preview Image (Tampilkan Gambar Full, Sembunyikan Teks Default) -->
                     <template v-if="previewImage">
-                        <img
-                            :src="previewImage"
-                            class="w-full h-full object-contain p-2"
-                        />
-
-                        <!-- Overlay Hover: Hanya muncul saat di-hover untuk ganti gambar -->
+                        <img :src="previewImage" class="w-full h-full object-contain p-2" />
                         <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white backdrop-blur-[1px]">
                             <RotateCcw class="w-8 h-8 mb-2" />
                             <span class="text-sm font-bold">Klik untuk ganti foto</span>
                         </div>
                     </template>
 
-                    <!-- Case 2: Belum Ada Image (Tampilkan Placeholder Upload) -->
                     <div v-else class="flex flex-col items-center justify-center p-6 transition-transform duration-300 group-hover:scale-105">
                         <div class="p-4 bg-white rounded-full shadow-sm mb-3 group-hover:shadow-md">
                             <UploadCloud class="w-8 h-8 text-[#99cc33]" />
@@ -276,7 +335,6 @@ function remove(photo: any) {
                         <p class="text-xs mt-1 text-slate-400 font-medium">JPG, PNG (Maks. 5MB)</p>
                     </div>
 
-                    <!-- Hidden Input -->
                     <input
                         ref="fileInputRef"
                         type="file"
@@ -285,8 +343,6 @@ function remove(photo: any) {
                         accept="image/*"
                     />
                 </div>
-
-                <!-- Error Message -->
                 <p v-if="createForm.errors.foto" class="text-xs text-red-500 mt-2 flex items-center font-medium animate-pulse">
                     <AlertCircle class="w-3 h-3 mr-1" /> {{ createForm.errors.foto }}
                 </p>
@@ -315,7 +371,6 @@ function remove(photo: any) {
       </div>
     </transition>
 
-    <!-- MODAL EDIT -->
     <transition name="modal">
       <div v-if="showEditModal" class="fixed inset-0 z-[70] flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" @click="showEditModal = false"></div>
@@ -329,23 +384,32 @@ function remove(photo: any) {
           </div>
 
           <div class="p-6 space-y-6">
+            <div class="space-y-2">
+                <label class="block text-sm font-bold text-slate-700">Tipe Foto</label>
+                <div class="grid grid-cols-2 gap-4">
+                    <label class="flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition-all hover:bg-slate-50" :class="editForm.tipe === 'galeri' ? 'border-[#99cc33] bg-[#99cc33]/5 ring-1 ring-[#99cc33]' : 'border-slate-200'">
+                        <input type="radio" v-model="editForm.tipe" value="galeri" class="accent-[#99cc33]" />
+                        <span class="text-sm font-bold" :class="editForm.tipe === 'galeri' ? 'text-[#99cc33]' : 'text-slate-600'">Galeri</span>
+                    </label>
+                    <label class="flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition-all hover:bg-slate-50" :class="editForm.tipe === 'cover_buku' ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500' : 'border-slate-200'">
+                        <input type="radio" v-model="editForm.tipe" value="cover_buku" class="accent-blue-500" />
+                        <span class="text-sm font-bold" :class="editForm.tipe === 'cover_buku' ? 'text-blue-600' : 'text-slate-600'">Cover Buku</span>
+                    </label>
+                </div>
+            </div>
+
             <div class="w-full">
                 <label class="block text-sm font-bold text-slate-700 mb-2">Preview Gambar</label>
 
                 <div class="relative aspect-video rounded-xl overflow-hidden bg-slate-100 border border-slate-200 mb-4 group">
                     <img :src="previewImage || ''" class="w-full h-full object-contain" />
 
-                    <!-- Edit Overlay -->
                     <label class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center cursor-pointer text-white">
                         <RotateCcw class="w-8 h-8 mb-2" />
                         <span class="text-sm font-bold">Ganti Gambar</span>
                         <input type="file" @change="(e) => handleFileChange(e, 'edit')" class="hidden" accept="image/*" />
                     </label>
                 </div>
-
-                <p v-if="editForm.errors.foto" class="text-xs text-red-500 mt-1 flex items-center">
-                    <AlertCircle class="w-3 h-3 mr-1" /> {{ editForm.errors.foto }}
-                </p>
                 <p class="text-xs text-slate-400 italic text-center">Klik gambar di atas untuk mengganti foto.</p>
             </div>
           </div>
@@ -366,7 +430,6 @@ function remove(photo: any) {
       </div>
     </transition>
 
-    <!-- Komponen Confirm Modal -->
     <ConfirmModal />
 
   </div>

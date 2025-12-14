@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, watch, computed } from 'vue';
 import Layout from '@/layouts/UserAppLayout.vue';
-import { Head } from '@inertiajs/vue3'; 
+import PaginationLink from '@/components/PaginationLink.vue'; // Pastikan komponen ini ada (dari percakapan sebelumnya)
+import { Head, router } from '@inertiajs/vue3'; 
+import { debounce } from 'lodash'; // Pastikan lodash terinstall: npm i lodash @types/lodash
 import {
     Search,
     ExternalLink,
@@ -29,20 +31,37 @@ interface LibraryItem {
     img_url: string | null; 
 }
 
-// [FIX] Tambahkan Interface untuk blok deskripsi
 interface DescriptionBlock {
     type: 'list' | 'p';
     content: string;
 }
 
-// -- PROPS --
+// -- PROPS (Updated untuk Pagination Laravel) --
 const props = defineProps<{
-    journals: LibraryItem[];
+    // Struktur ini cocok dengan return $query->paginate() dari Laravel
+    journals: {
+        data: LibraryItem[];
+        links: Array<{
+            url: string | null;
+            label: string;
+            active: boolean;
+        }>;
+        current_page: number;
+        from: number;
+        to: number;
+        total: number;
+    };
+    // Menerima state filter dari backend agar sinkron saat refresh
+    filters?: {
+        search?: string;
+        type?: 'journal' | 'ebook';
+    };
 }>();
 
 // -- STATE --
-const activeTab = ref<'journal' | 'ebook'>('journal');
-const searchQuery = ref('');
+// Ambil default dari props filters (jika ada) atau default value
+const activeTab = ref<'journal' | 'ebook'>(props.filters?.type || 'journal');
+const searchQuery = ref(props.filters?.search || '');
 
 // -- BREADCRUMB --
 const breadcrumb = [
@@ -51,29 +70,38 @@ const breadcrumb = [
     { label: 'Referensi Digital' },
 ];
 
-// -- LOGIC --
-const currentSource = computed(() => {
-    return props.journals.filter(item => item.type === activeTab.value);
-});
+// -- LOGIC SERVER SIDE --
 
-const filteredItems = computed(() => {
-    if (!searchQuery.value) return currentSource.value; 
-    
-    const query = searchQuery.value.toLowerCase();
-    return currentSource.value.filter(item =>
-        item.name.toLowerCase().includes(query) ||
-        item.description.toLowerCase().includes(query)
+// 1. Fungsi Request Data
+const fetchData = () => {
+    router.get(
+        // URL saat ini
+        window.location.pathname, 
+        { 
+            search: searchQuery.value,
+            type: activeTab.value 
+        },
+        {
+            preserveState: true, // Jaga state komponen
+            preserveScroll: true, // Jaga posisi scroll
+            replace: true, // Ganti history browser agar rapi
+        }
     );
-});
-
-const switchTab = (tab: 'journal' | 'ebook') => {
-    activeTab.value = tab;
-    searchQuery.value = ''; 
 };
 
-// -- HELPER: PARSE DESKRIPSI [UPDATED] --
-// Kita tambahkan return type explicit ": DescriptionBlock[]"
-// dan filter type predicate ": item is DescriptionBlock"
+// 2. Watch Search (Debounce agar hemat request)
+watch(searchQuery, debounce(() => {
+    fetchData();
+}, 500));
+
+// 3. Watch Tab (Langsung request saat ganti tab)
+const switchTab = (tab: 'journal' | 'ebook') => {
+    activeTab.value = tab;
+    searchQuery.value = ''; // Reset search saat ganti tab (opsional, tergantung UX yg dimau)
+    fetchData();
+};
+
+// -- HELPER: PARSE DESKRIPSI --
 const parseDescription = (text: string): DescriptionBlock[] => {
     if (!text) return [];
     
@@ -88,6 +116,11 @@ const parseDescription = (text: string): DescriptionBlock[] => {
     })
     .filter((item): item is DescriptionBlock => item !== null); 
 };
+
+// Helper untuk membersihkan link pagination (filter link prev/next bawaan jika mau custom, atau pakai semua)
+const paginationLinks = computed(() => {
+    return props.journals.links;
+});
 </script>
 
 <template>
@@ -150,20 +183,20 @@ const parseDescription = (text: string): DescriptionBlock[] => {
                         Koleksi {{ activeTab === 'journal' ? 'E-Journal' : 'E-Book' }}
                     </h2>
                     <span class="text-sm font-medium px-4 py-1.5 rounded-full bg-white border border-slate-200 text-slate-500">
-                        {{ filteredItems.length }} referensi Tersedia
+                        {{ journals.total }} referensi Tersedia
                     </span>
                 </div>
 
                 <TransitionGroup 
                     tag="div" 
-                    class="space-y-6 mb-20"
+                    class="space-y-6 mb-12"
                     enter-active-class="transition ease-out duration-300"
                     enter-from-class="opacity-0 translate-y-6"
                     enter-to-class="opacity-100 translate-y-0"
                     leave-active-class="absolute opacity-0"
                 >
                     <div
-                        v-for="item in filteredItems"
+                        v-for="item in journals.data"
                         :key="item.id"
                         class="group relative bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-[#99cc33]/10 transition-all duration-300 hover:-translate-y-1 flex flex-col md:flex-row gap-8 items-start overflow-hidden"
                     >
@@ -254,7 +287,21 @@ const parseDescription = (text: string): DescriptionBlock[] => {
                     </div>
                 </TransitionGroup>
 
-                <div v-if="filteredItems.length === 0" class="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-dashed border-slate-200">
+                <div v-if="journals.data.length > 0" class="flex flex-col items-center justify-between gap-6 sm:flex-row border-t border-slate-200 pt-8 pb-12">
+                    <div class="text-sm text-slate-500 font-medium bg-white px-4 py-2 rounded-full shadow-sm border border-slate-100">
+                        Menampilkan <span class="text-[#99cc33] font-bold">{{ journals.from }}</span> - <span class="text-[#99cc33] font-bold">{{ journals.to }}</span> dari <span class="text-slate-800 font-bold">{{ journals.total }}</span> referensi
+                    </div>
+
+                    <nav class="isolate inline-flex -space-x-px rounded-xl shadow-sm bg-white p-1 border border-slate-100">
+                        <PaginationLink
+                            v-for="(link, index) in paginationLinks"
+                            :key="index"
+                            :link="link"
+                        />
+                    </nav>
+                </div>
+
+                <div v-if="journals.data.length === 0" class="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-dashed border-slate-200">
                     <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4">
                         <Search class="w-10 h-10 text-slate-300" />
                     </div>
@@ -263,11 +310,11 @@ const parseDescription = (text: string): DescriptionBlock[] => {
                         Tidak ada data dengan kata kunci "<span class="font-bold">{{ searchQuery }}</span>".
                     </p>
                     <button 
-                        @click="searchQuery = ''" 
+                        @click="switchTab('journal')" 
                         class="text-sm font-bold hover:underline"
                         :class="activeTab === 'journal' ? 'text-[#99cc33]' : 'text-blue-600'"
                     >
-                        Bersihkan Pencarian
+                        Reset Pencarian
                     </button>
                 </div>
 
