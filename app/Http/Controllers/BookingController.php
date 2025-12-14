@@ -72,7 +72,7 @@ class BookingController extends Controller
         }
 
         // 2. Pagination
-        $bookings = $query->latest()->paginate(10)->withQueryString();
+        $bookings = $query->latest()->paginate(2)->withQueryString();
 
         return Inertia::render('admin/booking/Index', [
             'bookings' => $bookings,
