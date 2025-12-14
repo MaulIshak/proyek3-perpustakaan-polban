@@ -55,7 +55,7 @@ const sidebarWidth = computed(() => (sidebarOpen.value ? 256 : 80));
         </button>
 
         <div
-            class="absolute top-0 z-30 flex h-40 flex-col justify-end pb-8 pl-8 pr-8 transition-all duration-300 pointer-events-none"
+            class="absolute top-0 z-30 flex h-32 flex-col justify-end pb-8 pl-8 pr-8 transition-all duration-300 pointer-events-none"
             :style="{ marginLeft: sidebarWidth + 'px', width: `calc(100% - ${sidebarWidth}px)` }"
         >
             <div class="pointer-events-auto">

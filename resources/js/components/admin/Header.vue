@@ -11,7 +11,7 @@ const emit = defineEmits(['toggle-profile-menu']);
 
 <template>
     <header
-        class="relative flex h-40 items-center justify-between rounded-b-4xl bg-[url('/hero-bg.jpg')] bg-cover bg-center shadow-sm"
+        class="relative flex h-30 items-center justify-between rounded-b-4xl bg-[url('/hero-bg.jpg')] bg-cover bg-center shadow-sm"
     >
         <div
             class="absolute inset-0 bg-[var(--dark-green)]/85 bg-gradient-to-r to-[var(--primary-green)]/50"

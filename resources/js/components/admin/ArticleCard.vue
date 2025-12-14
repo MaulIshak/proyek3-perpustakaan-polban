@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Calendar, Eye, Pencil, Trash, Clock } from 'lucide-vue-next';
-import { defineEmits, defineProps, computed } from 'vue';
+import { computed } from 'vue';
 import { Link } from '@inertiajs/vue3';
 
 const props = defineProps<{
