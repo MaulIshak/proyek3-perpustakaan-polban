@@ -17,7 +17,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <section class="w-full py-4">
+    <section class="w-full py-1">
         <div class="mx-auto max-w-7xl">
             <!-- Header Section (Consistent with Home) -->
             <div

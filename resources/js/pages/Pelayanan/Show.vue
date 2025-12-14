@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Layout from '@/layouts/UserAppLayout.vue';
+import ScrollReveal from '@/components/ScrollReveal.vue'; // [CRITICAL] Import komponen ini
 import {
     ArrowRight,
     BookOpen,
@@ -8,7 +9,8 @@ import {
     FileText,
     Laptop,
     Users,
-    ShieldCheck, // Tambahan icon dekoratif jika perlu
+    ShieldCheck,
+    AlertCircle, // Icon untuk state "Not Found"
 } from 'lucide-vue-next';
 import { computed } from 'vue';
 
@@ -160,20 +162,20 @@ const breadcrumb = computed(() => [
         :breadcrumb="breadcrumb"
         :title="activeData?.title || 'Layanan'"
     >
-        <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+        <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-slate-50/50">
             <div
-                class="absolute top-0 right-0 h-[600px] w-[600px] rounded-full bg-[#99cc33]/10 blur-3xl"
+                class="absolute top-0 right-0 h-[300px] w-[300px] sm:h-[600px] sm:w-[600px] rounded-full bg-[#99cc33]/10 blur-3xl opacity-60"
             ></div>
             <div
-                class="absolute bottom-0 left-0 h-[500px] w-[500px] rounded-full bg-[#99cc33]/5 blur-3xl"
+                class="absolute bottom-0 left-0 h-[250px] w-[250px] sm:h-[500px] sm:w-[500px] rounded-full bg-[#99cc33]/5 blur-3xl opacity-60"
             ></div>
         </div>
 
         <div
-            class="relative container mx-auto px-4 py-10 sm:px-6 lg:px-8"
+            class="relative container mx-auto px-4 py-8 sm:py-12 sm:px-6 lg:px-8"
             v-if="activeData"
         >
-            <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
                 <ScrollReveal
                     v-for="(section, index) in activeData.content"
                     :key="index"
@@ -182,47 +184,47 @@ const breadcrumb = computed(() => [
                     class="h-full"
                 >
                     <div
-                        class="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-xl shadow-slate-200/50 transition-all duration-300 hover:-translate-y-1 hover:border-[#99cc33]/50 hover:shadow-[#99cc33]/20"
+                        class="group relative flex h-full flex-col overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-100 bg-white shadow-lg shadow-slate-200/50 transition-all duration-300 hover:-translate-y-1 hover:border-[#99cc33]/50 hover:shadow-xl hover:shadow-[#99cc33]/10"
                     >
                         <div
-                            class="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-[#99cc33]/20 blur-2xl transition-all duration-500 group-hover:bg-[#99cc33]/30"
+                            class="absolute -top-6 -right-6 sm:-top-10 sm:-right-10 h-24 w-24 sm:h-32 sm:w-32 rounded-full bg-[#99cc33]/20 blur-2xl transition-all duration-500 group-hover:bg-[#99cc33]/30"
                         ></div>
 
                         <div
-                            class="relative flex items-center gap-4 bg-gradient-to-br from-[#99cc33]/10 to-transparent p-6 sm:p-8"
+                            class="relative flex items-center gap-4 bg-gradient-to-br from-[#99cc33]/5 to-transparent p-6 sm:p-8"
                         >
                             <div
-                                class="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#99cc33] text-white shadow-lg shadow-[#99cc33]/40 transition-transform duration-300 group-hover:scale-110"
+                                class="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-[#99cc33] text-white shadow-lg shadow-[#99cc33]/30 transition-transform duration-300 group-hover:scale-110"
                             >
-                                <ShieldCheck class="h-6 w-6" />
+                                <ShieldCheck class="h-5 w-5 sm:h-6 sm:w-6" />
                             </div>
 
                             <div class="flex-1">
                                 <h2
-                                    class="text-xl font-bold text-slate-800 group-hover:text-[#99cc33] transition-colors"
+                                    class="text-lg sm:text-xl font-bold text-slate-800 group-hover:text-[#99cc33] transition-colors leading-tight"
                                 >
                                     {{ section.subtitle }}
                                 </h2>
                                 <div
-                                    class="mt-1 h-1 w-12 rounded-full bg-[#99cc33]/40"
+                                    class="mt-1.5 h-1 w-12 rounded-full bg-[#99cc33]/40"
                                 ></div>
                             </div>
                         </div>
 
-                        <div class="flex-grow p-6 sm:p-8 pt-2">
-                            <ul class="space-y-4">
+                        <div class="flex-grow p-6 sm:p-8 pt-2 sm:pt-2">
+                            <ul class="space-y-3 sm:space-y-4">
                                 <li
                                     v-for="(item, itemIndex) in section.items"
                                     :key="itemIndex"
-                                    class="group/item flex items-start gap-3 rounded-lg p-2 transition-colors hover:bg-[#99cc33]/5"
+                                    class="group/item flex items-start gap-3 rounded-lg p-1.5 sm:p-2 transition-colors hover:bg-[#99cc33]/5"
                                 >
-                                    <div class="mt-1 shrink-0">
+                                    <div class="mt-0.5 sm:mt-1 shrink-0">
                                         <CheckCircle2
-                                            class="h-5 w-5 text-[#99cc33] drop-shadow-sm transition-transform duration-300 group-hover/item:scale-110"
+                                            class="h-4 w-4 sm:h-5 sm:w-5 text-[#99cc33] drop-shadow-sm transition-transform duration-300 group-hover/item:scale-110"
                                         />
                                     </div>
                                     <span
-                                        class="text-[0.95rem] leading-relaxed text-slate-600 transition-colors group-hover/item:text-slate-900"
+                                        class="text-sm sm:text-[0.95rem] leading-relaxed text-slate-600 transition-colors group-hover/item:text-slate-900"
                                     >
                                         {{ item }}
                                     </span>
@@ -240,15 +242,15 @@ const breadcrumb = computed(() => [
             class="container mx-auto px-4 py-20 text-center"
         >
             <div
-                class="mb-4 inline-flex h-20 w-20 items-center justify-center rounded-full bg-[#99cc33]/10"
+                class="mb-4 inline-flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full bg-slate-50 border border-slate-100"
             >
-                <FileText class="h-10 w-10 text-[#99cc33]" />
+                <AlertCircle class="h-8 w-8 sm:h-10 sm:w-10 text-slate-400" />
             </div>
-            <h2 class="text-xl font-bold text-slate-700">
+            <h2 class="text-lg sm:text-xl font-bold text-slate-700">
                 Layanan Tidak Ditemukan
             </h2>
-            <p class="text-slate-500 mt-2">
-                Mohon maaf, informasi layanan yang Anda cari tidak tersedia.
+            <p class="text-sm sm:text-base text-slate-500 mt-2 max-w-md mx-auto">
+                Mohon maaf, informasi layanan yang Anda cari tidak tersedia atau URL yang Anda tuju salah.
             </p>
         </ScrollReveal>
     </Layout>

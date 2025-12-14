@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import PaginationLink from '@/components/PaginationLink.vue';
 import PengumumanCard from '@/components/PengumumanCard.vue';
+import ScrollReveal from '@/components/ScrollReveal.vue'; // Import ScrollReveal
 import UserAppLayout from '@/layouts/UserAppLayout.vue';
 import { router } from '@inertiajs/vue3';
 import { debounce } from 'lodash';
@@ -64,8 +65,7 @@ const paginationLinks = computed(() => {
 </script>
 
 <template>
-    <UserAppLayout :page="true" :breadcrumb="breadcrumb" title="Pengumuman">
-        <!-- Background Decoration -->
+    <UserAppLayout :page="true" :breadcrumb="breadcrumb" title="Arsip Pengumuman">
         <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
             <div
                 class="absolute top-0 right-0 h-[600px] w-[600px] rounded-full bg-[#99cc33]/5 blur-3xl"
@@ -76,12 +76,14 @@ const paginationLinks = computed(() => {
         </div>
 
         <div
-            class="relative container mx-auto min-h-[60vh] px-4 py-10 sm:px-6 lg:px-8"
+            class="relative container mx-auto min-h-[60vh] px-4 py-10 sm:px-6 lg:px-8 mt-10"
         >
-            <!-- 1. Search Bar Modern -->
-            <div class="relative z-20 mx-auto -mt-16 mb-12 max-w-2xl">
+            <ScrollReveal
+                animation="zoom-in"
+                :duration="600"
+                class="relative z-20 mx-auto -mt-16 mb-12 max-w-2xl"
+            >
                 <div class="group relative">
-                    <!-- Shadow Effect -->
                     <div
                         class="absolute inset-0 rounded-full bg-[#99cc33]/20 opacity-0 blur-md transition-opacity duration-300 group-focus-within:opacity-100"
                     ></div>
@@ -102,24 +104,30 @@ const paginationLinks = computed(() => {
                         />
                     </div>
                 </div>
-            </div>
+            </ScrollReveal>
 
-            <!-- 2. Content Area -->
             <div v-if="props.articles.data.length > 0">
-                <!-- List Pengumuman (Vertical Stack) -->
                 <div class="mx-auto mb-12 max-w-5xl space-y-6">
-                    <PengumumanCard
-                        v-for="pengumuman in props.articles.data"
+                    <ScrollReveal
+                        v-for="(pengumuman, index) in props.articles.data"
                         :key="pengumuman.article_id"
-                        :id="pengumuman.article_id"
-                        :title="pengumuman.judul"
-                        :content="pengumuman.content"
-                        :date="pengumuman.created_date"
-                    />
+                        animation="fade-up"
+                        :duration="600"
+                        :delay="index * 100"
+                        class="w-full"
+                    >
+                        <PengumumanCard
+                            :id="pengumuman.article_id"
+                            :title="pengumuman.judul"
+                            :content="pengumuman.content"
+                            :date="pengumuman.created_date"
+                        />
+                    </ScrollReveal>
                 </div>
 
-                <!-- Pagination & Info -->
-                <div
+                <ScrollReveal
+                    animation="fade-in"
+                    :delay="300"
                     class="mx-auto flex max-w-5xl flex-col items-center justify-between gap-6 border-t border-slate-200 pt-8 sm:flex-row"
                 >
                     <div
@@ -149,12 +157,13 @@ const paginationLinks = computed(() => {
                             :link="link"
                         />
                     </nav>
-                </div>
+                </ScrollReveal>
             </div>
 
-            <!-- 3. Empty State -->
-            <div
+            <ScrollReveal
                 v-else
+                animation="zoom-in"
+                :duration="500"
                 class="flex flex-col items-center justify-center py-24 text-center"
             >
                 <div
@@ -178,7 +187,7 @@ const paginationLinks = computed(() => {
                 >
                     Reset Pencarian
                 </button>
-            </div>
+            </ScrollReveal>
         </div>
     </UserAppLayout>
 </template>

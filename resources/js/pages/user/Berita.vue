@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import BeritaCard from '@/components/BeritaCard.vue';
 import PaginationLink from '@/components/PaginationLink.vue';
+import ScrollReveal from '@/components/ScrollReveal.vue'; // Import ScrollReveal
 import UserAppLayout from '@/layouts/UserAppLayout.vue';
 import { router } from '@inertiajs/vue3';
 import { debounce } from 'lodash';
-import { Search, FileX } from 'lucide-vue-next'; // Tambah FileX untuk empty state
+import { FileX, Search } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 
 // Tipe data
@@ -66,18 +67,19 @@ const paginationLinks = computed(() => {
 <template>
     <UserAppLayout :page="true" :breadcrumb="breadcrumb" title="Arsip Berita">
 
-        <!-- Background Decoration -->
         <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
             <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-[#99cc33]/5 rounded-full blur-3xl"></div>
             <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-gray-100 rounded-full blur-3xl"></div>
         </div>
 
-        <div class="container mx-auto px-4 py-10 sm:px-6 lg:px-8 relative min-h-[60vh]">
+        <div class="container mx-auto px-4 py-10 sm:px-6 lg:px-8 relative min-h-[60vh] mt-10">
 
-            <!-- 1. Search Bar Modern -->
-            <div class="max-w-2xl mx-auto mb-12 -mt-16 relative z-20">
+            <ScrollReveal
+                animation="zoom-in"
+                :duration="600"
+                class="max-w-2xl mx-auto mb-12 -mt-16 relative z-20"
+            >
                 <div class="relative group">
-                    <!-- Shadow Effect -->
                     <div class="absolute inset-0 bg-[#99cc33]/20 rounded-full blur-md opacity-0 group-focus-within:opacity-100 transition-opacity duration-300"></div>
 
                     <div class="relative bg-white rounded-full shadow-lg shadow-slate-200/50 flex items-center px-2 py-1.5 border border-slate-100 focus-within:border-[#99cc33] transition-colors">
@@ -92,26 +94,33 @@ const paginationLinks = computed(() => {
                         />
                     </div>
                 </div>
-            </div>
+            </ScrollReveal>
 
-            <!-- 2. Content Area -->
             <div v-if="props.articles.data.length > 0">
-                <!-- Grid Berita -->
                 <div class="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3 mb-12">
-                    <BeritaCard
-                        v-for="berita in props.articles.data"
+                    <ScrollReveal
+                        v-for="(berita, index) in props.articles.data"
                         :key="berita.article_id"
-                        :id="berita.article_id"
-                        :title="berita.judul"
-                        :content="berita.content"
-                        :thumbnail="berita.url_thumbnail || '/hero-bg.jpg'"
-                        :date="berita.created_date"
-                        class="h-full transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
-                    />
+                        animation="fade-up"
+                        :delay="index * 100"
+                        class="h-full"
+                    >
+                        <BeritaCard
+                            :id="berita.article_id"
+                            :title="berita.judul"
+                            :content="berita.content"
+                            :thumbnail="berita.url_thumbnail || '/hero-bg.jpg'"
+                            :date="berita.created_date"
+                            class="h-full transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
+                        />
+                    </ScrollReveal>
                 </div>
 
-                <!-- Pagination & Info -->
-                <div class="flex flex-col items-center justify-between gap-6 sm:flex-row border-t border-slate-200 pt-8">
+                <ScrollReveal
+                    animation="fade-in"
+                    :delay="300"
+                    class="flex flex-col items-center justify-between gap-6 sm:flex-row border-t border-slate-200 pt-8"
+                >
                     <div class="text-sm text-slate-500 font-medium bg-white px-4 py-2 rounded-full shadow-sm border border-slate-100">
                         Menampilkan <span class="text-[#99cc33] font-bold">{{ props.articles.from }}</span> - <span class="text-[#99cc33] font-bold">{{ props.articles.to }}</span> dari <span class="text-slate-800 font-bold">{{ props.articles.total }}</span> berita
                     </div>
@@ -123,11 +132,15 @@ const paginationLinks = computed(() => {
                             :link="link"
                         />
                     </nav>
-                </div>
+                </ScrollReveal>
             </div>
 
-            <!-- 3. Empty State -->
-            <div v-else class="flex flex-col items-center justify-center py-24 text-center">
+            <ScrollReveal
+                v-else
+                animation="zoom-in"
+                :duration="500"
+                class="flex flex-col items-center justify-center py-24 text-center"
+            >
                 <div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mb-6 animate-pulse">
                     <FileX class="w-10 h-10 text-slate-400" />
                 </div>
@@ -143,7 +156,7 @@ const paginationLinks = computed(() => {
                 >
                     Reset Pencarian
                 </button>
-            </div>
+            </ScrollReveal>
 
         </div>
     </UserAppLayout>
