@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'; 
-// [PERBAIKAN] Tambahkan 'Link' di sini
 import { useForm, router, Link } from '@inertiajs/vue3'; 
 import AdminLayout from '@/layouts/AdminLayout.vue';
 import { Button } from '@/components/ui/button';
@@ -42,8 +41,9 @@ interface PaginatedBookings {
     current_page: number;
     last_page: number;
     total: number;
-    from: number;
+    from: number; // Laravel otomatis mengisi ini
     to: number;
+    per_page: number; // Laravel otomatis mengisi ini
 }
 
 const props = defineProps<{
@@ -224,7 +224,7 @@ defineOptions({ layout: (h: any, page: any) => h(AdminLayout, { title: 'Booking 
 
                         <tr v-for="(item, index) in bookings.data" :key="item.id" class="hover:bg-[#99cc33]/5 transition-colors duration-200 group">
                             <td class="px-6 py-5 text-center font-medium text-gray-400">
-                                {{ (bookings.current_page - 1) * 10 + index + 1 }}
+                                {{ bookings.from + index }}
                             </td>
                             
                             <td class="px-6 py-5 align-top">
