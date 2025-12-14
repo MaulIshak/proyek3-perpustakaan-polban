@@ -13,7 +13,8 @@ import {
     Save,
     Search,
     ChevronLeft, 
-    ChevronRight 
+    ChevronRight,
+    AlertTriangle // Icon baru untuk warning
 } from 'lucide-vue-next';
 
 // --- TYPES ---
@@ -26,7 +27,7 @@ interface BookingData {
     judul_buku: string;
     pengarang: string;
     created_at: string;
-    status: 'pending' | 'approved' | 'rejected' | 'cancelled';
+    status: 'pending' | 'approved' | 'rejected' | 'cancelled' | 'collected';
     rejection_reason?: string;
     deadline?: string;
 }
@@ -41,9 +42,8 @@ interface PaginatedBookings {
     current_page: number;
     last_page: number;
     total: number;
-    from: number; // Laravel otomatis mengisi ini
+    from: number;
     to: number;
-    per_page: number; // Laravel otomatis mengisi ini
 }
 
 const props = defineProps<{
@@ -75,6 +75,10 @@ const showRejectModal = ref(false);
 const showCancelModal = ref(false);
 const showDeleteModal = ref(false);
 
+// [BARU] State untuk modal konfirmasi baru
+const showCollectedModal = ref(false);
+const showUnapproveModal = ref(false);
+
 const form = useForm({
     status: '',
     rejection_reason: '' as string | null,
@@ -95,7 +99,6 @@ const formatDeadline = (dateString: string) => {
 const setQuickDate = (daysToAdd: number) => {
     const date = new Date();
     date.setDate(date.getDate() + daysToAdd);
-    date.setHours(9, 0, 0, 0); 
     
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -121,12 +124,42 @@ const openCancelModal = (booking: BookingData) => {
 };
 const openDeleteModal = (booking: BookingData) => { selectedBooking.value = booking; showDeleteModal.value = true; };
 
+// [BARU] Actions untuk modal baru
+const openCollectedModal = (booking: BookingData) => { selectedBooking.value = booking; showCollectedModal.value = true; };
+const openUnapproveModal = (booking: BookingData) => { selectedBooking.value = booking; showUnapproveModal.value = true; };
+
 // --- SUBMIT FUNCTIONS ---
 const submitApprove = () => {
     if (!selectedBooking.value) return;
     form.status = 'approved'; 
     form.rejection_reason = null;
     form.patch(`/admin/booking-buku/${selectedBooking.value.id}/status`, { onSuccess: () => showApproveModal.value = false });
+};
+
+// [UBAH] Menggunakan Modal, bukan window.confirm
+const submitCollected = () => {
+    if (!selectedBooking.value) return;
+    
+    form.status = 'collected'; 
+    form.rejection_reason = null; 
+    form.deadline = ''; 
+    
+    form.patch(`/admin/booking-buku/${selectedBooking.value.id}/status`, {
+        onSuccess: () => showCollectedModal.value = false
+    });
+};
+
+// [UBAH] Menggunakan Modal, bukan window.confirm
+const submitUnapprove = () => {
+    if (!selectedBooking.value) return;
+
+    form.status = 'cancelled';
+    form.rejection_reason = null;
+    form.deadline = '';
+    
+    form.patch(`/admin/booking-buku/${selectedBooking.value.id}/status`, {
+        onSuccess: () => showUnapproveModal.value = false
+    });
 };
 
 const submitReject = () => {
@@ -154,6 +187,7 @@ const getStatusStyles = (status: string) => {
         case 'approved': return 'bg-[#f0fdf4] text-[#16a34a] ring-1 ring-[#16a34a]/20';
         case 'rejected': return 'bg-[#fef2f2] text-[#dc2626] ring-1 ring-[#dc2626]/20';
         case 'cancelled': return 'bg-gray-50 text-gray-600 ring-1 ring-gray-200';
+        case 'collected': return 'bg-blue-50 text-blue-600 ring-1 ring-blue-200'; 
         default: return 'bg-[#fffbeb] text-[#b45309] ring-1 ring-[#b45309]/20';
     }
 };
@@ -163,6 +197,7 @@ const getStatusLabel = (status: string) => {
         case 'approved': return 'Disetujui';
         case 'rejected': return 'Ditolak';
         case 'cancelled': return 'Dibatalkan';
+        case 'collected': return 'Sudah Diambil'; 
         default: return 'Menunggu';
     }
 };
@@ -293,16 +328,46 @@ defineOptions({ layout: (h: any, page: any) => h(AdminLayout, { title: 'Booking 
 
                             <td class="px-6 py-5 align-middle text-right">
                                 <div class="flex flex-col gap-2 items-end justify-center h-full">
+                                    
                                     <div v-if="item.status === 'pending'" class="flex gap-2">
                                         <Button @click="openApproveModal(item)" size="sm" class="bg-[#99cc33] hover:bg-[#88b82d] text-white h-9 px-4 text-xs shadow-md rounded-lg">Setuju</Button>
                                         <Button @click="openRejectModal(item)" size="sm" variant="outline" class="border-red-200 text-red-600 hover:bg-red-50 h-9 px-4 text-xs hover:border-red-300 rounded-lg">Tolak</Button>
                                     </div>
-                                    <div v-if="item.status === 'approved'">
-                                         <Button @click="openCancelModal(item)" size="sm" variant="outline" class="border-gray-300 text-gray-600 hover:bg-gray-100 h-9 px-4 text-xs rounded-lg">Batal Ambil</Button>
+
+                                    <div v-if="item.status === 'approved'" class="flex flex-col gap-2 w-full">
+                                        <Button 
+                                            @click="openCollectedModal(item)" 
+                                            size="sm" 
+                                            class="bg-[#15803d] hover:bg-[#14532d] text-white h-8 px-3 text-[11px] w-full rounded-lg shadow-sm font-semibold"
+                                        >
+                                            <CheckCircle2 class="w-3 h-3 mr-1.5" /> 
+                                            Buku Diambil
+                                        </Button>
+                                        
+                                        <Button 
+                                            @click="openUnapproveModal(item)" 
+                                            size="sm" 
+                                            variant="outline" 
+                                            class="border-orange-200 text-orange-600 hover:bg-orange-50 h-8 px-3 text-[11px] w-full rounded-lg font-medium"
+                                        >
+                                            <X class="w-3 h-3 mr-1.5" />
+                                            Batal Setuju
+                                        </Button>
                                     </div>
-                                    <button @click="openDeleteModal(item)" class="group/delete text-gray-300 hover:text-red-600 p-2 transition-colors" title="Hapus Data">
+
+                                    <div v-if="item.status === 'collected'" class="flex justify-end">
+                                        <span class="text-[10px] text-gray-400 italic mr-2">Selesai</span>
+                                    </div>
+
+                                    <button 
+                                        v-if="item.status === 'rejected' || item.status === 'cancelled' || item.status === 'collected'"
+                                        @click="openDeleteModal(item)" 
+                                        class="group/delete text-gray-300 hover:text-red-600 p-2 transition-colors mt-1" 
+                                        title="Hapus Data"
+                                    >
                                         <Trash2 class="h-5 w-5" />
                                     </button>
+
                                 </div>
                             </td>
                         </tr>
@@ -395,6 +460,58 @@ defineOptions({ layout: (h: any, page: any) => h(AdminLayout, { title: 'Booking 
                     <h3 class="text-xl font-bold text-gray-900">{{ showDeleteModal ? 'Hapus Data Permanen?' : 'Batalkan Transaksi?' }}</h3>
                     <p class="text-gray-500 text-sm mt-2">{{ showDeleteModal ? 'Data yang dihapus tidak bisa dikembalikan.' : 'Status akan diubah menjadi dibatalkan.' }}</p>
                     <div class="flex gap-3 mt-8 justify-center"><Button variant="outline" @click="showCancelModal = false; showDeleteModal = false" class="rounded-xl">Batal</Button><Button v-if="showDeleteModal" @click="submitDelete" :disabled="form.processing" class="bg-gray-800 hover:bg-black text-white rounded-xl">Ya, Hapus</Button><Button v-else @click="submitCancel" :disabled="form.processing" class="bg-gray-600 hover:bg-gray-700 text-white rounded-xl">Ya, Batalkan</Button></div>
+                </div>
+            </div>
+        </Teleport>
+
+        <Teleport to="body">
+            <div v-if="showCollectedModal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+                <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm flex flex-col border-t-[6px] border-[#15803d] animate-in fade-in zoom-in duration-200">
+                    <div class="p-6 text-center">
+                        <div class="bg-green-50 p-4 rounded-full inline-flex mb-4 shadow-sm border border-green-100">
+                            <CheckCircle2 class="h-8 w-8 text-[#15803d]" />
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800">Konfirmasi Pengambilan?</h3>
+                        <p class="text-gray-500 text-sm mt-2">
+                            Pastikan buku <strong>{{ selectedBooking?.judul_buku }}</strong> sudah diserahkan kepada peminjam.
+                        </p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-b-2xl border-t border-gray-100 flex gap-3">
+                        <Button variant="outline" @click="showCollectedModal = false" class="flex-1 rounded-xl border-gray-200 text-gray-600 hover:bg-white h-10">Batal</Button>
+                        <Button 
+                            @click="submitCollected" 
+                            :disabled="form.processing" 
+                            class="flex-1 bg-[#15803d] hover:bg-[#14532d] text-white rounded-xl shadow-lg shadow-green-900/10 h-10 font-bold transition-all"
+                        >
+                            {{ form.processing ? 'Menyimpan...' : 'Ya, Sudah Diambil' }}
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        </Teleport>
+
+        <Teleport to="body">
+            <div v-if="showUnapproveModal" class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+                <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm flex flex-col border-t-[6px] border-orange-400 animate-in fade-in zoom-in duration-200">
+                    <div class="p-6 text-center">
+                        <div class="bg-orange-50 p-4 rounded-full inline-flex mb-4 shadow-sm border border-orange-100">
+                            <AlertTriangle class="h-8 w-8 text-orange-500" />
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800">Batalkan Persetujuan?</h3>
+                        <p class="text-gray-500 text-sm mt-2">
+                            Status peminjaman <strong>{{ selectedBooking?.judul_buku }}</strong> akan diubah menjadi <strong>Dibatalkan</strong>.
+                        </p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-b-2xl border-t border-gray-100 flex gap-3">
+                        <Button variant="outline" @click="showUnapproveModal = false" class="flex-1 rounded-xl border-gray-200 text-gray-600 hover:bg-white h-10">Kembali</Button>
+                        <Button 
+                            @click="submitUnapprove" 
+                            :disabled="form.processing" 
+                            class="flex-1 bg-orange-500 hover:bg-orange-600 text-white rounded-xl shadow-lg shadow-orange-500/20 h-10 font-bold transition-all"
+                        >
+                            {{ form.processing ? 'Memproses...' : 'Ya, Batalkan' }}
+                        </Button>
+                    </div>
                 </div>
             </div>
         </Teleport>

@@ -10,12 +10,14 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
-        Schema::table('book_covers', function (Blueprint $table) {
-            // Perintah untuk menghapus kolom 'title'
+{
+    Schema::table('book_covers', function (Blueprint $table) {
+        // Cek dulu apakah kolom 'title' ada
+        if (Schema::hasColumn('book_covers', 'title')) {
             $table->dropColumn('title');
-        });
-    }
+        }
+    });
+}
 
     /**
      * Reverse the migrations.
