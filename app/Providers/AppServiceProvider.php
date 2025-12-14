@@ -19,10 +19,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->when(QuestionController::class)
             ->needs(BrevoService::class)
             ->give(function () {
+                // [FIX] Gunakan config(), bukan env()
                 return new BrevoService(
-                    env('BREVO_API_KEY'),       // API Key Utama
-                    'TANYA PUSTAKAWAN',         // <--- NAMA KHUSUS
-                    env('BREVO_SENDER_EMAIL')   // Email Utama (Harus Verified)
+                    config('services.brevo.key'),
+                    'TANYA PUSTAKAWAN',
+                    config('services.brevo.sender_email')
                 );
             });
 
@@ -30,10 +31,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->when(BookingController::class)
             ->needs(BrevoService::class)
             ->give(function () {
+                // [FIX] Gunakan config(), bukan env()
                 return new BrevoService(
-                    env('BREVO_API_KEY'),                    // API Key Utama (SAMA)
-                    'Layanan Sirkulasi Perpustakaan Polban', // <--- NAMA BEDA
-                    env('BREVO_SENDER_EMAIL')                // Email Utama (SAMA)
+                    config('services.brevo.key'),
+                    'Layanan Sirkulasi Perpustakaan Polban',
+                    config('services.brevo.sender_email')
                 );
             });
     }
