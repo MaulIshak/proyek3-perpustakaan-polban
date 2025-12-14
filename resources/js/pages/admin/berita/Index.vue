@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Link, router } from '@inertiajs/vue3';
 import debounce from 'lodash/debounce';
-import { FileSearch, Newspaper, Plus, Search } from 'lucide-vue-next';
+import { FileSearch, Newspaper, Plus, Search, ArrowUpDown } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 
 // Components
@@ -21,6 +21,8 @@ const props = defineProps<{
         total: number;
     };
     searchQuery: string;
+    statusFilter: string;
+    sortFilter: string;
 }>();
 
 // Layout Definition
@@ -38,13 +40,45 @@ defineOptions({
 
 // --- Logic Pencarian ---
 const search = ref(props.searchQuery || '');
+const status = ref(props.statusFilter || 'all');
+const sort = ref(props.sortFilter || 'desc');
 
 watch(
     search,
     debounce((value: string) => {
         router.get(
             '/admin/berita',
-            { search: value },
+            { search: value, status: status.value, sort: sort.value },
+            {
+                preserveState: true,
+                replace: true,
+                preserveScroll: true,
+            },
+        );
+    }, 300),
+);
+
+watch(
+    status,
+    debounce((value: string) => {
+        router.get(
+            '/admin/berita',
+            { search: search.value, status: value, sort: sort.value },
+            {
+                preserveState: true,
+                replace: true,
+                preserveScroll: true,
+            },
+        );
+    }, 300),
+);
+
+watch(
+    sort,
+    debounce((value: string) => {
+        router.get(
+            '/admin/berita',
+            { search: search.value, status: status.value, sort: value },
             {
                 preserveState: true,
                 replace: true,
@@ -95,23 +129,50 @@ function openModal(article: any) {
 
 <template>
     <div class="space-y-6">
-        <!-- 1. Toolbar: Search & Create -->
+        <!-- 1. Toolbar: Search, Filter & Create -->
         <div
-            class="flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:flex-row"
+            class="flex flex-col gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between"
         >
-            <!-- Search Input -->
-            <div class="group relative w-full sm:max-w-md">
-                <div
-                    class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 transition-colors group-focus-within:text-[#99cc33]"
-                >
-                    <Search class="h-5 w-5" />
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
+                <!-- Search Input -->
+                <div class="group relative w-full sm:max-w-md">
+                    <div
+                        class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 transition-colors group-focus-within:text-[#99cc33]"
+                    >
+                        <Search class="h-5 w-5" />
+                    </div>
+                    <input
+                        v-model="search"
+                        type="text"
+                        placeholder="Cari judul berita..."
+                        class="block w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pr-3 pl-10 leading-5 placeholder-slate-400 transition-all focus:border-[#99cc33] focus:bg-white focus:ring-4 focus:ring-[#99cc33]/10 focus:outline-none sm:text-sm"
+                    />
                 </div>
-                <input
-                    v-model="search"
-                    type="text"
-                    placeholder="Cari judul berita..."
-                    class="block w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pr-3 pl-10 leading-5 placeholder-slate-400 transition-all focus:border-[#99cc33] focus:bg-white focus:ring-4 focus:ring-[#99cc33]/10 focus:outline-none sm:text-sm"
-                />
+
+                <!-- Filter Status -->
+                <div class="flex items-center gap-2">
+                    <span class="text-sm font-medium text-slate-700">Status:</span>
+                    <select
+                        v-model="status"
+                        class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-[#99cc33] focus:outline-none focus:ring-2 focus:ring-[#99cc33]/20"
+                    >
+                        <option value="all">Semua</option>
+                        <option value="published">Published</option>
+                        <option value="draft">Draft</option>
+                    </select>
+                </div>
+
+                <!-- Sort -->
+                <div class="flex items-center gap-2">
+                    <ArrowUpDown class="w-4 h-4 text-slate-400" />
+                    <select
+                        v-model="sort"
+                        class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm focus:border-[#99cc33] focus:outline-none focus:ring-2 focus:ring-[#99cc33]/20"
+                    >
+                        <option value="desc">Terbaru</option>
+                        <option value="asc">Terlama</option>
+                    </select>
+                </div>
             </div>
 
             <!-- Create Button -->
@@ -177,27 +238,36 @@ function openModal(article: any) {
                 class="mb-4 flex h-20 w-20 animate-pulse items-center justify-center rounded-full bg-slate-50"
             >
                 <FileSearch v-if="search" class="h-10 w-10 text-slate-400" />
+                <Newspaper v-else-if="status !== 'all'" class="h-10 w-10 text-slate-400" />
                 <Newspaper v-else class="h-10 w-10 text-slate-400" />
             </div>
 
             <h3 class="text-lg font-bold text-slate-800">
-                {{ search ? 'Pencarian Tidak Ditemukan' : 'Belum Ada Berita' }}
+                {{
+                    search
+                        ? 'Pencarian Tidak Ditemukan'
+                        : status !== 'all'
+                        ? `Tidak Ada Berita ${status === 'published' ? 'Published' : 'Draft'}`
+                        : 'Belum Ada Berita'
+                }}
             </h3>
 
             <p class="mt-1 max-w-sm text-center text-sm text-slate-500">
                 {{
                     search
                         ? `Tidak ada berita yang cocok dengan kata kunci "${search}".`
+                        : status !== 'all'
+                        ? `Tidak ada berita dengan status ${status === 'published' ? 'published' : 'draft'}.`
                         : 'Mulai buat berita pertama Anda untuk mempublikasikan kegiatan terbaru.'
                 }}
             </p>
 
             <button
-                v-if="search"
-                @click="search = ''"
+                v-if="search || status !== 'all'"
+                @click="() => { search = ''; status = 'all'; }"
                 class="mt-6 text-sm font-bold text-[#99cc33] hover:text-[#88b82d] hover:underline"
             >
-                Reset Pencarian
+                Reset Filter
             </button>
             <Link
                 v-else

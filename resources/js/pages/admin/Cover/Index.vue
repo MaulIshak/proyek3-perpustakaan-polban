@@ -48,7 +48,7 @@ const previewImage = ref<string | null>(null);
 const { open } = useConfirmModal();
 
 const form = useForm({
-    link_buku: '', 
+    link_buku: '',
     image: null as File | null,
     _method: 'POST',
 });
@@ -136,7 +136,7 @@ const handleDelete = (cover: Cover) => {
 
         <div v-if="covers.length > 0" class="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
             <div v-for="cover in covers" :key="cover.id" class="group relative flex flex-col">
-                
+
                 <div class="relative aspect-[2/3] w-full cursor-pointer overflow-hidden rounded-xl border border-slate-200 bg-slate-100 shadow-md transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl group-hover:shadow-[#99cc33]/20">
                     <img :src="`/storage/${cover.image_path}`" alt="Book Cover" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
 
@@ -171,7 +171,7 @@ const handleDelete = (cover: Cover) => {
                 Tambah Cover Sekarang
             </button>
         </div>
-
+        <Teleport to="body">
         <Transition enter-active-class="transition duration-300 ease-out" enter-from-class="opacity-0 scale-95" enter-to-class="opacity-100 scale-100" leave-active-class="transition duration-200 ease-in" leave-from-class="opacity-100 scale-100" leave-to-class="opacity-0 scale-95">
             <div v-if="showModal" class="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-6">
                 <div @click="closeModal" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity"></div>
@@ -186,7 +186,7 @@ const handleDelete = (cover: Cover) => {
 
                     <div class="space-y-6 overflow-y-auto bg-white p-6">
                         <form @submit.prevent="submit" id="createForm" class="space-y-5">
-                            
+
                             <div class="space-y-1.5">
                                 <label class="text-sm font-bold text-slate-700 flex items-center gap-1">
                                     Link Buku <span class="text-red-500">*</span>
@@ -250,7 +250,7 @@ const handleDelete = (cover: Cover) => {
                 </div>
             </div>
         </Transition>
-
+</Teleport>
         <ConfirmModal />
     </div>
 </template>

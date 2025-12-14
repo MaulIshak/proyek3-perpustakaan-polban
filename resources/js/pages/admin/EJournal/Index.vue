@@ -5,15 +5,15 @@ import {
     Book, Library, Pencil, Plus, Save, Trash2, UploadCloud, X, MinusCircle, Link as LinkIcon, Search, Globe, ChevronLeft, ChevronRight
 } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
-import { debounce } from 'lodash'; 
+import { debounce } from 'lodash';
 
 // Import Komponen Pagination Admin (Sama seperti halaman Galeri & Usulan Buku)
-import PaginationLink from '@/components/admin/PaginationLink.vue'; 
+import PaginationLink from '@/components/admin/PaginationLink.vue';
 
 const props = defineProps({
     journals: Object, // { data: [], links: [], ... }
     errors: Object,
-    filters: Object, 
+    filters: Object,
 });
 
 // -- STATE MANAGEMENT --
@@ -24,7 +24,7 @@ const fileInputRef = ref(null);
 
 // State Filter
 const search = ref(props.filters?.search || '');
-const filterType = ref(props.filters?.type || 'all'); 
+const filterType = ref(props.filters?.type || 'all');
 
 // -- WATCHER (Filter Server Side) --
 watch(
@@ -32,7 +32,7 @@ watch(
     debounce(([newSearch, newType]) => {
         router.get('/admin/e-journals', {
             search: newSearch,
-            type: newType === 'all' ? null : newType 
+            type: newType === 'all' ? null : newType
         }, {
             preserveState: true,
             preserveScroll: true,
@@ -115,7 +115,7 @@ defineOptions({
 <template>
     <div class="font-inter relative min-h-screen overflow-hidden p-6 lg:p-8">
         <div class="relative z-10 w-full">
-            
+
             <div class="mb-8 flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-center">
                     <div class="flex rounded-xl border border-slate-200 bg-white p-1 shadow-sm">
@@ -126,10 +126,10 @@ defineOptions({
 
                     <div class="relative">
                         <Search class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                        <input 
-                            v-model="search" 
-                            type="text" 
-                            placeholder="Cari referensi..." 
+                        <input
+                            v-model="search"
+                            type="text"
+                            placeholder="Cari referensi..."
                             class="h-10 w-full min-w-[240px] rounded-xl border border-slate-200 bg-white pl-10 pr-4 text-sm font-medium outline-none focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20 sm:w-64"
                         >
                     </div>
@@ -161,7 +161,7 @@ defineOptions({
                                         <Globe v-else class="h-5 w-5 text-slate-300" />
                                     </div>
                                 </td>
-                                
+
                                 <td class="px-6 py-5">
                                     <div class="flex flex-col gap-2">
                                         <span class="text-base leading-tight font-bold text-slate-800">{{ item.name }}</span>
@@ -192,7 +192,7 @@ defineOptions({
                                     </div>
                                 </td>
                             </tr>
-                            
+
                             <tr v-if="journals.data.length === 0">
                                 <td colspan="5" class="px-6 py-12 text-center">
                                     <div class="flex flex-col items-center justify-center gap-3">
@@ -211,12 +211,12 @@ defineOptions({
                     <p class="text-sm text-slate-500">
                         Menampilkan <span class="font-bold text-slate-700">{{ journals.from }}</span> - <span class="font-bold text-slate-700">{{ journals.to }}</span> dari <span class="font-bold text-slate-700">{{ journals.total }}</span> data
                     </p>
-                    
+
                     <PaginationLink :links="journals.links" />
                 </div>
             </div>
         </div>
-
+<Teleport to="body">
         <Transition enter-active-class="transition duration-300" enter-from-class="opacity-0" enter-to-class="opacity-100" leave-active-class="transition duration-200" leave-from-class="opacity-100" leave-to-class="opacity-0">
             <div v-if="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm">
                 <div class="max-h-[90vh] w-full max-w-lg overflow-hidden overflow-y-auto rounded-2xl bg-white shadow-2xl">
@@ -273,7 +273,7 @@ defineOptions({
                                     <Plus class="w-3 h-3" /> Tambah Link
                                 </button>
                             </div>
-                            
+
                             <div v-if="form.additional_links.length === 0" class="text-xs text-slate-400 italic bg-slate-50 p-3 rounded-lg border border-dashed border-slate-200 text-center">
                                 Tidak ada link tambahan.
                             </div>
@@ -316,5 +316,6 @@ defineOptions({
                 </div>
             </div>
         </Transition>
+    </Teleport>
     </div>
 </template>

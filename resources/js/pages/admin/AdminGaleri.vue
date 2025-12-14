@@ -161,38 +161,31 @@ const getLabel = (label) => {
 
 <template>
   <div class="space-y-8 font-sans">
+            <div
+            class="flex flex-col items-center justify-between gap-4 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:flex-row"
+        >
+            <div class="flex items-center gap-3">
+                <div class="rounded-xl bg-[#99cc33]/10 p-2 text-[#99cc33]">
+                    <ImageIcon class="h-6 w-6" />
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">
+                        Daftar Gambar
+                    </h2>
+                    <p class="text-xs font-medium text-slate-500">
+                        Total {{ props.photos.total }} item
+                    </p>
+                </div>
+            </div>
 
-    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
-      <div class="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
-          <div class="flex rounded-xl border border-slate-200 bg-slate-50/50 p-1">
-              <button @click="typeFilter = ''" class="rounded-lg px-3 py-2 text-xs font-bold transition-all" :class="typeFilter === '' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'">Semua</button>
-              <button @click="typeFilter = 'galeri'" class="rounded-lg px-3 py-2 text-xs font-bold transition-all" :class="typeFilter === 'galeri' ? 'bg-white text-[#99cc33] shadow-sm' : 'text-slate-500 hover:text-slate-700'">Galeri</button>
-              <button @click="typeFilter = 'cover_buku'" class="rounded-lg px-3 py-2 text-xs font-bold transition-all" :class="typeFilter === 'cover_buku' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'">Cover</button>
-          </div>
-
-          <div class="relative w-full sm:w-64">
-              <Search class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <input 
-                  v-model="search" 
-                  type="text" 
-                  placeholder="Cari foto..." 
-                  class="h-10 w-full rounded-xl border border-slate-200 bg-white pl-9 pr-4 text-sm font-medium outline-none focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
-              >
-          </div>
-      </div>
-
-      <div class="flex items-center gap-4 w-full lg:w-auto justify-between lg:justify-end">
-          <p class="text-xs text-slate-500 font-medium hidden sm:block">Total {{ props.photos.total }} item</p>
-          <button
-            @click="openCreate"
-            class="inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-transparent text-sm font-bold rounded-xl text-white bg-[#99cc33] hover:bg-[#88b82d] shadow-lg shadow-[#99cc33]/30 transition-all hover:-translate-y-0.5 active:translate-y-0"
-          >
-            <Plus class="w-5 h-5" />
-            Upload Foto
-          </button>
-      </div>
-    </div>
-
+            <button
+                @click="openCreate"
+                class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-transparent bg-[#99cc33] px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#99cc33]/30 transition-all hover:-translate-y-0.5 hover:bg-[#88b82d] active:translate-y-0 sm:w-auto"
+            >
+                <Plus class="h-5 w-5" />
+                Upload Foto
+            </button>
+        </div>
     <div v-if="props.photos.data.length > 0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
       <div
         v-for="item in props.photos.data"
@@ -226,10 +219,6 @@ const getLabel = (label) => {
         </div>
 
         <div class="p-3 bg-white border-t border-slate-100 flex justify-between items-center">
-            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border"
-                  :class="item.tipe === 'galeri' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-blue-50 text-blue-600 border-blue-100'">
-                {{ item.tipe === 'galeri' ? 'GALERI' : 'COVER BUKU' }}
-            </span>
             <span class="text-xs text-slate-400 font-medium">{{ item.size || '0' }} KB</span>
         </div>
       </div>
@@ -255,21 +244,21 @@ const getLabel = (label) => {
         <p class="text-sm text-slate-500">
             Menampilkan <span class="font-bold text-slate-700">{{ props.photos.from }}</span> - <span class="font-bold text-slate-700">{{ props.photos.to }}</span> dari <span class="font-bold text-slate-700">{{ props.photos.total }}</span> foto
         </p>
-        
+
         <div class="flex items-center gap-1">
             <template v-for="(link, k) in props.photos.links" :key="k">
-                <div v-if="link.url === null" 
+                <div v-if="link.url === null"
                         class="flex h-9 min-w-[36px] items-center justify-center rounded-lg border border-transparent px-3 text-sm text-slate-300"
                         v-html="getLabel(link.label)">
                 </div>
-                
-                <component 
-                    :is="link.url ? 'button' : 'span'" 
+
+                <component
+                    :is="link.url ? 'button' : 'span'"
                     v-else
                     @click="link.url && router.get(link.url, {}, { preserveState: true, preserveScroll: true })"
                     class="flex h-9 min-w-[36px] items-center justify-center rounded-lg px-3 text-sm font-bold transition-all border"
-                    :class="link.active 
-                        ? 'bg-[#99cc33] text-white border-[#99cc33] shadow-md shadow-[#99cc33]/20' 
+                    :class="link.active
+                        ? 'bg-[#99cc33] text-white border-[#99cc33] shadow-md shadow-[#99cc33]/20'
                         : 'bg-white text-slate-600 border-slate-200 hover:border-[#99cc33] hover:text-[#99cc33]'"
                 >
                     <span v-if="link.label.includes('Previous')"><ChevronLeft class="h-4 w-4" /></span>
@@ -279,7 +268,7 @@ const getLabel = (label) => {
             </template>
         </div>
     </div>
-
+<Teleport to="body">
     <transition name="modal">
       <div v-if="showCreateModal" class="fixed inset-0 z-[70] flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" @click="showCreateModal = false"></div>
@@ -293,19 +282,6 @@ const getLabel = (label) => {
           </div>
 
           <div class="p-6 space-y-6">
-            <div class="space-y-2">
-                <label class="block text-sm font-bold text-slate-700">Tipe Foto</label>
-                <div class="grid grid-cols-2 gap-4">
-                    <label class="flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition-all hover:bg-slate-50" :class="createForm.tipe === 'galeri' ? 'border-[#99cc33] bg-[#99cc33]/5 ring-1 ring-[#99cc33]' : 'border-slate-200'">
-                        <input type="radio" v-model="createForm.tipe" value="galeri" class="accent-[#99cc33]" />
-                        <span class="text-sm font-bold" :class="createForm.tipe === 'galeri' ? 'text-[#99cc33]' : 'text-slate-600'">Galeri</span>
-                    </label>
-                    <label class="flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition-all hover:bg-slate-50" :class="createForm.tipe === 'cover_buku' ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500' : 'border-slate-200'">
-                        <input type="radio" v-model="createForm.tipe" value="cover_buku" class="accent-blue-500" />
-                        <span class="text-sm font-bold" :class="createForm.tipe === 'cover_buku' ? 'text-blue-600' : 'text-slate-600'">Cover Buku</span>
-                    </label>
-                </div>
-            </div>
 
             <div class="space-y-2">
                 <label class="block text-sm font-bold text-slate-700 mb-2">File Foto</label>
@@ -370,7 +346,9 @@ const getLabel = (label) => {
         </div>
       </div>
     </transition>
+    </Teleport>
 
+    <Teleport to="body">
     <transition name="modal">
       <div v-if="showEditModal" class="fixed inset-0 z-[70] flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" @click="showEditModal = false"></div>
@@ -384,19 +362,7 @@ const getLabel = (label) => {
           </div>
 
           <div class="p-6 space-y-6">
-            <div class="space-y-2">
-                <label class="block text-sm font-bold text-slate-700">Tipe Foto</label>
-                <div class="grid grid-cols-2 gap-4">
-                    <label class="flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition-all hover:bg-slate-50" :class="editForm.tipe === 'galeri' ? 'border-[#99cc33] bg-[#99cc33]/5 ring-1 ring-[#99cc33]' : 'border-slate-200'">
-                        <input type="radio" v-model="editForm.tipe" value="galeri" class="accent-[#99cc33]" />
-                        <span class="text-sm font-bold" :class="editForm.tipe === 'galeri' ? 'text-[#99cc33]' : 'text-slate-600'">Galeri</span>
-                    </label>
-                    <label class="flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition-all hover:bg-slate-50" :class="editForm.tipe === 'cover_buku' ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500' : 'border-slate-200'">
-                        <input type="radio" v-model="editForm.tipe" value="cover_buku" class="accent-blue-500" />
-                        <span class="text-sm font-bold" :class="editForm.tipe === 'cover_buku' ? 'text-blue-600' : 'text-slate-600'">Cover Buku</span>
-                    </label>
-                </div>
-            </div>
+
 
             <div class="w-full">
                 <label class="block text-sm font-bold text-slate-700 mb-2">Preview Gambar</label>
@@ -429,7 +395,7 @@ const getLabel = (label) => {
         </div>
       </div>
     </transition>
-
+</Teleport>
     <ConfirmModal />
 
   </div>

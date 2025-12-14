@@ -46,7 +46,7 @@ class GaleriController extends Controller
                 'max:5120',                 // Maksimal 5MB (Best Practice)
             ],
             'tipe' => [
-                'required', 
+                'required',
                 'in:galeri,cover_buku'
             ],
         ], [
@@ -68,7 +68,7 @@ class GaleriController extends Controller
             'foto_id' => (string) Str::uuid(), // ID Database tetap UUID
             'url_foto' => $fileData['url'],
             'size' => $fileData['size'],
-            'tipe' => $request->tipe,
+            'tipe' => 'galeri',
         ]);
 
         return redirect()->back()->with('success', 'Foto berhasil diunggah.');
@@ -95,7 +95,7 @@ class GaleriController extends Controller
 
             // Upload file baru (Nama Asli)
             $fileData = $this->handleFileUpload($request->file('foto'));
-            
+
             $photo->url_foto = $fileData['url'];
             $photo->size = $fileData['size'];
         }
@@ -109,10 +109,10 @@ class GaleriController extends Controller
     public function destroy($id)
     {
         $photo = Photo::findOrFail($id);
-        
+
         // Hapus file fisik
         $this->deleteFile($photo->url_foto);
-        
+
         $photo->delete();
 
         return redirect()->back()->with('success', 'Foto dihapus.');
@@ -127,11 +127,11 @@ class GaleriController extends Controller
     {
         // Ambil nama asli file (tanpa ekstensi)
         $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-        
+
         // Bersihkan nama file (Slugify) agar aman untuk URL
         // Contoh: "Screenshot (279).jpg" -> "screenshot-279"
         $safeName = Str::slug($originalName);
-        
+
         // Tambahkan Timestamp agar unik (mencegah overwrite jika nama sama)
         // Contoh hasil: "screenshot-279-17092344.jpg"
         $fileName = $safeName . '-' . time() . '.' . $file->getClientOriginalExtension();
@@ -153,7 +153,7 @@ class GaleriController extends Controller
         if ($url) {
             // Ubah URL publik (/storage/...) menjadi path relatif (public/...)
             $path = str_replace('/storage/', 'public/', $url);
-            
+
             if (Storage::exists($path)) {
                 Storage::delete($path);
             }
@@ -166,7 +166,7 @@ class GaleriController extends Controller
         // Angka 12 dipilih agar pas dengan layout grid (bisa dibagi 2, 3, dan 4 kolom)
         $photos = Photo::where('tipe', 'galeri')
                         ->orderBy('created_date', 'desc')
-                        ->paginate(12); 
+                        ->paginate(12);
 
         return Inertia::render('Galeri/Galeri', [
             'photos' => $photos,

@@ -5,7 +5,7 @@ import ScrollReveal from '@/components/ScrollReveal.vue'; // Import ScrollReveal
 import UserAppLayout from '@/layouts/UserAppLayout.vue';
 import { router } from '@inertiajs/vue3';
 import { debounce } from 'lodash';
-import { FileX, Search } from 'lucide-vue-next';
+import { FileX, Search, ArrowUpDown } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 
 // Tipe data
@@ -32,6 +32,7 @@ const props = defineProps<{
         total: number;
     };
     searchQuery: string | null;
+    sortFilter: string;
 }>();
 
 const breadcrumb = [
@@ -42,11 +43,12 @@ const breadcrumb = [
 
 // State pencarian
 const search = ref(props.searchQuery || '');
+const sort = ref(props.sortFilter || 'desc');
 
 const searchArticles = debounce(() => {
     router.get(
         '/berita',
-        { search: search.value },
+        { search: search.value, sort: sort.value },
         {
             preserveState: true,
             replace: true,
@@ -56,6 +58,20 @@ const searchArticles = debounce(() => {
 }, 300);
 
 watch(search, searchArticles);
+
+const sortArticles = debounce(() => {
+    router.get(
+        '/berita',
+        { search: search.value, sort: sort.value },
+        {
+            preserveState: true,
+            replace: true,
+            preserveScroll: true,
+        },
+    );
+}, 300);
+
+watch(sort, sortArticles);
 
 const paginationLinks = computed(() => {
     return props.articles.links.filter(
@@ -77,21 +93,36 @@ const paginationLinks = computed(() => {
             <ScrollReveal
                 animation="zoom-in"
                 :duration="600"
-                class="max-w-2xl mx-auto mb-12 -mt-16 relative z-20"
+                class="max-w-4xl mx-auto mb-12 -mt-16 relative z-20"
             >
-                <div class="relative group">
-                    <div class="absolute inset-0 bg-[#99cc33]/20 rounded-full blur-md opacity-0 group-focus-within:opacity-100 transition-opacity duration-300"></div>
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-center">
+                    <!-- Search -->
+                    <div class="relative group flex-1 max-w-md">
+                        <div class="absolute inset-0 bg-[#99cc33]/20 rounded-full blur-md opacity-0 group-focus-within:opacity-100 transition-opacity duration-300"></div>
 
-                    <div class="relative bg-white rounded-full shadow-lg shadow-slate-200/50 flex items-center px-2 py-1.5 border border-slate-100 focus-within:border-[#99cc33] transition-colors">
-                        <div class="pl-4 pr-2 text-slate-400 group-focus-within:text-[#99cc33] transition-colors">
-                            <Search class="w-6 h-6" />
+                        <div class="relative bg-white rounded-full shadow-lg shadow-slate-200/50 flex items-center px-2 py-1.5 border border-slate-100 focus-within:border-[#99cc33] transition-colors">
+                            <div class="pl-4 pr-2 text-slate-400 group-focus-within:text-[#99cc33] transition-colors">
+                                <Search class="w-6 h-6" />
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Cari judul atau topik berita..."
+                                v-model="search"
+                                class="w-full bg-transparent border-none outline-none text-slate-700 placeholder:text-slate-400 h-12 text-base focus:ring-0"
+                            />
                         </div>
-                        <input
-                            type="text"
-                            placeholder="Cari judul atau topik berita..."
-                            v-model="search"
-                            class="w-full bg-transparent border-none outline-none text-slate-700 placeholder:text-slate-400 h-12 text-base focus:ring-0"
-                        />
+                    </div>
+
+                    <!-- Sort -->
+                    <div class="flex items-center gap-2">
+                        <ArrowUpDown class="w-5 h-5 text-slate-400" />
+                        <select
+                            v-model="sort"
+                            class="rounded-full border border-slate-100 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-lg shadow-slate-200/50 focus:border-[#99cc33] focus:outline-none focus:ring-2 focus:ring-[#99cc33]/20 transition-colors"
+                        >
+                            <option value="desc">Terbaru</option>
+                            <option value="asc">Terlama</option>
+                        </select>
                     </div>
                 </div>
             </ScrollReveal>

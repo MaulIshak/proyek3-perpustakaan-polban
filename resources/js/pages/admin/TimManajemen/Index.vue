@@ -269,6 +269,7 @@ function deleteItem(item: (typeof props.manajemen)[0]) {
         </div>
 
         <!-- 3. Modal Form (Create/Edit) -->
+         <Teleport to="body">
         <transition name="modal">
             <div
                 v-if="showModal"
@@ -405,7 +406,7 @@ function deleteItem(item: (typeof props.manajemen)[0]) {
                 </div>
             </div>
         </transition>
-
+</Teleport>
         <!-- Komponen Konfirmasi Hapus -->
         <ConfirmModal />
     </div>

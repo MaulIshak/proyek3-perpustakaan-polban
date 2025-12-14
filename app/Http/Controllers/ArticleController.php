@@ -13,19 +13,26 @@ class ArticleController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
+        $status = $request->input('status', 'all');
+        $sort = $request->input('sort', 'desc');
 
         $articles = Article::where('type', 'berita')
             ->when($search, function ($query, $search) {
                 $lowerSearch = strtolower($search);
                 $query->whereRaw('LOWER(judul) LIKE ?', ["%{$lowerSearch}%"]);
             })
-            ->orderBy('created_date', 'desc')
+            ->when($status !== 'all', function ($query) use ($status) {
+                $query->where('status', $status);
+            })
+            ->orderBy('created_date', $sort === 'asc' ? 'asc' : 'desc')
             ->paginate(8)
             ->withQueryString();
 
         return inertia('admin/berita/Index', [
             'articles' => $articles,
             'searchQuery' => $search,
+            'statusFilter' => $status,
+            'sortFilter' => $sort,
         ]);
     }
 
@@ -204,6 +211,7 @@ public function updateBerita(Request $request, $id)
     public function beritaUser(Request $request)
     {
         $search = $request->input('search');
+        $sort = $request->input('sort', 'desc');
 
         $articles = Article::where('type', 'berita')
             ->where('status', 'published')
@@ -211,18 +219,20 @@ public function updateBerita(Request $request, $id)
                 $lowerSearch = strtolower($search);
                 $query->whereRaw('LOWER(judul) LIKE ?', ["%{$lowerSearch}%"]);
             })
-            ->orderBy('created_date', 'desc')
+            ->orderBy('created_date', $sort === 'asc' ? 'asc' : 'desc')
             ->paginate(6)
             ->withQueryString();
 
         return inertia('user/Berita', [
             'articles' => $articles,
             'searchQuery' => $search,
+            'sortFilter' => $sort,
         ]);
     }
     public function pengumumanUser(Request $request)
     {
         $search = $request->input('search');
+        $sort = $request->input('sort', 'desc');
 
         $articles = Article::where('type', 'pengumuman')
             ->where('status', 'published')
@@ -230,13 +240,14 @@ public function updateBerita(Request $request, $id)
                 $lowerSearch = strtolower($search);
                 $query->whereRaw('LOWER(judul) LIKE ?', ["%{$lowerSearch}%"]);
             })
-            ->orderBy('created_date', 'desc')
+            ->orderBy('created_date', $sort === 'asc' ? 'asc' : 'desc')
             ->paginate(3)
             ->withQueryString();
 
         return inertia('user/Pengumuman', [
             'articles' => $articles,
             'searchQuery' => $search,
+            'sortFilter' => $sort,
         ]);
     }
 
@@ -244,19 +255,26 @@ public function updateBerita(Request $request, $id)
     public function indexPengumuman(Request $request)
     {
         $search = $request->input('search');
+        $status = $request->input('status', 'all');
+        $sort = $request->input('sort', 'desc');
 
         $articles = Article::where('type', 'pengumuman')
             ->when($search, function ($query, $search) {
                 $lowerSearch = strtolower($search);
                 $query->whereRaw('LOWER(judul) LIKE ?', ["%{$lowerSearch}%"]);
             })
-            ->orderBy('created_date', 'desc')
+            ->when($status !== 'all', function ($query) use ($status) {
+                $query->where('status', $status);
+            })
+            ->orderBy('created_date', $sort === 'asc' ? 'asc' : 'desc')
             ->paginate(8)
             ->withQueryString();
 
         return inertia('admin/pengumuman/Index', [
             'articles' => $articles,
             'searchQuery' => $search,
+            'statusFilter' => $status,
+            'sortFilter' => $sort,
         ]);
     }
 
