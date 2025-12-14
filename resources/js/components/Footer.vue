@@ -88,7 +88,7 @@ const socialMedia = [
                                 <h4 class="font-bold text-slate-800 leading-snug">
                                     Perpustakaan Politeknik Negeri Bandung
                                 </h4>
-                                <span class="text-xs font-mono text-slate-400 block mb-1">NPP 321702200000001</span>
+                                <span class="font-mono text-slate-400 block mb-1">NPP 321702200000001</span>
                                 <p class="text-sm text-slate-500 leading-relaxed">
                                     Gedung H, Lantai 1, Jl. Gegerkalong Hilir, Ds. Ciwaruga, Bandung Barat, Jawa Barat 40559
                                 </p>
@@ -121,7 +121,7 @@ const socialMedia = [
                         </div>
 
                         <div class="pt-4 border-t border-slate-200/50">
-                            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Media Sosial</h4>
+                            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Ikuti Kami</h4>
                             <div class="flex gap-3">
                                 <a
                                     v-for="(social, idx) in socialMedia"
@@ -140,7 +140,7 @@ const socialMedia = [
 
             <div class="mt-12 sm:mt-16 border-t border-slate-200 pt-8 text-center">
                 <p class="text-xs sm:text-sm font-medium text-slate-500">
-                    &copy; {{ new Date().getFullYear() }} UPT Perpustakaan Politeknik Negeri Bandung.
+                    &copy; {{ new Date().getFullYear() }} Perpustakaan Politeknik Negeri Bandung.
                     <span class="block sm:inline mt-1 sm:mt-0 text-slate-400">All rights reserved.</span>
                 </p>
             </div>
