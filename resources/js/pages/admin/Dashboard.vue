@@ -28,8 +28,6 @@ defineOptions({
         ),
 });
 
-// --- PROPS DARI CONTROLLER ---
-// PERBAIKAN: Menggunakan withDefaults agar tidak error jika props undefined
 const props = withDefaults(
     defineProps<{
         stats?: {
@@ -59,8 +57,6 @@ const props = withDefaults(
     },
 );
 
-// --- HELPER FUNCTIONS ---
-// Mapping string icon name dari backend ke komponen Lucide
 const iconMap: Record<string, any> = {
     Newspaper,
     Megaphone,

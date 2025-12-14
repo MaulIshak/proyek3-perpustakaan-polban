@@ -1,17 +1,18 @@
 <script setup lang="ts">
+import ScrollReveal from '@/components/ScrollReveal.vue'; // Pastikan path sesuai
 import Layout from '@/layouts/UserAppLayout.vue';
 import {
+    AlertCircle,
     BookOpen,
     Download,
     FileCheck,
     FileText,
+    FileType,
     GitGraph,
     Image,
-    ShieldCheck,
-    AlertCircle,
-    FileType
+    ShieldCheck
 } from 'lucide-vue-next';
-import { ref, computed } from 'vue';
+import { computed, ref } from 'vue';
 
 // --- 1. DEFINISI TIPE DATA ---
 interface Settings {
@@ -86,7 +87,11 @@ const downloadFile = (path?: string) => {
 
         <div class="relative container mx-auto px-3 py-6 sm:px-6 sm:py-10 lg:px-8">
 
-            <div class="mb-8 grid grid-cols-2 gap-2 sm:mb-12 sm:flex sm:flex-wrap sm:justify-center sm:gap-3">
+            <ScrollReveal
+                animation="fade-up"
+                :duration="800"
+                class="mb-8 grid grid-cols-2 gap-2 sm:mb-12 sm:flex sm:flex-wrap sm:justify-center sm:gap-3"
+            >
                 <button
                     v-for="tab in tabs"
                     :key="tab.id"
@@ -96,16 +101,21 @@ const downloadFile = (path?: string) => {
                         activeTab === tab.id
                             ? '-translate-y-0.5 border-[#99cc33] bg-[#99cc33] text-white shadow-lg shadow-[#99cc33]/30 sm:-translate-y-1'
                             : 'border-slate-200 bg-white text-slate-600 hover:border-[#99cc33]/30 hover:bg-slate-50 hover:text-[#99cc33]',
-                        /* Membuat tab terakhir (jika ganjil) mengambil 2 kolom di mobile agar rapi */
+                        /* Logic kolom ganjil mobile */
                         tabs.length % 2 !== 0 && tabs.indexOf(tab) === tabs.length - 1 ? 'col-span-2 sm:col-span-1' : ''
                     ]"
                 >
                     <component :is="tab.icon" class="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     {{ tab.label }}
                 </button>
-            </div>
+            </ScrollReveal>
 
-            <div class="mx-auto min-h-[400px] max-w-5xl">
+            <ScrollReveal
+                animation="fade-up"
+                :duration="800"
+                :delay="200"
+                class="mx-auto min-h-[400px] max-w-5xl"
+            >
                 <transition name="fade" mode="out-in">
 
                     <div
@@ -227,12 +237,13 @@ const downloadFile = (path?: string) => {
                     </div>
 
                 </transition>
-            </div>
+            </ScrollReveal>
         </div>
     </Layout>
 </template>
 
 <style scoped>
+/* Transisi Vue internal untuk perpindahan tab */
 .fade-enter-active,
 .fade-leave-active {
     transition: opacity 0.3s ease, transform 0.3s ease;

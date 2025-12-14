@@ -120,17 +120,23 @@ const activeTab = ref('berita');
                                 animation="fade-in"
                                 class="mb-6 flex items-center justify-between border-b border-slate-100 pb-4"
                             >
-                                <h2
-                                    class="text-xl font-bold text-slate-800 md:text-2xl"
-                                >
-                                    Pengumuman
-                                </h2>
-                                <a
-                                    href="/pengumuman"
-                                    class="text-sm font-semibold text-[#99cc33] hover:underline"
-                                >
-                                    Lihat Semua &rarr;
-                                </a>
+                <div>
+                    <div class="mb-2 flex items-center gap-3">
+                        <div
+                            class="rounded-lg bg-[#99cc33]/10 p-2 text-[#99cc33]"
+                        >
+                            <Newspaper class="h-6 w-6" />
+                        </div>
+                        <h2
+                            class="text-3xl font-black tracking-tight text-slate-900"
+                        >
+                            Pengumuman Terbaru
+                        </h2>
+                    </div>
+                    <div
+                        class="ml-1 h-1.5 w-24 rounded-full bg-[#99cc33] shadow-sm shadow-[#99cc33]/50"
+                    ></div>
+                </div>
                             </ScrollReveal>
                             <div class="grid gap-4">
                                 <template

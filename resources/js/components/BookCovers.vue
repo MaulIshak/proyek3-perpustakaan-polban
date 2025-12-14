@@ -13,7 +13,7 @@ const props = defineProps({
 </script>
 
 <template>
-    <section class="w-full py-8">
+    <section class="w-full py-3">
         <div class="mx-auto max-w-7xl">
             <!-- 1. Header Section -->
             <div
