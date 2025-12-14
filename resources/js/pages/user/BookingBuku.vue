@@ -32,12 +32,13 @@ const form = useForm({
 
 const showMessage = ref(false);
 const messageRef = ref<HTMLElement | null>(null);
-const formError = ref(''); // Pesan error global
+const formError = ref('');
 
 // --- STATE VALIDASI ---
 const errors = reactive({
     nimNip: null as string | null,
-    whatsapp: null as string | null
+    whatsapp: null as string | null,
+    email: null as string | null
 });
 
 // --- VALIDASI NIM / NIP ---
@@ -45,8 +46,7 @@ const validateNim = (value: string) => {
     if (!value) return "Wajib diisi.";
     if (/[^0-9]/.test(value)) return "Hanya boleh angka (0-9).";
     if (value.length < 9) return `Kurang (${value.length}/9 digit).`;
-    if (value.length > 10) return `Lebih (${value.length}/10 digit).`;
-    return null; // Valid
+    return null;
 };
 
 // --- VALIDASI WHATSAPP ---
@@ -55,16 +55,24 @@ const validateWa = (value: string) => {
     if (/[^0-9]/.test(value)) return "Nomor HP hanya boleh angka.";
     if (value.length < 10) return `Kurang (${value.length}/10 digit).`;
     if (value.length > 15) return `Lebih (${value.length}/15 digit).`;
-    return null; // Valid
+    return null;
+};
+
+// --- VALIDASI EMAIL POLBAN ---
+const validateEmail = (value: string) => {
+    if (!value) return "Wajib diisi.";
+    if (!value.endsWith('@polban.ac.id')) {
+        return "Wajib menggunakan email @polban.ac.id";
+    }
+    return null;
 };
 
 // --- HANDLER INPUT ---
 const handleNimInput = (event: Event) => {
     const val = (event.target as HTMLInputElement).value;
     form.nimNip = val;
-    // Validasi real-time hanya untuk visual, tidak memblokir tombol
     errors.nimNip = validateNim(val);
-    formError.value = ''; // Reset pesan error global
+    formError.value = '';
 };
 
 const handleWaInput = (event: Event) => {
@@ -74,29 +82,38 @@ const handleWaInput = (event: Event) => {
     formError.value = '';
 };
 
+const handleEmailInput = (event: Event) => {
+    const val = (event.target as HTMLInputElement).value;
+    form.email = val;
+    errors.email = validateEmail(val);
+    formError.value = '';
+};
+
 // --- SUBMIT FORM ---
 const submitForm = () => {
-    // 1. Lakukan Validasi Menyeluruh Saat Tombol Ditekan
+    // 1. Validasi Menyeluruh
     const nimError = validateNim(form.nimNip);
     const waError = validateWa(form.whatsapp);
+    const emailError = validateEmail(form.email);
 
-    // Update state error agar muncul di input field
+    // Update state error visual
     errors.nimNip = nimError;
     errors.whatsapp = waError;
+    errors.email = emailError;
 
     // 2. Cek Jika Ada Error
-    if (nimError || waError) {
-        // Tampilkan pesan global dan HENTIKAN proses kirim
+    if (nimError || waError || emailError) {
         formError.value = "Data belum valid. Mohon perbaiki kolom berwarna merah.";
         
-        // Opsional: Scroll ke input yang salah agar user sadar
+        // Auto focus
         if (nimError) document.getElementById('nimInput')?.focus();
         else if (waError) document.getElementById('waInput')?.focus();
+        else if (emailError) document.getElementById('emailInput')?.focus();
         
         return;
     }
 
-    // 3. Jika Lolos Validasi -> Kirim ke Server
+    // 3. Kirim ke Server
     form.post('/book-reservation', {
         preserveScroll: true,
         onSuccess: () => {
@@ -104,6 +121,7 @@ const submitForm = () => {
             form.reset();
             errors.nimNip = null;
             errors.whatsapp = null;
+            errors.email = null;
             formError.value = '';
             
             setTimeout(() => {
@@ -153,7 +171,7 @@ const submitForm = () => {
                 <div class="h-2 w-full bg-gradient-to-r from-[#99cc33] to-[var(--dark-green)]"></div>
 
                 <div class="p-8 sm:p-10">
-                    <form @submit.prevent="submitForm" class="space-y-10">
+                    <form @submit.prevent="submitForm" class="space-y-8">
                         
                         <div>
                             <h3 class="mb-6 flex items-center gap-2 border-b border-slate-100 pb-2 text-lg font-bold text-slate-800">
@@ -186,7 +204,7 @@ const submitForm = () => {
                                             :class="errors.nimNip 
                                                 ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-200 text-red-900' 
                                                 : 'border-slate-200 focus:border-[#99cc33] focus:ring-[#99cc33]/20'"
-                                            placeholder="Masukkan NIM atau NIP (9-10 digit)" required inputmode="numeric" 
+                                            placeholder="Masukkan NIM atau NIP" required inputmode="numeric" 
                                         />
 
                                         <div v-if="form.nimNip.length > 0" class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
@@ -195,13 +213,11 @@ const submitForm = () => {
                                         </div>
                                     </div>
                                     
-                                    <div class="min-h-[1.5rem] mt-2">
-                                        <transition enter-active-class="transition-opacity duration-300 ease-out" enter-from-class="opacity-0" enter-to-class="opacity-100" leave-active-class="transition-opacity duration-200 ease-in" leave-from-class="opacity-100" leave-to-class="opacity-0">
-                                            <p v-if="errors.nimNip" class="text-xs font-medium flex items-center gap-1 text-red-500">
-                                                {{ errors.nimNip }}
-                                            </p>
-                                        </transition>
-                                    </div>
+                                    <transition enter-active-class="transition-opacity duration-300 ease-out" enter-from-class="opacity-0" enter-to-class="opacity-100" leave-active-class="transition-opacity duration-200 ease-in" leave-from-class="opacity-100" leave-to-class="opacity-0">
+                                        <p v-if="errors.nimNip" class="mt-2 text-xs font-medium flex items-center gap-1 text-red-500">
+                                            {{ errors.nimNip }}
+                                        </p>
+                                    </transition>
                                 </div>
 
                                 <div>
@@ -230,22 +246,46 @@ const submitForm = () => {
                                         </div>
                                     </div>
 
-                                    <div class="min-h-[1.5rem] mt-2">
-                                        <transition enter-active-class="transition-opacity duration-300 ease-out" enter-from-class="opacity-0" enter-to-class="opacity-100" leave-active-class="transition-opacity duration-200 ease-in" leave-from-class="opacity-100" leave-to-class="opacity-0">
-                                            <p v-if="errors.whatsapp" class="text-xs font-medium flex items-center gap-1 text-red-500">
-                                                {{ errors.whatsapp }}
-                                            </p>
-                                        </transition>
-                                    </div>
+                                    <transition enter-active-class="transition-opacity duration-300 ease-out" enter-from-class="opacity-0" enter-to-class="opacity-100" leave-active-class="transition-opacity duration-200 ease-in" leave-from-class="opacity-100" leave-to-class="opacity-0">
+                                        <p v-if="errors.whatsapp" class="mt-2 text-xs font-medium flex items-center gap-1 text-red-500">
+                                            {{ errors.whatsapp }}
+                                        </p>
+                                    </transition>
                                 </div>
 
                                 <div class="md:col-span-2">
-                                    <label class="mb-2 block text-sm font-semibold text-slate-700">Email <span class="text-red-500">*</span></label>
-                                    <div class="relative">
-                                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400"><Mail class="h-5 w-5" /></div>
-                                        <input v-model="form.email" type="email" class="w-full rounded-xl border border-slate-200 py-3 pr-4 pl-10 text-slate-700 outline-none focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20" placeholder="email@polban.ac.id" required />
+                                    <label class="mb-2 block text-sm font-semibold text-slate-700">Email Polban <span class="text-red-500">*</span></label>
+                                    <div class="relative group">
+                                        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 transition-colors"
+                                             :class="errors.email ? 'text-red-400' : (form.email ? 'text-green-500' : 'text-slate-400')">
+                                            <Mail class="h-5 w-5" />
+                                        </div>
+                                        
+                                        <input 
+                                            id="emailInput"
+                                            :value="form.email"
+                                            @input="handleEmailInput"
+                                            type="email" 
+                                            class="w-full rounded-xl border py-3 pr-10 pl-10 transition-all outline-none focus:ring-2"
+                                            :class="errors.email 
+                                                ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-red-200 text-red-900' 
+                                                : 'border-slate-200 focus:border-[#99cc33] focus:ring-[#99cc33]/20'"
+                                            placeholder="nama.mahasiswa@polban.ac.id" required 
+                                        />
+
+                                        <div v-if="form.email.length > 0" class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                                            <Check v-if="!errors.email" class="h-5 w-5 text-green-500" />
+                                            <AlertTriangle v-else class="h-5 w-5 text-red-500 animate-pulse" />
+                                        </div>
                                     </div>
+
+                                    <transition enter-active-class="transition-opacity duration-300 ease-out" enter-from-class="opacity-0" enter-to-class="opacity-100" leave-active-class="transition-opacity duration-200 ease-in" leave-from-class="opacity-100" leave-to-class="opacity-0">
+                                        <p v-if="errors.email" class="mt-2 text-xs font-medium flex items-center gap-1 text-red-500">
+                                            {{ errors.email }}
+                                        </p>
+                                    </transition>
                                 </div>
+
                             </div>
                         </div>
 

@@ -11,6 +11,18 @@ use App\Services\BrevoService;      // [1] Import Service Brevo
 
 class BookingController extends Controller
 {
+    protected $brevo;
+
+    /**
+     * [UBAH] Inject Service Melalui Constructor
+     * Ini memungkinkan Laravel menyuntikkan konfigurasi Brevo yang SPESIFIK
+     * untuk 'Booking Buku' (Nama Pengirim: Layanan Sirkulasi).
+     */
+    public function __construct(BrevoService $brevo)
+    {
+        $this->brevo = $brevo;
+    }
+
     // --- USER SIDE ---
     public function create()
     {
@@ -59,25 +71,23 @@ class BookingController extends Controller
             });
         }
 
-        // 2. Pagination (Ganti get() jadi paginate())
-        // withQueryString() berguna agar saat pindah halaman, search tidak hilang
+        // 2. Pagination
         $bookings = $query->latest()->paginate(2)->withQueryString();
 
         return Inertia::render('admin/booking/Index', [
             'bookings' => $bookings,
-            'filters'  => $request->only(['search']), // Kirim balik input search ke frontend
+            'filters'  => $request->only(['search']),
         ]);
     }
 
-    // [2] Inject BrevoService ke method updateStatus
-    public function updateStatus(Request $request, $id, BrevoService $brevo)
+    // [UBAH] Hapus BrevoService dari parameter method, gunakan $this->brevo
+    public function updateStatus(Request $request, $id)
     {
         $booking = BookingBuku::findOrFail($id);
         
         $request->validate([
             'status' => 'required|in:approved,rejected,cancelled,pending',
             'rejection_reason' => 'nullable|string',
-            // [PERBAIKAN 1] Tambahkan 'nullable' agar tidak error saat cancel/reject
             'deadline' => 'nullable|required_if:status,approved|date', 
         ]);
 
@@ -93,7 +103,7 @@ class BookingController extends Controller
         } else {
             // Status Cancelled / Pending
             $booking->rejection_reason = null;
-            $booking->deadline = null; // [PERBAIKAN 2] Reset deadline jika dibatalkan
+            $booking->deadline = null; // Reset deadline jika dibatalkan
         }
 
         $booking->save();
@@ -114,7 +124,7 @@ class BookingController extends Controller
                 'book_title' => $booking->judul_buku,
                 'status'     => $booking->status,
                 'reason'     => $booking->rejection_reason,
-                'deadline'   => $deadlineString,
+                'deadline'   => $deadlineString, 
             ];
 
             try {
@@ -127,11 +137,12 @@ class BookingController extends Controller
                     default => 'Update Status Booking'
                 };
 
-                $brevo->sendEmail(
-                    $booking->email,
-                    $booking->nama_lengkap,
-                    $subject,
-                    $emailContent
+                // [UBAH] Gunakan $this->brevo yang sudah diinject di constructor
+                $this->brevo->sendEmail(
+                    $booking->email,        
+                    $booking->nama_lengkap, 
+                    $subject,               
+                    $emailContent           
                 );
 
             } catch (\Exception $e) {
@@ -144,7 +155,8 @@ class BookingController extends Controller
 
     public function destroy($id)
     {
-        BookingBuku::findOrFail($id)->delete();
+        $booking = BookingBuku::findOrFail($id);
+        $booking->delete();
         return redirect()->back()->with('success', 'Data booking berhasil dihapus.');
     }
 }
