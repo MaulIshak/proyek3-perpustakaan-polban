@@ -71,13 +71,13 @@ const validateField = (field: string) => {
     switch (field) {
         case 'nama_pengusul':
             if (!value) liveErrors.nama_pengusul = 'Nama wajib diisi.';
-            else if ((value as string).length < 4) liveErrors.nama_pengusul = 'Nama terlalu pendek (min. 3 karakter).';
+            else if ((value as string).length < 3) liveErrors.nama_pengusul = 'Nama terlalu pendek (min. 3 karakter).';
             break;
 
         case 'nim':
             if (!value) liveErrors.nim = 'NIM wajib diisi.';
             else if (!/^\d+$/.test(value as string)) liveErrors.nim = 'NIM harus berupa angka.';
-            else if ((value as string).length < 9) liveErrors.nim = 'NIM/NIP tidak valid(minimal 9 digit)';
+            else if ((value as string).length < 5) liveErrors.nim = 'NIM tidak valid.';
             break;
 
         case 'prodi':
