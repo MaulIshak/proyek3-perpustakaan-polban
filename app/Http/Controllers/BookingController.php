@@ -61,7 +61,7 @@ class BookingController extends Controller
 
         // 2. Pagination (Ganti get() jadi paginate())
         // withQueryString() berguna agar saat pindah halaman, search tidak hilang
-        $bookings = $query->latest()->paginate(2)->withQueryString();
+        $bookings = $query->latest()->paginate(10)->withQueryString();
 
         return Inertia::render('admin/booking/Index', [
             'bookings' => $bookings,
