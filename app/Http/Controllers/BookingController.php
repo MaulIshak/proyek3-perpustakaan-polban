@@ -6,18 +6,13 @@ use App\Models\BookingBuku;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log; // Untuk logging error
-use App\Services\BrevoService;      // [1] Import Service Brevo
+use Illuminate\Support\Facades\Log;
+use App\Services\BrevoService;
 
 class BookingController extends Controller
 {
     protected $brevo;
 
-    /**
-     * [UBAH] Inject Service Melalui Constructor
-     * Ini memungkinkan Laravel menyuntikkan konfigurasi Brevo yang SPESIFIK
-     * untuk 'Booking Buku' (Nama Pengirim: Layanan Sirkulasi).
-     */
     public function __construct(BrevoService $brevo)
     {
         $this->brevo = $brevo;
@@ -58,21 +53,18 @@ class BookingController extends Controller
     // --- ADMIN SIDE ---
     public function indexAdmin(Request $request)
     {
-        // Query Dasar
         $query = BookingBuku::query();
 
-        // 1. Logika Search (Jika ada input 'search')
         if ($request->has('search') && $request->search != '') {
             $search = $request->search;
             $query->where(function($q) use ($search) {
-                $q->where('nama_lengkap', 'ilike', "%{$search}%") // Gunakan 'ilike' utk PostgreSQL (case-insensitive)
+                $q->where('nama_lengkap', 'ilike', "%{$search}%")
                   ->orWhere('nim_nip', 'like', "%{$search}%")
                   ->orWhere('judul_buku', 'ilike', "%{$search}%");
             });
         }
 
-        // 2. Pagination
-        $bookings = $query->latest()->paginate(2)->withQueryString();
+        $bookings = $query->latest()->paginate(5)->withQueryString();
 
         return Inertia::render('admin/booking/Index', [
             'bookings' => $bookings,
@@ -80,36 +72,41 @@ class BookingController extends Controller
         ]);
     }
 
-    // [UBAH] Hapus BrevoService dari parameter method, gunakan $this->brevo
     public function updateStatus(Request $request, $id)
     {
         $booking = BookingBuku::findOrFail($id);
         
+        // [1] Tambahkan 'collected' ke validasi
         $request->validate([
-            'status' => 'required|in:approved,rejected,cancelled,pending',
+            'status' => 'required|in:approved,rejected,cancelled,pending,collected',
             'rejection_reason' => 'nullable|string',
             'deadline' => 'nullable|required_if:status,approved|date', 
         ]);
 
         $booking->status = $request->status;
         
-        // --- LOGIKA PENYIMPANAN DEADLINE ---
+        // --- LOGIKA PENYIMPANAN DATA TAMBAHAN ---
         if ($request->status === 'approved') {
             $booking->deadline = $request->deadline; 
             $booking->rejection_reason = null;
         } elseif ($request->status === 'rejected') {
             $booking->rejection_reason = $request->rejection_reason;
-            $booking->deadline = null; // Hapus deadline
+            $booking->deadline = null;
+        } elseif ($request->status === 'collected') {
+            // Jika diambil, hapus deadline & reason (bersih)
+            $booking->deadline = null;
+            $booking->rejection_reason = null;
         } else {
             // Status Cancelled / Pending
             $booking->rejection_reason = null;
-            $booking->deadline = null; // Reset deadline jika dibatalkan
+            $booking->deadline = null;
         }
 
         $booking->save();
 
         // --- LOGIKA KIRIM EMAIL ---
-        if ($booking->status !== 'pending') {
+        // [PERUBAHAN] Jangan kirim email jika status 'collected'
+        if ($booking->status !== 'pending' && $booking->status !== 'collected') {
             
             $deadlineString = '-';
 
@@ -137,7 +134,6 @@ class BookingController extends Controller
                     default => 'Update Status Booking'
                 };
 
-                // [UBAH] Gunakan $this->brevo yang sudah diinject di constructor
                 $this->brevo->sendEmail(
                     $booking->email,        
                     $booking->nama_lengkap, 
