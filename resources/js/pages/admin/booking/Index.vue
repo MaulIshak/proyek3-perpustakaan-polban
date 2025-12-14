@@ -1,20 +1,28 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'; 
+import { ref, watch, computed } from 'vue'; 
 import { useForm, router, Link } from '@inertiajs/vue3'; 
 import AdminLayout from '@/layouts/AdminLayout.vue';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { 
     CalendarClock, 
     CheckCircle2,
     Book,
-    Plus,
     Trash2,
     X,
-    Save,
     Search,
     ChevronLeft, 
     ChevronRight,
-    AlertTriangle // Icon baru untuk warning
+    AlertTriangle,
+    Filter,
+    Check
 } from 'lucide-vue-next';
 
 // --- TYPES ---
@@ -46,24 +54,57 @@ interface PaginatedBookings {
     to: number;
 }
 
+// Props
 const props = defineProps<{
     bookings: PaginatedBookings; 
-    filters?: { search: string }; 
+    filters?: { search: string; status: string }; 
 }>();
 
-// --- STATE SEARCH ---
+// --- STATE SEARCH & FILTER ---
 const search = ref(props.filters?.search || '');
+const statusFilter = ref(props.filters?.status || 'all');
 
+// Helper untuk Label Status di Filter
+const statusLabels: Record<string, string> = {
+    all: 'Semua Status',
+    pending: 'Menunggu',
+    approved: 'Disetujui',
+    collected: 'Sudah Diambil',
+    rejected: 'Ditolak',
+    cancelled: 'Dibatalkan'
+};
+
+const currentStatusLabel = computed(() => statusLabels[statusFilter.value] || 'Semua Status');
+
+// Fungsi Fetch Data
+const fetchData = () => {
+    router.get('/admin/booking-buku', { 
+        search: search.value,
+        status: statusFilter.value === 'all' ? '' : statusFilter.value
+    }, {
+        preserveState: true, 
+        replace: true,       
+        preserveScroll: true 
+    });
+};
+
+// Fungsi Ganti Filter (untuk Dropdown)
+const setFilter = (status: string) => {
+    statusFilter.value = status;
+    // watch akan otomatis memanggil fetchData
+};
+
+// Watchers
 let timeout: ReturnType<typeof setTimeout>;
-watch(search, (value) => {
+watch(search, () => {
     clearTimeout(timeout);
     timeout = setTimeout(() => {
-        router.get('/admin/booking-buku', { search: value }, {
-            preserveState: true, 
-            replace: true,       
-            preserveScroll: true 
-        });
+        fetchData();
     }, 500);
+});
+
+watch(statusFilter, () => {
+    fetchData();
 });
 
 // --- STATE MODALS ---
@@ -74,8 +115,6 @@ const showApproveModal = ref(false);
 const showRejectModal = ref(false);
 const showCancelModal = ref(false);
 const showDeleteModal = ref(false);
-
-// [BARU] State untuk modal konfirmasi baru
 const showCollectedModal = ref(false);
 const showUnapproveModal = ref(false);
 
@@ -117,49 +156,28 @@ const openApproveModal = (booking: BookingData) => {
 };
 
 const openRejectModal = (booking: BookingData) => { selectedBooking.value = booking; rejectionReason.value = ''; showRejectModal.value = true; };
-const openCancelModal = (booking: BookingData) => { 
-    selectedBooking.value = booking; 
-    form.reset(); form.clearErrors(); 
-    showCancelModal.value = true; 
-};
+const openCancelModal = (booking: BookingData) => { selectedBooking.value = booking; form.reset(); form.clearErrors(); showCancelModal.value = true; };
 const openDeleteModal = (booking: BookingData) => { selectedBooking.value = booking; showDeleteModal.value = true; };
-
-// [BARU] Actions untuk modal baru
 const openCollectedModal = (booking: BookingData) => { selectedBooking.value = booking; showCollectedModal.value = true; };
 const openUnapproveModal = (booking: BookingData) => { selectedBooking.value = booking; showUnapproveModal.value = true; };
 
 // --- SUBMIT FUNCTIONS ---
 const submitApprove = () => {
     if (!selectedBooking.value) return;
-    form.status = 'approved'; 
-    form.rejection_reason = null;
+    form.status = 'approved'; form.rejection_reason = null;
     form.patch(`/admin/booking-buku/${selectedBooking.value.id}/status`, { onSuccess: () => showApproveModal.value = false });
 };
 
-// [UBAH] Menggunakan Modal, bukan window.confirm
 const submitCollected = () => {
     if (!selectedBooking.value) return;
-    
-    form.status = 'collected'; 
-    form.rejection_reason = null; 
-    form.deadline = ''; 
-    
-    form.patch(`/admin/booking-buku/${selectedBooking.value.id}/status`, {
-        onSuccess: () => showCollectedModal.value = false
-    });
+    form.status = 'collected'; form.rejection_reason = null; form.deadline = ''; 
+    form.patch(`/admin/booking-buku/${selectedBooking.value.id}/status`, { onSuccess: () => showCollectedModal.value = false });
 };
 
-// [UBAH] Menggunakan Modal, bukan window.confirm
 const submitUnapprove = () => {
     if (!selectedBooking.value) return;
-
-    form.status = 'cancelled';
-    form.rejection_reason = null;
-    form.deadline = '';
-    
-    form.patch(`/admin/booking-buku/${selectedBooking.value.id}/status`, {
-        onSuccess: () => showUnapproveModal.value = false
-    });
+    form.status = 'cancelled'; form.rejection_reason = null; form.deadline = '';
+    form.patch(`/admin/booking-buku/${selectedBooking.value.id}/status`, { onSuccess: () => showUnapproveModal.value = false });
 };
 
 const submitReject = () => {
@@ -170,9 +188,7 @@ const submitReject = () => {
 
 const submitCancel = () => {
     if (!selectedBooking.value) return;
-    form.status = 'cancelled'; 
-    form.rejection_reason = null; 
-    form.deadline = '';
+    form.status = 'cancelled'; form.rejection_reason = null; form.deadline = '';
     form.patch(`/admin/booking-buku/${selectedBooking.value.id}/status`, { onSuccess: () => showCancelModal.value = false });
 };
 
@@ -220,16 +236,70 @@ defineOptions({ layout: (h: any, page: any) => h(AdminLayout, { title: 'Booking 
                     </span>
                 </h2>
 
-                <div class="relative w-full md:w-72 group">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Search class="h-4 w-4 text-[#99cc33]/70 group-focus-within:text-[#99cc33]" />
+                <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger as-child>
+                            <Button 
+                                variant="outline" 
+                                class="w-full sm:w-48 justify-between bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white focus:ring-0 focus:ring-offset-0 transition-all"
+                            >
+                                <div class="flex items-center gap-2 truncate">
+                                    <Filter class="h-4 w-4 opacity-80" />
+                                    <span class="truncate">{{ currentStatusLabel }}</span>
+                                </div>
+                                <div class="opacity-50">
+                                    <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </div>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent class="w-56" align="end">
+                            <DropdownMenuLabel>Filter Status</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            
+                            <DropdownMenuItem @click="setFilter('all')" class="justify-between cursor-pointer">
+                                <span class="flex items-center gap-2">Semua Status</span>
+                                <Check v-if="statusFilter === 'all'" class="h-4 w-4 " />
+                            </DropdownMenuItem>
+                            
+                            <DropdownMenuItem @click="setFilter('pending')" class="justify-between cursor-pointer">
+                                <span class="flex items-center gap-2">Menunggu</span>
+                                <Check v-if="statusFilter === 'pending'" class="h-4 w-4 " />
+                            </DropdownMenuItem>
+                            
+                            <DropdownMenuItem @click="setFilter('approved')" class="justify-between cursor-pointer">
+                                <span class="flex items-center gap-2">Disetujui</span>
+                                <Check v-if="statusFilter === 'approved'" class="h-4 w-4 " />
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem @click="setFilter('collected')" class="justify-between cursor-pointer">
+                                <span class="flex items-center gap-2">Sudah Diambil</span>
+                                <Check v-if="statusFilter === 'collected'" class="h-4 w-4 " />
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem @click="setFilter('rejected')" class="justify-between cursor-pointer">
+                                <span class="flex items-center gap-2">Ditolak</span>
+                                <Check v-if="statusFilter === 'rejected'" class="h-4 w-4 " />
+                            </DropdownMenuItem>
+
+                            <DropdownMenuItem @click="setFilter('cancelled')" class="justify-between cursor-pointer">
+                                <span class="flex items-center gap-2">Dibatalkan</span>
+                                <Check v-if="statusFilter === 'cancelled'" class="h-4 w-4 " />
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <div class="relative w-full sm:w-64 group">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <Search class="h-4 w-4 text-[#99cc33]/70 group-focus-within:text-[#99cc33]" />
+                        </div>
+                        <input 
+                            v-model="search"
+                            type="text" 
+                            class="block w-full pl-10 pr-3 py-2 border-none rounded-lg leading-5 bg-white/90 text-slate-900 placeholder-slate-500 focus:outline-none focus:bg-white focus:ring-2 focus:ring-white/50 sm:text-sm transition-all shadow-sm" 
+                            placeholder="Cari Nama / NIM..." 
+                        />
                     </div>
-                    <input 
-                        v-model="search"
-                        type="text" 
-                        class="block w-full pl-10 pr-3 py-2 border-none rounded-lg leading-5 bg-white/90 text-slate-900 placeholder-slate-500 focus:outline-none focus:bg-white focus:ring-2 focus:ring-white/50 sm:text-sm transition-all shadow-sm" 
-                        placeholder="Cari Nama / NIM / Buku..." 
-                    />
+
                 </div>
             </div>
 

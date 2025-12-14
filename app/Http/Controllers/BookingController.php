@@ -55,6 +55,7 @@ class BookingController extends Controller
     {
         $query = BookingBuku::query();
 
+        // 1. Logika Search
         if ($request->has('search') && $request->search != '') {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -64,11 +65,18 @@ class BookingController extends Controller
             });
         }
 
-        $bookings = $query->latest()->paginate(5)->withQueryString();
+        // 2. [BARU] Logika Filter Status
+        if ($request->has('status') && $request->status != '' && $request->status !== 'all') {
+            $query->where('status', $request->status);
+        }
+
+        // 3. Pagination
+        $bookings = $query->latest()->paginate(10)->withQueryString();
 
         return Inertia::render('admin/booking/Index', [
             'bookings' => $bookings,
-            'filters'  => $request->only(['search']),
+            // Kembalikan parameter filter agar frontend bisa menjaga state-nya
+            'filters'  => $request->only(['search', 'status']),
         ]);
     }
 
