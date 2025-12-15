@@ -35,7 +35,7 @@ class QuestionController extends Controller
         // 2. Validasi Input Ketat
         $validated = $request->validate([
             'nama'       => ['required', 'string', 'max:100', 'min:3'],
-            'email'      => ['required', 'email', 'max:255'], 
+            'email'      => ['required', 'email', 'max:255'],
             'pertanyaan' => ['required', 'string', 'max:3000', 'min:10'],
         ], [
             'nama.required' => 'Nama wajib diisi.',
@@ -61,7 +61,7 @@ class QuestionController extends Controller
         ])->render();
 
         // 4. Kirim Email Menggunakan Service
-        $adminEmail = 'muhammad.faliq.tif24@polban.ac.id'; // Email Admin Tujuan
+        $adminEmail = 'maulana.ishak.tif24@polban.ac.id'; // Email Admin Tujuan
 
         // [UBAH] Gunakan $this->brevo yang sudah di-inject dengan nama pengirim khusus
         $this->brevo->sendEmail(
