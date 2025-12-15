@@ -68,7 +68,7 @@ const tabs = [
 // Single Form for All Settings
 const form = useForm({
     _method: 'POST',
-    
+
     // Tab 1: Alur
     alur_description: props.settings?.alur_description || '',
     alur_image: null as File | null,
@@ -91,7 +91,7 @@ const form = useForm({
     watermark_title: props.settings?.watermark_title || '',
     watermark_info: props.settings?.watermark_info || 'Format PDF - Ukuran: Max 2 MB',
     watermark_instruction: props.settings?.watermark_instruction || '',
-    watermark_file: null as File | null,   
+    watermark_file: null as File | null,
 });
 
 const submitSettings = () => {
@@ -107,7 +107,7 @@ const submitSettings = () => {
     });
 };
 
-const MAX_FILE_SIZE_MB = 5; 
+const MAX_FILE_SIZE_MB = 5;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
 const handleFileChange = (field: string, event: Event) => {
@@ -119,10 +119,10 @@ const handleFileChange = (field: string, event: Event) => {
         if (file.size > MAX_FILE_SIZE_BYTES) {
             // Tampilkan Toast Error
             showToast(`Gagal! Ukuran file terlalu besar. Maksimal ${MAX_FILE_SIZE_MB} MB.`, 'error');
-            
+
             // Reset input file agar user harus pilih ulang
-            target.value = ''; 
-            
+            target.value = '';
+
             // Jangan masukkan ke form
             return;
         }
@@ -134,7 +134,7 @@ const handleFileChange = (field: string, event: Event) => {
              target.value = '';
              return;
         }
-        
+
         if (!isImage && file.type !== 'application/pdf' && !file.name.match(/\.(doc|docx)$/i)) {
              // Validasi sederhana untuk PDF/Doc
              showToast('Format file tidak didukung.', 'error');
@@ -172,12 +172,12 @@ const getTabLabel = () => {
 
 <template>
     <div class="space-y-8 font-sans text-slate-600 relative">
-
+        <Teleport to="body">
         <transition name="toast">
-            <div v-if="toast.show" 
+            <div v-if="toast.show"
                 class="fixed top-24 right-5 z-[100] flex items-center gap-3 px-4 py-3 rounded-xl shadow-xl border backdrop-blur-md transition-all duration-300 min-w-[300px]"
-                :class="toast.type === 'success' 
-                    ? 'bg-white/95 border-emerald-200 text-emerald-700' 
+                :class="toast.type === 'success'
+                    ? 'bg-white/95 border-emerald-200 text-emerald-700'
                     : 'bg-white/95 border-rose-200 text-rose-700'"
             >
                 <div class="p-1 rounded-full shrink-0" :class="toast.type === 'success' ? 'bg-emerald-100' : 'bg-rose-100'">
@@ -192,7 +192,7 @@ const getTabLabel = () => {
                 </button>
             </div>
         </transition>
-
+        </Teleport>
         <div class="flex flex-wrap gap-2 bg-white p-2 rounded-2xl border border-slate-100 shadow-sm w-fit">
             <button
                 v-for="tab in tabs"
@@ -209,13 +209,13 @@ const getTabLabel = () => {
         </div>
 
         <div class="bg-white rounded-3xl border border-slate-100 shadow-lg shadow-slate-200/50 p-6 sm:p-8 min-h-[500px] relative overflow-hidden">
-            
+
             <div class="absolute -top-20 -right-20 w-64 h-64 bg-[#99cc33]/5 rounded-full blur-3xl pointer-events-none"></div>
 
             <transition name="fade" mode="out-in">
-                
+
                 <div :key="activeTab" class="relative z-10">
-                    
+
                     <div class="flex items-center gap-4 mb-8 pb-6 border-b border-slate-100">
                         <div class="p-3 bg-[#99cc33]/10 rounded-2xl text-[#99cc33]">
                             <component :is="tabs.find(t => t.id === activeTab)?.icon" class="w-8 h-8" />
@@ -227,9 +227,9 @@ const getTabLabel = () => {
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                        
+
                         <div class="space-y-6">
-                            
+
                             <div v-if="['alur', 'persyaratan', 'panduan'].includes(activeTab)">
                                 <label class="block text-sm font-bold text-slate-700 mb-2">Deskripsi / Penjelasan</label>
                                 <textarea
@@ -267,35 +267,35 @@ const getTabLabel = () => {
                                             {{ activeTab === 'alur' ? 'PNG, JPG' : 'PDF Only' }} (Max 5MB)
                                         </p>
                                     </div>
-                                    <input 
-                                        type="file" 
-                                        class="hidden" 
+                                    <input
+                                        type="file"
+                                        class="hidden"
                                         :accept="activeTab === 'alur' ? 'image/*' : 'application/pdf, .doc, .docx'"
                                         @change="handleFileChange(
-                                            activeTab === 'alur' ? 'alur_image' : 
-                                            activeTab === 'persyaratan' ? 'requirement_file' : 
-                                            activeTab === 'panduan' ? 'guide_file' : 
-                                            activeTab + '_file', 
+                                            activeTab === 'alur' ? 'alur_image' :
+                                            activeTab === 'persyaratan' ? 'requirement_file' :
+                                            activeTab === 'panduan' ? 'guide_file' :
+                                            activeTab + '_file',
                                             $event
-                                        )" 
+                                        )"
                                     />
                                 </label>
-                                
+
                                 <p v-if="(form as any)[
-                                    activeTab === 'alur' ? 'alur_image' : 
-                                    activeTab === 'persyaratan' ? 'requirement_file' : 
-                                    activeTab === 'panduan' ? 'guide_file' : 
+                                    activeTab === 'alur' ? 'alur_image' :
+                                    activeTab === 'persyaratan' ? 'requirement_file' :
+                                    activeTab === 'panduan' ? 'guide_file' :
                                     activeTab + '_file'
                                 ]" class="mt-2 text-sm text-[#99cc33] font-bold flex items-center gap-1">
-                                    <CheckSquare class="w-4 h-4"/> 
-                                    File baru dipilih: 
-                                    {{ 
+                                    <CheckSquare class="w-4 h-4"/>
+                                    File baru dipilih:
+                                    {{
                                         (form as any)[
-                                            activeTab === 'alur' ? 'alur_image' : 
-                                            activeTab === 'persyaratan' ? 'requirement_file' : 
-                                            activeTab === 'panduan' ? 'guide_file' : 
+                                            activeTab === 'alur' ? 'alur_image' :
+                                            activeTab === 'persyaratan' ? 'requirement_file' :
+                                            activeTab === 'panduan' ? 'guide_file' :
                                             activeTab + '_file'
-                                        ]?.name 
+                                        ]?.name
                                     }}
                                 </p>
                             </div>
@@ -309,11 +309,11 @@ const getTabLabel = () => {
                             <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3 z-10 flex items-center gap-2">
                                 <CheckSquare class="w-3 h-3"/> Preview File Aktif
                             </p>
-                            
+
                             <div class="flex-1 flex flex-col items-center justify-center rounded-xl bg-white shadow-sm border border-slate-100 p-2 z-10 w-full text-center overflow-hidden">
-                                
+
                                 <div v-if="getCurrentFilePath()" class="w-full h-full flex flex-col items-center justify-center">
-                                    
+
                                     <img
                                         v-if="activeTab === 'alur'"
                                         :src="getCurrentFilePath()"
@@ -338,7 +338,7 @@ const getTabLabel = () => {
                                             <p class="text-sm text-slate-400 mb-6 max-w-xs mx-auto">
                                                 Preview tidak tersedia untuk format ini. Silakan download untuk melihat isinya.
                                             </p>
-                                            
+
                                             <a :href="getCurrentFilePath()" target="_blank" class="inline-flex items-center gap-2 px-6 py-2.5 bg-slate-800 text-white rounded-xl text-sm font-bold hover:bg-slate-900 transition-colors shadow-lg shadow-slate-200">
                                                 <Download class="w-4 h-4" /> Download File
                                             </a>
