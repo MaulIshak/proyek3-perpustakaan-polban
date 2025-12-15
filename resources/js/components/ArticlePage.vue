@@ -56,9 +56,9 @@ const authorName = computed(() => {
         >
             <div
                 class="border-b border-slate-100 p-6 sm:p-10"
-                :v-show="!props.isAdmin"
             >
                 <Link
+                    v-if="!props.isAdmin"
                     :href="backUrl"
                     class="group mb-6 inline-flex items-center gap-2 text-sm font-bold text-slate-500 transition-colors hover:text-[#99cc33] sm:mb-8"
                 >

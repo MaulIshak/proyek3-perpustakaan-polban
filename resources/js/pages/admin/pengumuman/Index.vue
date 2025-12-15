@@ -121,6 +121,7 @@ function openModal(article: any) {
         url_attachment: article.url_attachment,
         attachment_name: article.attachment_name,
         type: 'pengumuman',
+        author: article.created_by,
     };
     modalOpen.value = true;
 }
