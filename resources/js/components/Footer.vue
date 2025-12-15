@@ -19,7 +19,7 @@ const socialMedia = [
 </script>
 
 <template>
-    <footer class="bg-[var(--background-green)] pt-12 pb-8 sm:pt-16 sm:pb-10 font-sans text-slate-600 border-t border-slate-200">
+    <footer class="bg-[var(--background-green)] pt-12 pb-8 sm:pt-10 sm:pb-6 font-sans text-slate-600 border-t border-slate-200">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-12 lg:gap-8">
 
@@ -138,7 +138,7 @@ const socialMedia = [
                 </div>
             </div>
 
-            <div class="mt-12 sm:mt-16 border-t border-slate-200 pt-8 text-center">
+            <div class="mt-8 sm:mt-8 border-t border-slate-200 pt-6 text-center">
                 <p class="text-xs sm:text-sm font-medium text-slate-500">
                     &copy; {{ new Date().getFullYear() }} Perpustakaan Politeknik Negeri Bandung.
                     <span class="block sm:inline mt-1 sm:mt-0 text-slate-400">All rights reserved.</span>
