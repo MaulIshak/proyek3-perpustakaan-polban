@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
     CheckCircle2,
+    Loader2, // Import icon loading
     Mail,
     MessageCircle,
     MessageSquare,
@@ -8,10 +9,11 @@ import {
     User,
     X,
 } from 'lucide-vue-next';
-import { ref } from 'vue';
+import { ref, computed } from 'vue'; // Tambahkan computed
 
 const isOpen = ref(false);
 const isSent = ref(false);
+const isLoading = ref(false); // State untuk loading
 
 const formData = ref({
     nama: '',
@@ -19,8 +21,22 @@ const formData = ref({
     pertanyaan: '',
 });
 
+// --- LOGIC VALIDASI REALTIME ---
+// Menggunakan computed agar reaktif. Tombol akan otomatis disable jika ini false.
+const isFormValid = computed(() => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return (
+        formData.value.nama.trim() !== '' &&
+        emailRegex.test(formData.value.email) &&
+        formData.value.pertanyaan.trim() !== ''
+    );
+});
+
 const handleSubmit = async (e: Event) => {
-    e.preventDefault();
+    // Prevent default tetap perlu, tapi kita handle validasi via button state juga
+    if (!isFormValid.value || isLoading.value) return;
+
+    isLoading.value = true; // Mulai Loading
 
     try {
         const csrfElement = document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement;
@@ -38,34 +54,30 @@ const handleSubmit = async (e: Event) => {
 
         const data = await res.json().catch(() => null);
 
-        // --- PERBAIKAN HANDLING ERROR 422 DISINI ---
         if (!res.ok) {
-            // Jika error validasi Laravel (422)
             if (res.status === 422 && data?.errors) {
-                // Gabungkan semua pesan error menjadi satu string
                 const errorMessages = Object.values(data.errors).flat().join('\n');
                 throw new Error(errorMessages);
             }
-
-            // Error lain (Limit rate, Server error, dll)
             throw new Error(data?.message || `Server Error: ${res.status}`);
         }
 
-        // Jika sukses
         isSent.value = true;
 
     } catch (err) {
         console.error("Gagal mengirim:", err);
-        // Tampilkan pesan error yang spesifik (misal: "Nama wajib diisi")
         alert(err instanceof Error ? err.message : "Terjadi kesalahan jaringan.");
+    } finally {
+        // --- KRUSIAL: Matikan loading apapun yang terjadi (sukses/error) ---
+        isLoading.value = false;
     }
 };
 
 const resetChat = () => {
     isOpen.value = false;
-    // Tunggu animasi selesai baru reset data form
     setTimeout(() => {
         isSent.value = false;
+        // Reset form
         formData.value = { nama: '', email: '', pertanyaan: '' };
     }, 300);
 };
@@ -73,22 +85,19 @@ const resetChat = () => {
 
 <template>
     <div>
-        <!-- Overlay Backdrop (Mobile Only) -->
         <transition name="fade">
             <div
                 v-if="isOpen"
-                class="fixed inset-0 z-40 bg-black/20  sm:hidden"
+                class="fixed inset-0 z-40 bg-black/20 sm:hidden"
                 @click="isOpen = false"
             ></div>
         </transition>
 
-        <!-- Tombol Floating Action Button (FAB) -->
         <transition name="scale">
             <div
                 v-if="!isOpen"
                 class="fixed right-6 bottom-6 z-50 flex items-center gap-3"
             >
-                <!-- Label Statis "Tanya Pustakawan" (Selalu Muncul di Desktop) -->
                 <span
                     class="hidden rounded-lg border border-slate-100 bg-white px-3 py-1.5 text-xs font-bold whitespace-nowrap text-slate-700 shadow-md transition-all duration-300 sm:block"
                 >
@@ -100,7 +109,6 @@ const resetChat = () => {
                     class="group flex h-16 w-16 items-center justify-center rounded-full bg-[#99cc33] text-white shadow-lg shadow-[#99cc33]/40 transition-all duration-300 hover:scale-110 hover:bg-[#88b82d] focus:ring-4 focus:ring-[#99cc33]/30 focus:outline-none"
                     aria-label="Buka Chat Pustakawan"
                 >
-                    <!-- Icon Chat -->
                     <MessageCircle
                         class="h-8 w-8 transition-transform group-hover:-rotate-12"
                     />
@@ -108,13 +116,11 @@ const resetChat = () => {
             </div>
         </transition>
 
-        <!-- Widget Window -->
         <transition name="slide-up">
             <div
                 v-if="isOpen"
                 class="fixed right-6 bottom-6 z-50 flex max-h-[80vh] w-full max-w-[calc(100vw-3rem)] flex-col overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-2xl shadow-slate-300/50 sm:w-[400px]"
             >
-                <!-- Header -->
                 <div
                     class="flex shrink-0 items-center justify-between bg-[#99cc33] p-5"
                 >
@@ -130,7 +136,6 @@ const resetChat = () => {
                             >
                                 Pustakawan
                             </h3>
-                            <!-- Status Online Dihilangkan, diganti teks statis -->
                             <p class="mt-0.5 text-xs font-medium text-white/90">
                                 Kami siap membantu
                             </p>
@@ -144,12 +149,10 @@ const resetChat = () => {
                     </button>
                 </div>
 
-                <!-- Content Area -->
                 <div class="flex-1 overflow-y-auto bg-slate-50 p-6">
-                    <!-- State: Form -->
                     <form
                         v-if="!isSent"
-                        @submit="handleSubmit"
+                        @submit.prevent="handleSubmit"
                         class="space-y-5"
                     >
                         <p
@@ -160,7 +163,6 @@ const resetChat = () => {
                         </p>
 
                         <div class="space-y-4">
-                            <!-- Nama -->
                             <div class="relative">
                                 <div
                                     class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400"
@@ -176,7 +178,6 @@ const resetChat = () => {
                                 />
                             </div>
 
-                            <!-- Email -->
                             <div class="relative">
                                 <div
                                     class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400"
@@ -192,7 +193,6 @@ const resetChat = () => {
                                 />
                             </div>
 
-                            <!-- Pesan -->
                             <div class="relative">
                                 <div
                                     class="pointer-events-none absolute top-3.5 left-3.5 flex items-start text-slate-400"
@@ -211,14 +211,23 @@ const resetChat = () => {
 
                         <button
                             type="submit"
-                            class="flex w-full items-center justify-center gap-2 rounded-xl bg-[#99cc33] py-3.5 text-sm font-bold text-white shadow-lg shadow-[#99cc33]/30 transition-all hover:bg-[#88b82d] active:scale-95"
+                            :disabled="!isFormValid || isLoading"
+                            class="flex w-full items-center justify-center gap-2 rounded-xl bg-[#99cc33] py-3.5 text-sm font-bold text-white shadow-lg shadow-[#99cc33]/30 transition-all
+                            hover:bg-[#88b82d] active:scale-95
+                            disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:active:scale-100"
                         >
-                            <Send class="h-4 w-4" />
-                            Kirim Pertanyaan
+                            <template v-if="isLoading">
+                                <Loader2 class="h-4 w-4 animate-spin" />
+                                Mengirim...
+                            </template>
+
+                            <template v-else>
+                                <Send class="h-4 w-4" />
+                                Kirim Pertanyaan
+                            </template>
                         </button>
                     </form>
 
-                    <!-- State: Success -->
                     <div
                         v-else
                         class="animate-fade-in flex h-full flex-col items-center justify-center py-8 text-center"
@@ -234,10 +243,8 @@ const resetChat = () => {
                         <p
                             class="mb-6 max-w-[250px] text-sm leading-relaxed text-slate-500"
                         >
-                            Terima kasih, <strong>{{ formData.nama }}</strong
-                            >. Tim kami akan segera membalas ke email
-                            <strong>{{ formData.email }}</strong
-                            >.
+                            Terima kasih, <strong>{{ formData.nama }}</strong>. Tim kami akan segera membalas ke email
+                            <strong>{{ formData.email }}</strong>.
                         </p>
                         <button
                             @click="
