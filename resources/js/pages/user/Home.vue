@@ -114,7 +114,7 @@ const activeTab = ref('berita');
                         <div
                             v-else-if="activeTab === 'pengumuman'"
                             key="pengumuman"
-                            class="mx-auto max-w-5xl"
+                            class="mx-auto "
                         >
                             <ScrollReveal
                                 animation="fade-in"
