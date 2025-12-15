@@ -86,11 +86,6 @@
                                 >Ingat saya</span
                             >
                         </label>
-                        <a
-                            href="#"
-                            class="text-sm text-[var(--font-green)] underline hover:text-[var(--dark-green)]"
-                            >Lupa kata sandi?</a
-                        >
                     </div>
 
                     <div>
