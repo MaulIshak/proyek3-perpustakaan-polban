@@ -6,6 +6,7 @@ const props = defineProps({
         type: Array<{
             id: Number;
             image_path: string;
+            link_buku: string;
         }>,
         default: [],
     },
@@ -58,7 +59,7 @@ const props = defineProps({
                 <a
                     v-for="(book, index) in data"
                     :key="index"
-                    :href="`/storage/${book.image_path}`"
+                    :href="`${book.link_buku}`"
                     class="group relative flex w-full cursor-pointer flex-col"
                 >
                     <!-- Book Cover -->
