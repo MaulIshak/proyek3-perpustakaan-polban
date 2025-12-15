@@ -41,6 +41,9 @@ const liveErrors = reactive<Record<string, string>>({
     reason: '',
 });
 
+// --- STATE MODAL KONFORMASI ---
+const showConfirmModal = ref(false);
+
 const form = useForm({
     nama_pengusul: '',
     nim: '',
@@ -107,7 +110,7 @@ const validateField = (field: string) => {
             if (!value) liveErrors.year = 'Tahun wajib diisi.';
             else if (Number(value) < 1900 || Number(value) > currentYear + 1) liveErrors.year = `Tahun tidak valid (1900 - ${currentYear + 1}).`;
             break;
-            
+
         case 'reason':
              // Opsional: jika ingin validasi alasan
              // if (!value) liveErrors.reason = 'Alasan usulan sebaiknya diisi.';
@@ -128,7 +131,7 @@ const getErrorMessage = (field: string) => {
 const submitForm = () => {
     // Validasi semua field sebelum submit
     Object.keys(liveErrors).forEach(key => validateField(key));
-    
+
     // Jika ada error di liveErrors, batalkan submit
     const hasLiveErrors = Object.values(liveErrors).some(err => err !== '');
     if (hasLiveErrors) {
@@ -136,6 +139,13 @@ const submitForm = () => {
         return;
     }
 
+    // Tampilkan Modal Konfirmasi
+    showConfirmModal.value = true;
+};
+
+// --- KONFIRMASI SUBMIT ---
+const confirmSubmit = () => {
+    showConfirmModal.value = false;
     form.post('usulan-buku/store', {
         preserveScroll: true,
         onSuccess: () => {
@@ -143,7 +153,7 @@ const submitForm = () => {
             form.reset();
             // Reset live errors juga
             Object.keys(liveErrors).forEach(k => liveErrors[k] = '');
-            
+
             nextTick(() => {
                 messageRef.value?.scrollIntoView({
                     behavior: 'smooth',
@@ -214,8 +224,8 @@ const submitForm = () => {
                                             @blur="validateField('nama_pengusul')"
                                             type="text"
                                             class="w-full rounded-xl border py-3 pr-4 pl-10 text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:ring-2"
-                                            :class="hasError('nama_pengusul') 
-                                                ? 'border-red-500 focus:border-red-500 focus:ring-red-200' 
+                                            :class="hasError('nama_pengusul')
+                                                ? 'border-red-500 focus:border-red-500 focus:ring-red-200'
                                                 : 'border-slate-200 focus:border-[#99cc33] focus:ring-[#99cc33]/20'"
                                             placeholder="Masukkan nama lengkap Anda"
                                         />
@@ -237,8 +247,8 @@ const submitForm = () => {
                                             @blur="validateField('nim')"
                                             type="text"
                                             class="w-full rounded-xl border py-3 pr-4 pl-10 text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:ring-2"
-                                            :class="hasError('nim') 
-                                                ? 'border-red-500 focus:border-red-500 focus:ring-red-200' 
+                                            :class="hasError('nim')
+                                                ? 'border-red-500 focus:border-red-500 focus:ring-red-200'
                                                 : 'border-slate-200 focus:border-[#99cc33] focus:ring-[#99cc33]/20'"
                                             placeholder="Nomor Induk"
                                         />
@@ -260,8 +270,8 @@ const submitForm = () => {
                                             @blur="validateField('prodi')"
                                             type="text"
                                             class="w-full rounded-xl border py-3 pr-4 pl-10 text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:ring-2"
-                                            :class="hasError('prodi') 
-                                                ? 'border-red-500 focus:border-red-500 focus:ring-red-200' 
+                                            :class="hasError('prodi')
+                                                ? 'border-red-500 focus:border-red-500 focus:ring-red-200'
                                                 : 'border-slate-200 focus:border-[#99cc33] focus:ring-[#99cc33]/20'"
                                             placeholder="Contoh: D3 Teknik Informatika"
                                         />
@@ -292,8 +302,8 @@ const submitForm = () => {
                                             @blur="validateField('title')"
                                             type="text"
                                             class="w-full rounded-xl border py-3 pr-4 pl-10 text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:ring-2"
-                                            :class="hasError('title') 
-                                                ? 'border-red-500 focus:border-red-500 focus:ring-red-200' 
+                                            :class="hasError('title')
+                                                ? 'border-red-500 focus:border-red-500 focus:ring-red-200'
                                                 : 'border-slate-200 focus:border-[#99cc33] focus:ring-[#99cc33]/20'"
                                             placeholder="Judul lengkap buku"
                                         />
@@ -315,8 +325,8 @@ const submitForm = () => {
                                             @blur="validateField('author')"
                                             type="text"
                                             class="w-full rounded-xl border py-3 pr-4 pl-10 text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:ring-2"
-                                            :class="hasError('author') 
-                                                ? 'border-red-500 focus:border-red-500 focus:ring-red-200' 
+                                            :class="hasError('author')
+                                                ? 'border-red-500 focus:border-red-500 focus:ring-red-200'
                                                 : 'border-slate-200 focus:border-[#99cc33] focus:ring-[#99cc33]/20'"
                                             placeholder="Nama penulis"
                                         />
@@ -338,8 +348,8 @@ const submitForm = () => {
                                             @blur="validateField('publisher')"
                                             type="text"
                                             class="w-full rounded-xl border py-3 pr-4 pl-10 text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:ring-2"
-                                            :class="hasError('publisher') 
-                                                ? 'border-red-500 focus:border-red-500 focus:ring-red-200' 
+                                            :class="hasError('publisher')
+                                                ? 'border-red-500 focus:border-red-500 focus:ring-red-200'
                                                 : 'border-slate-200 focus:border-[#99cc33] focus:ring-[#99cc33]/20'"
                                             placeholder="Nama penerbit"
                                         />
@@ -361,8 +371,8 @@ const submitForm = () => {
                                             @blur="validateField('isbn')"
                                             type="text"
                                             class="w-full rounded-xl border py-3 pr-4 pl-10 text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:ring-2"
-                                            :class="hasError('isbn') 
-                                                ? 'border-red-500 focus:border-red-500 focus:ring-red-200' 
+                                            :class="hasError('isbn')
+                                                ? 'border-red-500 focus:border-red-500 focus:ring-red-200'
                                                 : 'border-slate-200 focus:border-[#99cc33] focus:ring-[#99cc33]/20'"
                                             placeholder="Contoh: 978-602-..."
                                         />
@@ -386,8 +396,8 @@ const submitForm = () => {
                                             min="1900"
                                             :max="new Date().getFullYear() + 1"
                                             class="w-full rounded-xl border py-3 pr-4 pl-10 text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:ring-2"
-                                            :class="hasError('year') 
-                                                ? 'border-red-500 focus:border-red-500 focus:ring-red-200' 
+                                            :class="hasError('year')
+                                                ? 'border-red-500 focus:border-red-500 focus:ring-red-200'
                                                 : 'border-slate-200 focus:border-[#99cc33] focus:ring-[#99cc33]/20'"
                                             placeholder="YYYY"
                                         />
@@ -448,5 +458,85 @@ const submitForm = () => {
                 </div>
             </div>
         </div>
+
+        <!-- Modal Konfirmasi -->
+        <transition
+            enter-active-class="transition ease-out duration-300"
+            enter-from-class="opacity-0"
+            enter-to-class="opacity-100"
+            leave-active-class="transition ease-in duration-200"
+            leave-from-class="opacity-100"
+            leave-to-class="opacity-0"
+        >
+            <div v-if="showConfirmModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                <div class="mx-4 w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl max-h-[80vh] overflow-y-auto">
+                    <h3 class="mb-4 text-xl font-bold text-slate-800">Konfirmasi Usulan Buku</h3>
+                    <p class="mb-4 text-slate-600">Pastikan data di bawah ini sudah benar sebelum mengirim:</p>
+
+                    <div class="space-y-3 rounded-lg bg-slate-50 p-4">
+                        <div class="grid grid-cols-1 gap-2">
+                            <div class="flex justify-between">
+                                <span class="font-medium text-slate-700">Nama Pengusul:</span>
+                                <span class="text-slate-800 text-right">{{ form.nama_pengusul }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="font-medium text-slate-700">NIM/NIP:</span>
+                                <span class="text-slate-800">{{ form.nim }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="font-medium text-slate-700">Program Studi:</span>
+                                <span class="text-slate-800">{{ form.prodi }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="font-medium text-slate-700">Judul Buku:</span>
+                                <span class="text-slate-800 text-right">{{ form.title }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="font-medium text-slate-700">Pengarang:</span>
+                                <span class="text-slate-800">{{ form.author }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="font-medium text-slate-700">Penerbit:</span>
+                                <span class="text-slate-800">{{ form.publisher }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="font-medium text-slate-700">ISBN:</span>
+                                <span class="text-slate-800">{{ form.isbn }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="font-medium text-slate-700">Tahun Terbit:</span>
+                                <span class="text-slate-800">{{ form.year }}</span>
+                            </div>
+                            <div v-if="form.price" class="flex justify-between">
+                                <span class="font-medium text-slate-700">Perkiraan Harga:</span>
+                                <span class="text-slate-800">Rp {{ form.price }}</span>
+                            </div>
+                            <div v-if="form.reason" class="col-span-2">
+                                <span class="font-medium text-slate-700">Alasan Usulan:</span>
+                                <p class="mt-1 text-slate-800 bg-white p-2 rounded border">{{ form.reason }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="mt-4 text-center text-sm text-slate-500">Apakah data sudah benar?</p>
+
+                    <div class="mt-6 flex gap-3">
+                        <button
+                            @click="showConfirmModal = false"
+                            class="flex-1 rounded-xl border border-slate-300 py-3 font-semibold text-slate-700 transition-colors hover:bg-slate-50"
+                        >
+                            Batal
+                        </button>
+                        <button
+                            @click="confirmSubmit"
+                            :disabled="form.processing"
+                            class="flex-1 rounded-xl bg-[#99cc33] py-3 font-semibold text-white shadow-lg transition-all hover:bg-[#88b82d] hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed"
+                        >
+                            {{ form.processing ? 'Mengirim...' : 'Ya, Kirim Usulan' }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </transition>
     </Layout>
 </template>
