@@ -180,7 +180,7 @@ const confirmSubmit = () => {
             <div class="absolute bottom-0 left-0 h-[500px] w-[500px] rounded-full bg-gray-100 blur-3xl"></div>
         </div>
 
-        <div class="relative container mx-auto px-4 py-10 sm:px-6 lg:px-8">
+        <div class="relative container mx-auto px-4 py-6 sm:px-6 lg:px-8">
              <transition
                 enter-active-class="transition ease-out duration-300"
                 enter-from-class="opacity-0 -translate-y-4"
@@ -189,29 +189,29 @@ const confirmSubmit = () => {
                 leave-from-class="opacity-100 translate-y-0"
                 leave-to-class="opacity-0 -translate-y-4"
             >
-                <div v-if="showMessage" ref="messageRef" class="mx-auto mb-8 flex max-w-4xl items-start gap-4 rounded-2xl border border-emerald-100 bg-emerald-50 p-6 shadow-lg">
+                <div v-if="showMessage" ref="messageRef" class="mx-auto mb-6 flex max-w-4xl items-start gap-3 rounded-2xl border border-emerald-100 bg-emerald-50 p-4 shadow-lg">
                     <div class="shrink-0 rounded-full bg-emerald-100 p-2 text-emerald-600">
-                        <CheckCircle2 class="h-8 w-8" />
+                        <CheckCircle2 class="h-6 w-6" />
                     </div>
                     <div>
-                        <h3 class="mb-1 text-xl font-bold text-emerald-800">Terima Kasih! 🙌</h3>
-                        <p class="leading-relaxed text-emerald-700">Usulan Anda telah kami terima dan akan diproses oleh pihak perpustakaan. Cek ketersediaan secara berkala.</p>
+                        <h3 class="mb-1 text-lg font-bold text-emerald-800">Terima Kasih! 🙌</h3>
+                        <p class="leading-snug text-sm text-emerald-700">Usulan Anda telah kami terima dan akan diproses oleh pihak perpustakaan. Cek ketersediaan secara berkala.</p>
                     </div>
                 </div>
             </transition>
 
-            <div class="mx-auto max-w-4xl overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-xl shadow-slate-200/60">
+                <div class="mx-auto max-w-4xl overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-xl shadow-slate-200/60">
                 <div class="h-2 w-full bg-gradient-to-r from-[#99cc33] to-[var(--dark-green)]"></div>
 
-                <div class="p-8 sm:p-10">
-                    <form @submit.prevent="submitForm" class="space-y-10">
+                <div class="p-6 sm:p-8">
+                    <form @submit.prevent="submitForm" class="space-y-6">
                         <div>
-                            <h3 class="mb-6 flex items-center gap-2 border-b border-slate-100 pb-2 text-lg font-bold text-slate-800">
+                            <h3 class="mb-4 flex items-center gap-2 border-b border-slate-100 pb-2 text-base font-bold text-slate-800">
                                 <User class="h-5 w-5 text-[#99cc33]" />
                                 Data Pengusul
                             </h3>
 
-                            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div class="md:col-span-2">
                                     <label class="mb-2 block text-sm font-semibold text-slate-700">Nama Lengkap <span class="text-red-500">*</span></label>
                                     <div class="relative">
@@ -223,7 +223,7 @@ const confirmSubmit = () => {
                                             @input="validateField('nama_pengusul')"
                                             @blur="validateField('nama_pengusul')"
                                             type="text"
-                                            class="w-full rounded-xl border py-3 pr-4 pl-10 text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:ring-2"
+                                            class="w-full rounded-xl border py-2.5 pr-4 pl-10 text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:ring-2"
                                             :class="hasError('nama_pengusul')
                                                 ? 'border-red-500 focus:border-red-500 focus:ring-red-200'
                                                 : 'border-slate-200 focus:border-[#99cc33] focus:ring-[#99cc33]/20'"
@@ -246,7 +246,7 @@ const confirmSubmit = () => {
                                             @input="validateField('nim')"
                                             @blur="validateField('nim')"
                                             type="text"
-                                            class="w-full rounded-xl border py-3 pr-4 pl-10 text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:ring-2"
+                                            class="w-full rounded-xl border py-2.5 pr-4 pl-10 text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:ring-2"
                                             :class="hasError('nim')
                                                 ? 'border-red-500 focus:border-red-500 focus:ring-red-200'
                                                 : 'border-slate-200 focus:border-[#99cc33] focus:ring-[#99cc33]/20'"
@@ -269,7 +269,7 @@ const confirmSubmit = () => {
                                             @input="validateField('prodi')"
                                             @blur="validateField('prodi')"
                                             type="text"
-                                            class="w-full rounded-xl border py-3 pr-4 pl-10 text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:ring-2"
+                                            class="w-full rounded-xl border py-2.5 pr-4 pl-10 text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:ring-2"
                                             :class="hasError('prodi')
                                                 ? 'border-red-500 focus:border-red-500 focus:ring-red-200'
                                                 : 'border-slate-200 focus:border-[#99cc33] focus:ring-[#99cc33]/20'"
@@ -284,12 +284,12 @@ const confirmSubmit = () => {
                         </div>
 
                         <div>
-                            <h3 class="mb-6 flex items-center gap-2 border-b border-slate-100 pb-2 text-lg font-bold text-slate-800">
+                            <h3 class="mb-4 flex items-center gap-2 border-b border-slate-100 pb-2 text-base font-bold text-slate-800">
                                 <BookPlus class="h-5 w-5 text-[#99cc33]" />
                                 Detail Buku
                             </h3>
 
-                            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
                                 <div class="md:col-span-2">
                                     <label class="mb-2 block text-sm font-semibold text-slate-700">Judul Buku <span class="text-red-500">*</span></label>
                                     <div class="relative">
@@ -301,7 +301,7 @@ const confirmSubmit = () => {
                                             @input="validateField('title')"
                                             @blur="validateField('title')"
                                             type="text"
-                                            class="w-full rounded-xl border py-3 pr-4 pl-10 text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:ring-2"
+                                            class="w-full rounded-xl border py-2.5 pr-4 pl-10 text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:ring-2"
                                             :class="hasError('title')
                                                 ? 'border-red-500 focus:border-red-500 focus:ring-red-200'
                                                 : 'border-slate-200 focus:border-[#99cc33] focus:ring-[#99cc33]/20'"
@@ -324,7 +324,7 @@ const confirmSubmit = () => {
                                             @input="validateField('author')"
                                             @blur="validateField('author')"
                                             type="text"
-                                            class="w-full rounded-xl border py-3 pr-4 pl-10 text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:ring-2"
+                                            class="w-full rounded-xl border py-2.5 pr-4 pl-10 text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:ring-2"
                                             :class="hasError('author')
                                                 ? 'border-red-500 focus:border-red-500 focus:ring-red-200'
                                                 : 'border-slate-200 focus:border-[#99cc33] focus:ring-[#99cc33]/20'"
@@ -347,7 +347,7 @@ const confirmSubmit = () => {
                                             @input="validateField('publisher')"
                                             @blur="validateField('publisher')"
                                             type="text"
-                                            class="w-full rounded-xl border py-3 pr-4 pl-10 text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:ring-2"
+                                            class="w-full rounded-xl border py-2.5 pr-4 pl-10 text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:ring-2"
                                             :class="hasError('publisher')
                                                 ? 'border-red-500 focus:border-red-500 focus:ring-red-200'
                                                 : 'border-slate-200 focus:border-[#99cc33] focus:ring-[#99cc33]/20'"
@@ -370,7 +370,7 @@ const confirmSubmit = () => {
                                             @input="validateField('isbn')"
                                             @blur="validateField('isbn')"
                                             type="text"
-                                            class="w-full rounded-xl border py-3 pr-4 pl-10 text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:ring-2"
+                                            class="w-full rounded-xl border py-2.5 pr-4 pl-10 text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:ring-2"
                                             :class="hasError('isbn')
                                                 ? 'border-red-500 focus:border-red-500 focus:ring-red-200'
                                                 : 'border-slate-200 focus:border-[#99cc33] focus:ring-[#99cc33]/20'"
@@ -395,7 +395,7 @@ const confirmSubmit = () => {
                                             type="number"
                                             min="1900"
                                             :max="new Date().getFullYear() + 1"
-                                            class="w-full rounded-xl border py-3 pr-4 pl-10 text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:ring-2"
+                                            class="w-full rounded-xl border py-2.5 pr-4 pl-10 text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:ring-2"
                                             :class="hasError('year')
                                                 ? 'border-red-500 focus:border-red-500 focus:ring-red-200'
                                                 : 'border-slate-200 focus:border-[#99cc33] focus:ring-[#99cc33]/20'"
@@ -407,7 +407,7 @@ const confirmSubmit = () => {
                                     </p>
                                 </div>
 
-                                <div class="md:col-span-2">
+                                    <div class="md:col-span-2">
                                     <label class="mb-2 block text-sm font-semibold text-slate-700">Perkiraan Harga (Opsional)</label>
                                     <div class="relative">
                                         <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
@@ -417,7 +417,7 @@ const confirmSubmit = () => {
                                             v-model="form.price"
                                             type="number"
                                             min="0"
-                                            class="w-full rounded-xl border border-slate-200 py-3 pr-4 pl-10 text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
+                                            class="w-full rounded-xl border border-slate-200 py-2.5 pr-4 pl-10 text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
                                             placeholder="Rp"
                                         />
                                     </div>
@@ -430,30 +430,29 @@ const confirmSubmit = () => {
                                             <AlignLeft class="h-5 w-5" />
                                         </div>
                                         <textarea
-                                            v-model="form.reason"
-                                            rows="4"
-                                            class="w-full resize-none rounded-xl border border-slate-200 py-3 pr-4 pl-10 text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
+                                                v-model="form.reason"
+                                                rows="4"
+                                                class="w-full resize-none rounded-xl border border-slate-200 py-2.5 pr-4 pl-10 text-slate-700 transition-all outline-none placeholder:text-slate-400 focus:border-[#99cc33] focus:ring-2 focus:ring-[#99cc33]/20"
                                             placeholder="Jelaskan mengapa buku ini penting untuk koleksi perpustakaan..."
                                         ></textarea>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="border-t border-slate-100 pt-6">
-                            <button
-                                type="submit"
-                                :disabled="form.processing"
-                                class="flex w-full items-center justify-center gap-2 rounded-xl bg-[#99cc33] py-4 text-lg font-bold text-white shadow-lg shadow-[#99cc33]/30 transition-all duration-300 hover:-translate-y-1 hover:bg-[#88b82d] hover:shadow-[#99cc33]/50 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0"
-                            >
-                                <Loader2 v-if="form.processing" class="h-5 w-5 animate-spin" />
-                                <Send v-else class="h-5 w-5" />
-                                {{ form.processing ? 'Mengirim...' : 'Kirim Usulan Buku' }}
-                            </button>
-                            <p class="mt-4 text-center text-sm text-slate-400">
-                                Pastikan semua data bertanda bintang (*) telah diisi dengan benar.
-                            </p>
-                        </div>
+                            <div class="border-t border-slate-100 pt-4">
+                                <button
+                                    type="submit"
+                                    :disabled="form.processing"
+                                    class="flex w-full items-center justify-center gap-2 rounded-xl bg-[#99cc33] py-3 text-base font-bold text-white shadow-md shadow-[#99cc33]/20 transition-all duration-300 hover:-translate-y-1 hover:bg-[#88b82d] hover:shadow-[#99cc33]/40 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-y-0"
+                                >
+                                    <Loader2 v-if="form.processing" class="h-5 w-5 animate-spin" />
+                                    <Send v-else class="h-5 w-5" />
+                                    {{ form.processing ? 'Mengirim...' : 'Kirim Usulan Buku' }}
+                                </button>
+                                <p class="mt-3 text-center text-sm text-slate-400">
+                                    Pastikan semua data bertanda bintang (*) telah diisi dengan benar.
+                                </p>
+                            </div>
                     </form>
                 </div>
             </div>
@@ -468,8 +467,8 @@ const confirmSubmit = () => {
             leave-from-class="opacity-100"
             leave-to-class="opacity-0"
         >
-            <div v-if="showConfirmModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                <div class="mx-4 w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl max-h-[80vh] overflow-y-auto">
+                <div v-if="showConfirmModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                <div class="mx-4 w-full max-w-lg rounded-2xl bg-white p-4 shadow-2xl max-h-[80vh] overflow-y-auto">
                     <h3 class="mb-4 text-xl font-bold text-slate-800">Konfirmasi Usulan Buku</h3>
                     <p class="mb-4 text-slate-600">Pastikan data di bawah ini sudah benar sebelum mengirim:</p>
 
@@ -520,17 +519,17 @@ const confirmSubmit = () => {
 
                     <p class="mt-4 text-center text-sm text-slate-500">Apakah data sudah benar?</p>
 
-                    <div class="mt-6 flex gap-3">
+                    <div class="mt-4 flex gap-3">
                         <button
                             @click="showConfirmModal = false"
-                            class="flex-1 rounded-xl border border-slate-300 py-3 font-semibold text-slate-700 transition-colors hover:bg-slate-50"
+                            class="flex-1 rounded-xl border border-slate-300 py-2.5 font-semibold text-slate-700 transition-colors hover:bg-slate-50"
                         >
                             Batal
                         </button>
                         <button
                             @click="confirmSubmit"
                             :disabled="form.processing"
-                            class="flex-1 rounded-xl bg-[#99cc33] py-3 font-semibold text-white shadow-lg transition-all hover:bg-[#88b82d] hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed"
+                            class="flex-1 rounded-xl bg-[#99cc33] py-2.5 font-semibold text-white shadow-md transition-all hover:bg-[#88b82d] hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed"
                         >
                             {{ form.processing ? 'Mengirim...' : 'Ya, Kirim Usulan' }}
                         </button>

@@ -2,7 +2,7 @@
 import { ref, watch, computed } from 'vue';
 import Layout from '@/layouts/UserAppLayout.vue';
 import PaginationLink from '@/components/PaginationLink.vue'; // Pastikan komponen ini ada (dari percakapan sebelumnya)
-import { Head, router } from '@inertiajs/vue3'; 
+import { Head, router } from '@inertiajs/vue3';
 import { debounce } from 'lodash'; // Pastikan lodash terinstall: npm i lodash @types/lodash
 import {
     Search,
@@ -12,7 +12,7 @@ import {
     Info,
     ArrowRight,
     Sparkles,
-    Link2 
+    Link2
 } from 'lucide-vue-next';
 
 // -- TYPES --
@@ -23,12 +23,12 @@ interface AdditionalLink {
 
 interface LibraryItem {
     id: number;
-    name: string;       
+    name: string;
     description: string;
-    url: string; 
-    additional_links: AdditionalLink[] | null; 
+    url: string;
+    additional_links: AdditionalLink[] | null;
     type: 'journal' | 'ebook';
-    img_url: string | null; 
+    img_url: string | null;
 }
 
 interface DescriptionBlock {
@@ -76,10 +76,10 @@ const breadcrumb = [
 const fetchData = () => {
     router.get(
         // URL saat ini
-        window.location.pathname, 
-        { 
+        window.location.pathname,
+        {
             search: searchQuery.value,
-            type: activeTab.value 
+            type: activeTab.value
         },
         {
             preserveState: true, // Jaga state komponen
@@ -104,17 +104,17 @@ const switchTab = (tab: 'journal' | 'ebook') => {
 // -- HELPER: PARSE DESKRIPSI --
 const parseDescription = (text: string): DescriptionBlock[] => {
     if (!text) return [];
-    
+
     return text.split('\n').map((line): DescriptionBlock | null => {
         const trimmed = line.trim();
         if (!trimmed) return null;
-        
+
         if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
             return { type: 'list', content: trimmed.substring(2) };
         }
         return { type: 'p', content: trimmed };
     })
-    .filter((item): item is DescriptionBlock => item !== null); 
+    .filter((item): item is DescriptionBlock => item !== null);
 };
 
 // Helper untuk membersihkan link pagination (filter link prev/next bawaan jika mau custom, atau pakai semua)
@@ -136,25 +136,25 @@ const paginationLinks = computed(() => {
         <div class="container mx-auto px-4 py-8 sm:px-6 lg:px-8 relative">
 
             <div class="max-w-6xl mx-auto">
-                
+
                 <div class="flex justify-center mb-10 relative z-20">
                     <div class="bg-white p-2 rounded-2xl shadow-sm border border-slate-200 inline-flex gap-3">
-                        <button 
+                        <button
                             @click="switchTab('journal')"
                             class="flex items-center gap-2.5 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300"
-                            :class="activeTab === 'journal' 
-                                ? 'bg-[#99cc33] text-white shadow-md shadow-[#99cc33]/20' 
+                            :class="activeTab === 'journal'
+                                ? 'bg-[#99cc33] text-white shadow-md shadow-[#99cc33]/20'
                                 : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'"
                         >
                             <Library class="w-5 h-5" />
                             E-Journals
                         </button>
 
-                        <button 
+                        <button
                             @click="switchTab('ebook')"
                             class="flex items-center gap-2.5 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-300"
-                            :class="activeTab === 'ebook' 
-                                ? 'bg-blue-500 text-white shadow-md shadow-blue-500/20' 
+                            :class="activeTab === 'ebook'
+                                ? 'bg-blue-500 text-white shadow-md shadow-blue-500/20'
                                 : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'"
                         >
                             <Book class="w-5 h-5" />
@@ -187,9 +187,9 @@ const paginationLinks = computed(() => {
                     </span>
                 </div>
 
-                <TransitionGroup 
-                    tag="div" 
-                    class="space-y-6 mb-12"
+                <TransitionGroup
+                    tag="div"
+                    class="space-y-4 mb-8"
                     enter-active-class="transition ease-out duration-300"
                     enter-from-class="opacity-0 translate-y-6"
                     enter-to-class="opacity-100 translate-y-0"
@@ -198,14 +198,14 @@ const paginationLinks = computed(() => {
                     <div
                         v-for="item in journals.data"
                         :key="item.id"
-                        class="group relative bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-[#99cc33]/10 transition-all duration-300 hover:-translate-y-1 flex flex-col md:flex-row gap-8 items-start overflow-hidden"
+                        class="group relative bg-white rounded-2xl p-4 sm:p-5 border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-[#99cc33]/10 transition-all duration-300 hover:-translate-y-1 flex flex-col md:flex-row gap-4 items-start overflow-hidden"
                     >
                         <div class="absolute left-0 top-6 bottom-6 w-1.5 rounded-r-full transition-colors duration-300"
                              :class="activeTab === 'journal' ? 'bg-[#99cc33]' : 'bg-blue-500'">
                         </div>
 
-                        <div class="w-full md:w-32 flex-shrink-0">
-                            <div class="aspect-square w-32 h-32 rounded-2xl bg-slate-50 border border-slate-100 p-4 flex items-center justify-center group-hover:bg-white group-hover:border-[#99cc33]/30 transition-all duration-300">
+                        <div class="w-full md:w-24 flex-shrink-0">
+                            <div class="aspect-square w-24 h-24 rounded-2xl bg-slate-50 border border-slate-100 p-3 flex items-center justify-center group-hover:bg-white group-hover:border-[#99cc33]/30 transition-all duration-300">
                                 <img
                                     v-if="item.img_url"
                                     :src="item.img_url"
@@ -219,14 +219,14 @@ const paginationLinks = computed(() => {
                             </div>
                         </div>
 
-                        <div class="flex-1 flex flex-col h-full min-h-[128px]">
-                            
+                        <div class="flex-1 flex flex-col h-full min-h-[88px]">
+
                             <div class="flex-1">
-                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-                                    <h3 class="text-xl font-bold text-slate-800 group-hover:text-[#99cc33] transition-colors">
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                                    <h3 class="text-lg font-bold text-slate-800 group-hover:text-[#99cc33] transition-colors">
                                         {{ item.name }}
                                     </h3>
-                                    
+
                                     <span class="inline-flex w-fit items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wide border"
                                         :class="activeTab === 'journal' ? 'bg-[#99cc33]/5 text-[#7da62b] border-[#99cc33]/20' : 'bg-blue-50 text-blue-600 border-blue-100'">
                                         <Sparkles class="w-3.5 h-3.5" />
@@ -234,10 +234,10 @@ const paginationLinks = computed(() => {
                                     </span>
                                 </div>
 
-                                <div class="mb-5 text-slate-600 text-base leading-relaxed space-y-2">
+                                <div class="mb-3 text-slate-600 text-sm leading-snug space-y-1">
                                     <template v-for="(block, idx) in parseDescription(item.description)" :key="idx">
                                         <div v-if="block.type === 'list'" class="flex items-start gap-2 pl-2">
-                                            <span class="mt-2 w-1.5 h-1.5 rounded-full shrink-0" 
+                                            <span class="mt-1 w-1.5 h-1.5 rounded-full shrink-0"
                                                   :class="activeTab === 'journal' ? 'bg-[#99cc33]' : 'bg-blue-500'">
                                             </span>
                                             <span>{{ block.content }}</span>
@@ -246,14 +246,14 @@ const paginationLinks = computed(() => {
                                     </template>
                                 </div>
 
-                                <div v-if="item.additional_links && item.additional_links.length > 0" class="mb-6 pt-3 border-t border-dashed border-slate-100">
+                                <div v-if="item.additional_links && item.additional_links.length > 0" class="mb-4 pt-2 border-t border-dashed border-slate-100">
                                     <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Link Terkait:</p>
                                     <div class="flex flex-wrap gap-3">
-                                        <a 
-                                            v-for="(link, lIdx) in item.additional_links" 
+                                        <a
+                                            v-for="(link, lIdx) in item.additional_links"
                                             :key="lIdx"
-                                            :href="link.url" 
-                                            target="_blank" 
+                                            :href="link.url"
+                                            target="_blank"
                                             class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 text-sm font-bold hover:bg-[#99cc33]/10 hover:border-[#99cc33]/50 hover:text-[#7da62b] transition-all group/link"
                                         >
                                             <Link2 class="w-3.5 h-3.5 opacity-50 group-hover/link:opacity-100" />
@@ -264,7 +264,7 @@ const paginationLinks = computed(() => {
                                 </div>
                             </div>
 
-                            <div class="pt-5 border-t border-slate-50 flex flex-wrap items-center justify-between gap-4">
+                            <div class="pt-3 border-t border-slate-50 flex flex-wrap items-center justify-between gap-3">
                                 <div class="flex items-center gap-2 text-sm font-medium text-slate-400">
                                     <Info class="w-4 h-4" />
                                     <span>Akses via IP Polban</span>
@@ -274,9 +274,9 @@ const paginationLinks = computed(() => {
                                     :href="item.url"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-white text-sm font-bold shadow-md transition-all duration-300 hover:shadow-lg transform active:scale-95"
-                                    :class="activeTab === 'journal' 
-                                        ? 'bg-[#99cc33] hover:bg-[#8ebf2f] shadow-[#99cc33]/20' 
+                                    class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-white text-sm font-bold shadow-md transition-all duration-300 hover:shadow-lg transform active:scale-95"
+                                    :class="activeTab === 'journal'
+                                        ? 'bg-[#99cc33] hover:bg-[#8ebf2f] shadow-[#99cc33]/20'
                                         : 'bg-blue-600 hover:bg-blue-700 shadow-blue-600/20'"
                                 >
                                     Buka Referensi Utama
@@ -287,7 +287,7 @@ const paginationLinks = computed(() => {
                     </div>
                 </TransitionGroup>
 
-                <div v-if="journals.data.length > 0" class="flex flex-col items-center justify-between gap-6 sm:flex-row border-t border-slate-200 pt-8 pb-12">
+                <div v-if="journals.data.length > 0" class="flex flex-col items-center justify-between gap-4 sm:flex-row border-t border-slate-200 pt-6 pb-8">
                     <div class="text-sm text-slate-500 font-medium bg-white px-4 py-2 rounded-full shadow-sm border border-slate-100">
                         Menampilkan <span class="text-[#99cc33] font-bold">{{ journals.from }}</span> - <span class="text-[#99cc33] font-bold">{{ journals.to }}</span> dari <span class="text-slate-800 font-bold">{{ journals.total }}</span> referensi
                     </div>
@@ -301,16 +301,16 @@ const paginationLinks = computed(() => {
                     </nav>
                 </div>
 
-                <div v-if="journals.data.length === 0" class="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-dashed border-slate-200">
-                    <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4">
-                        <Search class="w-10 h-10 text-slate-300" />
+                <div v-if="journals.data.length === 0" class="flex flex-col items-center justify-center py-12 bg-white rounded-2xl border border-dashed border-slate-200">
+                    <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-3">
+                        <Search class="w-8 h-8 text-slate-300" />
                     </div>
                     <h3 class="text-lg font-bold text-slate-800 mb-1">Tidak Ditemukan</h3>
-                    <p class="text-slate-500 mb-6">
+                    <p class="text-slate-500 mb-4">
                         Tidak ada data dengan kata kunci "<span class="font-bold">{{ searchQuery }}</span>".
                     </p>
-                    <button 
-                        @click="switchTab('journal')" 
+                    <button
+                        @click="switchTab('journal')"
                         class="text-sm font-bold hover:underline"
                         :class="activeTab === 'journal' ? 'text-[#99cc33]' : 'text-blue-600'"
                     >

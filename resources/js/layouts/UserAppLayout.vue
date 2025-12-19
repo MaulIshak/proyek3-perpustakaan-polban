@@ -32,7 +32,7 @@ defineProps<{
                     <div class="absolute inset-0 bg-black/50"></div>
 
                     <div
-                        class="relative z-10 container mx-auto px-4 py-16 sm:px-6 sm:py-20 lg:px-8"
+                        class="relative z-10 container mx-auto px-4 py-10 sm:px-6 sm:py-14 lg:px-8"
                     >
                         <ScrollReveal animation="slide-left" :duration="500">
                             <RemahanRoti

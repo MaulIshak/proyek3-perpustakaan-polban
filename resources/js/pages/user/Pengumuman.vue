@@ -97,7 +97,7 @@ const paginationLinks = computed(() => {
             <ScrollReveal
                 animation="zoom-in"
                 :duration="600"
-                class="relative z-20 mx-auto -mt-16 mb-12 max-w-4xl"
+                class="relative z-20 mx-auto -mt-16 mb-4 max-w-4xl"
             >
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-center">
                     <!-- Search -->

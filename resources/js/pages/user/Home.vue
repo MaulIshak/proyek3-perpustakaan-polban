@@ -50,11 +50,11 @@ const activeTab = ref('berita');
         :breadcrumb="breadcrumbs"
     >
         <section
-            class="relative min-h-[85vh] overflow-hidden px-4 pt-6 pb-24 sm:px-6 lg:px-8"
+            class="relative overflow-hidden pt-6 pb-4"
         >
             <div class="relative z-10 container mx-auto max-w-7xl">
                 <ScrollReveal animation="fade-up" :delay="100">
-                    <div class="mb-10">
+                    <div class="mb-4">
                         <div
                             class="grid grid-cols-3 gap-2 md:flex md:flex-wrap md:justify-center md:gap-3"
                         >
@@ -65,7 +65,7 @@ const activeTab = ref('berita');
                                 class="group relative overflow-hidden transition-all duration-300"
                                 :class="[
                                     // === STYLE MOBILE (Kotak Vertikal) ===
-                                    'flex h-20 flex-col items-center justify-center rounded-xl border px-1 py-3 shadow-sm',
+                                    'flex h-16 flex-col items-center justify-center rounded-xl border px-1 py-2 shadow-sm',
 
                                     // === STYLE DESKTOP (Pil Horizontal - Override Mobile) ===
                                     'md:h-auto md:flex-row md:gap-2 md:rounded-full md:px-6 md:py-3 md:shadow-sm',
@@ -103,7 +103,7 @@ const activeTab = ref('berita');
                     </div>
                 </ScrollReveal>
 
-                <div class="min-h-[400px]">
+                <div class="min-h-[240px]">
                     <transition name="fade-slide" mode="out-in">
                         <div v-if="activeTab === 'berita'" key="berita">
                             <ScrollReveal animation="fade-up" :duration="500">
