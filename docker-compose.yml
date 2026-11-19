@@ -39,7 +39,7 @@ services:
       - storage:/usr/share/nginx/html/storage:rw
       - public:/usr/share/nginx/html/public:ro
   db:
-    image: bitnami/postgresql
+    image: soldevelo/postgresql
     platform: linux/amd64
     ports:
       - 8989:5432
